@@ -7,7 +7,7 @@
 
 </div>
 
-##### a simple whatsapp bot written in JavaScript and using .
+#### a simple whatsapp bot written in JavaScript and using .
 
 ## Features
 
