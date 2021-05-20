@@ -1,0 +1,19 @@
+{
+  "name": "whatsapp-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Eyal Michon",
+  "license": "ISC",
+  "dependencies": {
+    "@open-wa/wa-automate": "^3.13.2",
+    "fetch": "^1.1.0",
+    "fs": "0.0.1-security",
+    "hjson": "^3.2.2",
+    "puppeteer": "^9.1.1",
+    "sharp": "^0.28.2"
+  }
+}
