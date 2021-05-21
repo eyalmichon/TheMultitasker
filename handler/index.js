@@ -103,7 +103,7 @@ async function redAlerts(client) {
             let response = await fetchWithTimeout(redAlertsURL, requestOptions, 4000);
             let length = await response.headers.get('content-length');
             if (length > 0) {
-                let data = await rawData.json();
+                let data = await response.json();
                 if (prevID != data.id && prevJson != prevJson) {
 
                     prevID = data.id;
@@ -123,10 +123,10 @@ async function redAlerts(client) {
                     // console.log(prevID, data.title, cities);
                     alert += "```בוט שומר החומות```";
 
-                    // // send to groups only alert without image.
-                    // senders["RedAlerts MessageOnly"].forEach(groupM => {
-                    //     client.sendText(groupM, alert);
-                    // })
+                    // send to groups only alert without image.
+                    senders["RedAlerts MessageOnly"].forEach(groupM => {
+                        client.sendText(groupM, alert);
+                    })
 
                     // only send an image if there is more than one city.
                     if (data.data.length > 1) {
@@ -134,17 +134,19 @@ async function redAlerts(client) {
                             const page = await browser.newPage();
                             page.setViewport({ width: 500, height: 500 });
                             let mapCpy = map.replace('LONG_LAT_AREA', getLongLat(data.data));
+                            // set contents of the page.
                             await page.setContent(mapCpy);
+                            // save image in base64.
                             var base64 = await page.screenshot({ encoding: "base64" });
-                            // send to all group memebers
-                            senders["Me"].forEach(async groupM => {
+                            // send to all group memebers.
+                            senders["RedAlerts"].forEach(async groupM => {
                                 await client.sendImage(groupM, `data:image/png;base64,${base64}`, '', alert);
                             });
                             await browser.close();
                         });
                     }
                     else {
-                        senders["Me"].forEach(groupM => {
+                        senders["RedAlerts"].forEach(groupM => {
                             client.sendText(groupM, alert);
                         });
                     }
@@ -163,8 +165,9 @@ async function redAlerts(client) {
 
 module.exports = msgHandler = async (client) => {
     await redAlerts(client);
-    // client.onAnyMessage(message => {
-    //     // // Cut message Cache if cache more than 3K
-    //     // client.getAmountOfLoadedMessages().then((msg) => (msg >= 3000) && client.cutMsgCache())
-    // });
+    client.onAnyMessage(message => {
+        // // Cut message Cache if cache more than 3K
+        client.getAmountOfLoadedMessages().then((msg) => (msg >= 3000) && client.cutMsgCache())
+
+    });
 }
