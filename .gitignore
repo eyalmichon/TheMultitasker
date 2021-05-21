@@ -14,6 +14,7 @@ secret
 *.txt
 *.data.json
 senders.hjson
+config.hjson
 
 # Runtime data
 pids

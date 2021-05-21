@@ -2,10 +2,13 @@ const fetch = require('node-fetch');
 const puppeteer = require('puppeteer');
 const fs = require("fs");
 var Hjson = require('hjson');
+const AbortController = require('abort-controller');
 
 // file for all senders sorted by use reason. should look something like this:
 // {"Me": "","RedAlerts MessageOnly": [],"RedAlerts":[]}
 var senders = Hjson.parse(fs.readFileSync(__dirname + '/senders.hjson', 'utf8'));
+// file for all configurations.
+var config = Hjson.parse(fs.readFileSync(__dirname + '/config.hjson', 'utf8'));
 var map = fs.readFileSync(__dirname + '/map.html', 'utf8');
 const json = require('./cities.json');
 
@@ -66,77 +69,91 @@ async function sleep(millis) {
     return new Promise(resolve => setTimeout(resolve, millis));
 }
 
+// use fetch function with a timeout so if it's stuck we can can abort it.
+async function fetchWithTimeout(url, requestOptions, timeout) {
+    const controller = new AbortController();
+    // add a timeout of 1 second for fetch
+    const id = setTimeout(() => controller.abort(), timeout);
+    // add signal object for requestOptions
+    requestOptions.signal = controller.signal
+
+    const response = await fetch(url, requestOptions);
+    clearTimeout(id);
+
+    return response;
+}
+
 async function redAlerts(client) {
     var activateRedAlerts = true;
     // ID for previous alert.
-    var prevID = 0;
-
+    let prevID = 0;
+    let prevJson = {};
     // site for fetching json data.
-    const redAlertsURL = 'https://www.tzevaadom.co.il/WarningMessages/Alert/alerts.json';
+    const redAlertsURL = config["RedAlertsURL"];
 
-    var requestOptions = {
+    let requestOptions = {
         method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Referer': 'https://www.oref.org.il/'
-        },
-        body: null
+        headers: config["RedAlertsRequestOptions"]
     };
 
 
     while (activateRedAlerts) {
         // fetch the json file from the official servers.
-        let rawData = await fetch(redAlertsURL, requestOptions);
         try {
+            let response = await fetchWithTimeout(redAlertsURL, requestOptions, 4000);
+            let length = await response.headers.get('content-length');
+            if (length > 0) {
+                let data = await rawData.json();
+                if (prevID != data.id && prevJson != prevJson) {
 
-            let data = await rawData.json();
-            if (prevID != data.id) {
+                    prevID = data.id;
+                    prevJson = data;
+                    let cities = findCities(data.data);
+                    let alert = "🔴 אזעקת צבע אדום:\n\n" + getDateTime() + "\n\n";
 
-                prevID = data.id;
-                let cities = findCities(data.data);
-                var alert = "🔴 אזעקת צבע אדום:\n\n" + getDateTime() + "\n\n";
+                    for (const [area, city] of Object.entries(cities)) {
+                        firstCity = json[city[0]];
+                        if (firstCity == undefined)
+                            continue;
+                        if (firstCity.countdown > 60)
+                            alert += "*• " + area + ":* " + city.join(', ') + " (" + firstCity.time + ")\n\n";
+                        else
+                            alert += "*• " + area + ":* " + city.join(', ') + " (" + firstCity.countdown + " שניות)\n\n";
+                    }
+                    // console.log(prevID, data.title, cities);
+                    alert += "```בוט שומר החומות```";
 
-                for (const [area, city] of Object.entries(cities)) {
-                    firstCity = json[city[0]];
-                    if (firstCity == undefined)
-                        continue;
-                    if (firstCity.countdown > 60)
-                        alert += "*• " + area + ":* " + city.join(', ') + " (" + firstCity.time + ")\n\n";
-                    else
-                        alert += "*• " + area + ":* " + city.join(', ') + " (" + firstCity.countdown + " שניות)\n\n";
-                }
-                // console.log(prevID, data.title, cities);
-                alert += "```בוט שומר החומות```";
+                    // // send to groups only alert without image.
+                    // senders["RedAlerts MessageOnly"].forEach(groupM => {
+                    //     client.sendText(groupM, alert);
+                    // })
 
-                // send to groups only alert without image.
-                senders["RedAlerts MessageOnly"].forEach(groupM => {
-                    client.sendText(groupM, alert);
-
-                })
-                // only send an image if there is more than one city.
-                if (data.data.length > 1) {
-                    puppeteer.launch().then(async browser => {
-                        const page = await browser.newPage();
-                        page.setViewport({ width: 500, height: 500 });
-                        let mapCpy = map.replace('LONG_LAT_AREA', getLongLat(data.data));
-                        await page.setContent(mapCpy);
-                        var base64 = await page.screenshot({ encoding: "base64" });
-                        // send to all group memebers
-                        senders["RedAlerts"].forEach(async groupM => {
-                            await client.sendImage(groupM, `data:image/png;base64,${base64}`, '', alert);
+                    // only send an image if there is more than one city.
+                    if (data.data.length > 1) {
+                        puppeteer.launch().then(async browser => {
+                            const page = await browser.newPage();
+                            page.setViewport({ width: 500, height: 500 });
+                            let mapCpy = map.replace('LONG_LAT_AREA', getLongLat(data.data));
+                            await page.setContent(mapCpy);
+                            var base64 = await page.screenshot({ encoding: "base64" });
+                            // send to all group memebers
+                            senders["Me"].forEach(async groupM => {
+                                await client.sendImage(groupM, `data:image/png;base64,${base64}`, '', alert);
+                            });
+                            await browser.close();
                         });
-                        await browser.close();
-                    });
-                }
-                else {
-                    senders["RedAlerts"].forEach(groupM => {
-                        client.sendText(groupM, alert);
-                    });
-                }
+                    }
+                    else {
+                        senders["Me"].forEach(groupM => {
+                            client.sendText(groupM, alert);
+                        });
+                    }
 
+                }
             }
+
         } catch (error) {
-            // console.log(error);
+            console.log('fetch timed out!\nError was: ' + error);
         }
 
         // sleep for 1 second between checking for alerts.
