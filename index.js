@@ -14,5 +14,11 @@ wa.create({
 }).then(client => start(client));
 
 async function start(client) {
-    msgHandler(client);
+    client.onAnyMessage(message => {
+        // // Cut message Cache if cache more than 3K
+        client.getAmountOfLoadedMessages().then((msg) => (msg >= 3000) && client.cutMsgCache())
+
+        // Message Handler
+        msgHandler(client, message);
+    });
 }
