@@ -14,6 +14,7 @@
 | (⌐■_■)☞|                Feature           |
 | :-----------: | :--------------------------------: |
 |       ✅       | Send Red Alerts 🚀 as message with (or without) location on GoogleMaps |
+|       ✅       | Owner can add and remove senders from sending groups (senders.json) straight from Whatsapp     |
 |              |     more to come...?          |
 <!-- |              |      | -->
 
@@ -26,7 +27,7 @@ then inside the project folder use the following command to install required pac
 ```
 npm install
 ```
-next, you'll need to create a sender file in [.hjson](https://hjson.github.io/) format (exactly the same as JSON but much better!) which you can use to save your group/private numbers safely without being part of the code.
+next, you'll need to create a sender file and a config file in [.hjson](https://hjson.github.io/) format (exactly the same as JSON but much better!) which you can use to save your group/private numbers and the URLs/Data for different functions safely without being part of the code.
 
 ## Running & Usage
 
