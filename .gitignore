@@ -9,11 +9,11 @@ lerna-debug.log*
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# secret files
+# private files
 secret
 *.txt
 *.data.json
-senders.hjson
+senders.json
 config.hjson
 
 # Runtime data
