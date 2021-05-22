@@ -27,7 +27,7 @@ then inside the project folder use the following command to install required pac
 ```
 npm install
 ```
-next, you'll need to create a sender file in json format and a config file in [.hjson](https://hjson.github.io/) format (exactly the same as JSON but much better!) which you can use to save your group/private numbers and the URLs/Data for different functions safely without being part of the code.
+next, you'll need to create a sender file in json format and a config file in [.hjson](https://hjson.github.io/) format (exactly the same as JSON but lets you add comments) which you can use to save your group/private numbers and the URLs/Data for different functions safely without being part of the code.
 
 ## Running & Usage
 
