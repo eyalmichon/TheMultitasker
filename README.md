@@ -7,7 +7,7 @@
 
 </div>
 
-#### a simple whatsapp bot written in JavaScript and using .
+#### a simple whatsapp bot written in JavaScript and using [wa-automate](https://github.com/open-wa/wa-automate-nodejs) for Node.js.
 
 ## Features
 
