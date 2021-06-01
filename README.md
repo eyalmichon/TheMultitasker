@@ -1,6 +1,6 @@
 <div align="center">
 
-# WhatsappBot
+# The Multitasker Bot
 
 ![forthebadge](https://img.shields.io/badge/Made%20with-Node.js-yellow)
 
@@ -21,7 +21,7 @@
 ## Installation
 clone the project:
 ```
-git clone https://github.com/eyalmichon/WhatsappBot.git
+git clone https://github.com/eyalmichon/TheMultitasker.git
 ```
 then inside the project folder use the following command to install required packages:
 ```
