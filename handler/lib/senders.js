@@ -7,11 +7,14 @@ class Senders {
         this.senders = JSON.parse(fs.readFileSync(sendersFileName, 'utf8'));
         this.sendersFileName = sendersFileName;
     }
+    // return the whole senders json object.
     getSenders() { return this.senders; }
+    // return a specific group from the json object.
+    getGroup(group) { return this.senders[group]; }
 
     // check if we got a correct number, this is the best we can do I guess...
     isCorrectNumber(num) {
-        return num.startsWith('972') && (num.endsWith('@c.us') || num.endsWith('@g.us') && (num.length === 17 || num.length === 28))
+        return num.startsWith('972') && (num.endsWith('@c.us') || num.endsWith('@g.us')) && (num.length === 17 || num.length === 28);
 
     }
 
