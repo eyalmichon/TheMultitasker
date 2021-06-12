@@ -64,7 +64,6 @@ Example senders.json:
 Example config.hjson:
 ```json
 {
-  {
     "RedAlertsURL":"https://www.tzevaadom.co.il/WarningMessages/Alert/alerts.json",
     "RedAlertsRequestOptions":{
         "X-Requested-With": "XMLHttpRequest",
