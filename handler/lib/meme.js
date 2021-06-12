@@ -7,12 +7,15 @@ const { fetchJson, fetchBase64 } = require('./fetcher')
  * @return  {Promise} Return meme from dankmemes, wholesomeanimemes, wholesomememes, MemeEconomy, memes, terriblefacebookmemes, historymemes
  */
 const random = () => new Promise((resolve, reject) => {
-    const subreddits = ['dankmemes', 'wholesomeanimemes', 'wholesomememes', 'MemeEconomy', 'memes', 'historymemes', 'ani_bm', 'okbuddyretard', '2meirl4meirl', 'PrequelMemes', 'me_irl']
+    const subreddits = ['dankmemes', 'surrealmemes', 'whitepeopletwitter', 'facepalm', 'funny'
+        , 'cursedcomments', 'blursedimages', 'bikinibottomtwitter', 'hmmm', 'memeeconomy', 'nukedmemes', 'nextfuckinglevel', 'memes', 'ani_bm'
+        , 'okbuddyretard', '2meirl4meirl', 'PrequelMemes', 'me_irl']
     const randSub = subreddits[Math.random() * subreddits.length | 0]
-    // console.log('looking for memes on ' + randSub)
+    console.log('looking for memes on ' + randSub)
     fetchJson('https://meme-api.herokuapp.com/gimme/' + randSub)
-        .then((result) => fetchBase64(result.url))
-        .then(result => resolve(result))
+        .then(async (result) => {
+            resolve({ image: await fetchBase64(result.url), title: result.title })
+        })
         .catch((err) => {
             console.error(err)
             reject(err)
