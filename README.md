@@ -19,11 +19,12 @@
 |       ✅       | Owner can add and remove senders from sending groups (senders.json) straight from Whatsapp.     |
 |       ✅       |     Create stickers from image 📷, video 🎥, gif 👾 or URL 🔗 just by sending them to the bot.          |
 |       ✅       |     Send a random message from a given group to your chat.          |
-|       ✅       |     Download content from Instagram straight to the chat          |
-|       ✅       |     Download videos from Twitter straight to the chat          |
-|       ✅      |     Get a random 🎲 meme from a set of subreddits you choose          |
-|       ✅       |     Kick 🦶 a participant or all participants from group          |
-|       ✅       |     Tag everyone in the group          |
+|       ✅       |     Download content from Instagram straight to the chat.          |
+|       ✅       |     Download videos from Twitter straight to the chat.          |
+|       ✅      |     Get a random 🎲 meme from a set of subreddits you choose.          |
+|       ✅       |     Kick 🦶 a participant or all participants from group.          |
+|       ✅       |     Tag everyone in the group.          |
+|       ✅      |     Get a list of names from a specific group.          |
 |              |     More to come...?          |
 <!-- |              |      | -->
 ## Dependencies
@@ -43,8 +44,34 @@ then inside the project folder use the following command to install required pac
 ```
 npm install
 ```
-next, you'll need to create a sender file in json format and a config file in [.hjson](https://hjson.github.io/) format (exactly the same as JSON but lets you add comments) which you can use to save your group/private numbers and the URLs/Data for different functions safely without being part of the code.
+next, you'll need to create a senders file in json format and a config file in [.hjson](https://hjson.github.io/) format (exactly the same as JSON but lets you add comments) which you can use to save your group/private numbers and the URLs/Data for different functions safely without being part of the code.
 
+Example senders.json:
+```json
+{
+  "Me": "",
+  "Allowed": [
+    ""
+  ],
+  "RedAlerts-MessageOnly": [
+    ""
+  ],
+  "RedAlerts": [
+    ""
+  ],
+}
+```
+Example config.hjson:
+```json
+{
+  {
+    "RedAlertsURL":"https://www.tzevaadom.co.il/WarningMessages/Alert/alerts.json",
+    "RedAlertsRequestOptions":{
+        "X-Requested-With": "XMLHttpRequest",
+        "Referer": "https://www.oref.org.il/"
+    }
+}
+```
 ## Running & Usage
 
 ```
