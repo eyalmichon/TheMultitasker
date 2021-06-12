@@ -90,7 +90,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-
 # managed
 **.data.json
 **.node-persist**
