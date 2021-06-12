@@ -1,17 +1,23 @@
 const { decryptMedia } = require('@open-wa/wa-automate');
-const fs = require('fs');
 const { downloader, meme, redAlerts, senders } = require('./lib');
-// const { Senders } = require('./lib/senders');
 const sendersFileName = __dirname + '/lib/util/senders.json';
 // Senders file object.
 const ourSenders = new senders.Senders(sendersFileName);
 
 // senders json object for all senders sorted by use case. should look something like this:
 // {"Me": "","RedAlerts-MessageOnly": [],"RedAlerts":[]}
-const _senders = () => { return ourSenders.getSenders(); }
+const getSenders = () => { return ourSenders.getSenders(); }
+const getGroup = (group) => { return ourSenders.getGroup(group); }
 
 function errLog(err) { console.log(err, '\n-------------------------------------------\n'); }
 
+async function getContactsObj(array, client) {
+    const promises = [];
+    array.forEach(item => {
+        promises.push(client.getContact(item))
+    })
+    return await Promise.all(promises);
+}
 // return true if in range, otherwise false
 function between(x, min, max) {
     return min < x && x <= max;
@@ -70,7 +76,7 @@ module.exports = msgHandler = async (client, message) => {
     // isn't in the allowed group AND it's not 'Me'). [if body doesn't start with prefix, we can make body =caption to see if it starts with prefix]
     if ((body === undefined || fromMe)
         || (!body.startsWith(prefix) && (caption === undefined || !(body = caption).startsWith(prefix)))
-        || ((!_senders()['Allowed'].includes(from) && _senders()['Me'] !== from))) return;
+        || ((!getGroup('Allowed').includes(from) && getGroup('Me') !== from))) return;
     // get the command from the body sent.
     const command = body.slice(1).trim().split(/ +/).shift().toLowerCase();
     // split the body content into args.
@@ -78,7 +84,7 @@ module.exports = msgHandler = async (client, message) => {
     // Bot's number.
     const botNumber = await client.getHostNumber() + '@c.us';
     // phone number of the owner of the bot, THIS NEEDS TO BE SET MANUALLY.
-    const botMaster = _senders()['Me'];
+    const botMaster = getGroup('Me');
     // if is a group message get the groups ID.
     const groupId = isGroupMsg ? chat.groupMetadata.id : '';
     // if is a group message get the group admins
@@ -151,7 +157,7 @@ module.exports = msgHandler = async (client, message) => {
                     else {
                         redAlerts.changeState(true);
                         await client.sendText(from, '🚨 Red Alerts has been *activated!*');
-                        redAlerts.alerts(client, _senders);
+                        redAlerts.alerts(client, getSenders);
                     }
                 }
                 if (args[0] === 'off') {
@@ -205,13 +211,13 @@ module.exports = msgHandler = async (client, message) => {
         case 'meme':
             if (args[0] !== undefined && botMaster === sender.id && between(args[0], 0, 10)) {
                 for (let i = 0; i < args[0]; i++) {
-                    let randomMeme64 = await meme.random();
-                    await client.sendImage(from, randomMeme64, '');
+                    let { image, title } = await meme.random();
+                    await client.sendImage(from, image, '', title);
                 }
             }
             else {
-                let randomMeme64 = await meme.random();
-                await client.sendImage(from, randomMeme64, '');
+                let { image, title } = await meme.random();
+                await client.sendImage(from, image, '', title);
             }
             break;
         // TO-DO custom meme.
@@ -290,11 +296,29 @@ module.exports = msgHandler = async (client, message) => {
             });
             break;
         case 'egg':
-            await forwardRandomMessageFromGroup(_senders()["ProjectEgg"], client, chatId);
+            await forwardRandomMessageFromGroup(getGroup("ProjectEgg"), client, chatId);
             break;
         case 'fart':
-            await forwardRandomMessageFromGroup(_senders()["Fartictionary"], client, chatId);
+            await forwardRandomMessageFromGroup(getGroup("Fartictionary"), client, chatId);
             break;
+
+        case 'membersof':
+            // only allows bot master to use 
+            if (botMaster !== sender.id) return client.reply(from, '📛 Failed, this command can only be used by the bot master!', id);
+            if (!ourSenders.isCorrectNumber(args[0])) return client.reply(from, '📛 Failed, number entered was incorrect.', id);
+            // gets all the phone numbers from a given group.
+            let membersNum = await client.getGroupMembersId(args[0]);
+            // get all the objects of user info.
+            let membersObj = await getContactsObj(membersNum, client);
+            // get all public shown names of the found numbers.
+            let memberNames = [];
+            membersObj.forEach(member => {
+                memberNames.push(member['pushname'] ? member['pushname'] : member['name'])
+            })
+            // send the list of names to the bot master.
+            await client.sendText(botMaster, memberNames.join(', '));
+            break;
+
         default:
             await client.reply(from, "Are you making up commands?\nUse !help for *real* available commands.", id);
 
