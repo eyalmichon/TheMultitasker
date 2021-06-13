@@ -1,6 +1,6 @@
 {
   "name": "the-multitasker",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,10 @@
   },
   "author": "Eyal Michon",
   "license": "ISC",
+  "engines": {
+    "node": "14.16.0",
+    "npm": "7.15.1"
+  },
   "dependencies": {
     "@open-wa/wa-automate": "^3.16.1",
     "abort-controller": "^3.0.0",
