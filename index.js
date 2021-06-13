@@ -8,11 +8,11 @@ wa.create({
     cacheEnabled: false,
     useChrome: true
     // run instead of chromium
-    // executablePath: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
 }).then(client => start(client));
 
 async function start(client) {
-    console.log('The Multitasker', '[Version 1.1.1]')
+    console.log('The Multitasker', '[Version 1.1.2]')
 
     // Force it to keep the current session
     client.onStateChanged((state) => {
