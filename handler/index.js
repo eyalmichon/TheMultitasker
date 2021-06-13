@@ -45,8 +45,8 @@ function isValidUrl(string) {
  * @returns Boolean
  */
 function isSocialNotValid(domain, link, quotedM) {
-    return (link === undefined || (!isValidUrl(link) && !link.includes(domain)))
-        && (quotedM === null || (!isValidUrl(link = quotedM.body) && !link.includes(domain)));
+    return (link === undefined || !isValidUrl(link) || !link.includes(domain))
+        && (quotedM === null || !isValidUrl(link = quotedM.body) || !link.includes(domain));
 }
 /**
  * Forward a random message from a given group.
@@ -93,7 +93,11 @@ module.exports = msgHandler = async (client, message) => {
     const isGroupAdmin = groupAdmins.includes(sender.id) || false;
     // if is a group message get the group members
     const groupMembers = isGroupMsg ? await client.getGroupMembersId(groupId) : '';
+    // save for easy reading.
     const link = args[0];
+    // get the quoted message if its not null.
+    let newMessage = quotedMsg || message;
+
 
 
     switch (command) {
@@ -175,14 +179,14 @@ module.exports = msgHandler = async (client, message) => {
             if (isValidUrl(link)) {
                 await client.reply(from, 'Please wait a moment while I do some magic... 🧙‍♂️', id);
                 let shouldCrop = args[1] === 'true' ? true : false;
-                await client.sendStickerfromUrl(chatId, link, null, { author: 'The Multitasker Bot', keepScale: !shouldCrop, pack: 'Stickers' });
+                // if sendStickerfromUrl returns false, means it's not an image/gif.
+                if (!(await client.sendStickerfromUrl(chatId, link, null, { author: 'The Multitasker Bot', keepScale: !shouldCrop, pack: 'Stickers' }))) { await client.reply(from, '📛 Not an image/gif', id); }
             }
             else
                 await client.reply(from, 'Are you sure this is a valid URL?\nSee !help url for more info.', id);
             break;
         case 's':
         case 'sticker':
-            let newMessage = quotedMsg || message;
             if (!newMessage.mimetype) return client.reply(from, '📛 Sorry, this is not the right way to use this command!\nSee !help for more details.', id)
             await client.reply(from, 'Please wait a moment while I do some magic... 🧙‍♂️', id);
             const mediaData = await decryptMedia(newMessage);
@@ -225,11 +229,11 @@ module.exports = msgHandler = async (client, message) => {
         case 'tagall':
             if (!isGroupMsg) return client.reply(from, '📛 Sorry, this command can only be used within a group!', id)
             if (!isGroupAdmin) return client.reply(from, '📛 Failed, this command can only be used by group admins!', id);
-            let mentionlist = '';
+            let mentionlist = [];
             groupMembers.forEach(member => {
-                if ((member !== sender.id) && (member !== botNumber)) mentionlist += `@${member.replace('@c.us', '')}`
+                if ((member !== sender.id) && (member !== botNumber)) mentionlist.push(`@${member.replace('@c.us', '')}`)
             });
-            await client.sendTextWithMentions(from, `${mentionlist}`);
+            await client.sendTextWithMentions(from, mentionlist.join(' '));
             break;
         case 'kick':
             if (!isGroupMsg) return client.reply(from, '📛 Sorry, this command can only be used within a group!', id)
@@ -250,7 +254,7 @@ module.exports = msgHandler = async (client, message) => {
         case 'insta':
         case 'instagram':
             // Return if link isn't valid.
-            if (isSocialNotValid('instagram.com', link, quotedMsg))
+            if (isSocialNotValid('instagram.com', link, newMessage))
                 return client.reply(from, 'Sorry, the link you sent is invalid.\nSee !help for more details.', id);
 
             await client.reply(from, '_I\'m on it! 🔨_', id)
@@ -260,10 +264,10 @@ module.exports = msgHandler = async (client, message) => {
                 data.forEach(item => {
                     // If there is a video key in the JSON, get the video.
                     if (item['video'] !== undefined)
-                        client.sendFileFromUrl(from, item['video'], 'video.mp4', '', null, null, true);
+                        client.sendFileFromUrl(from, item['video'], 'video.mp4', '', null, null, true).catch(err => { errLog(err) })
                     // Else if the requested item didn't have a video in it.
                     else
-                        client.sendFileFromUrl(from, item['image'], 'photo.jpg', '', null, null, true);
+                        client.sendFileFromUrl(from, item['image'], 'photo.jpg', '', null, null, true).catch(err => { errLog(err) });
                 })
             }).catch((err) => {
                 errLog(err);
@@ -275,7 +279,7 @@ module.exports = msgHandler = async (client, message) => {
         case 'tw':
         case 'twitter':
             // Return if link isn't valid.
-            if (isSocialNotValid('twitter.com', link, quotedMsg))
+            if (isSocialNotValid('twitter.com', link, newMessage))
                 return client.reply(from, 'Sorry, the link you sent is invalid.\nSee !help for more details.', id);
 
             await client.reply(from, '_I\'m on it! 🔨_', id)
@@ -318,7 +322,11 @@ module.exports = msgHandler = async (client, message) => {
             // send the list of names to the bot master.
             await client.sendText(botMaster, memberNames.join(', '));
             break;
-
+        // just in case you want to refresh the session.
+        case 'refresh':
+            if (botMaster !== sender.id) return client.reply(from, '📛 Failed, this command can only be used by the bot master!', id);
+            client.refresh();
+            break;
         default:
             await client.reply(from, "Are you making up commands?\nUse !help for *real* available commands.", id);
 
