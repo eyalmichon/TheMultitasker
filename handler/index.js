@@ -1,15 +1,19 @@
 const { decryptMedia } = require('@open-wa/wa-automate');
-const { downloader, meme, redAlerts, senders } = require('./lib');
+const { downloader, meme, redAlerts, fetcher, compile, senders, spam } = require('./lib');
+
 const sendersFileName = __dirname + '/lib/util/senders.json';
 // Senders file object.
 const ourSenders = new senders.Senders(sendersFileName);
-
-// senders json object for all senders sorted by use case. should look something like this:
-// {"Me": "","RedAlerts-MessageOnly": [],"RedAlerts":[]}
+// senders json object for all senders sorted by use case.
 const getSenders = () => { return ourSenders.getSenders(); }
+// Get a specific group.
 const getGroup = (group) => { return ourSenders.getGroup(group); }
+// a spam map to filter out the spammers.
+const spamSet = new spam.Spam();
+// a spam map to filter out the spammers for social fetching services.
+const socialSpam = new spam.Spam();
 
-function errLog(err) { console.log(err, '\n-------------------------------------------\n'); }
+function errLog(err) { console.error(err, '\n'); }
 
 async function getContactsObj(array, client) {
     const promises = [];
@@ -18,24 +22,22 @@ async function getContactsObj(array, client) {
     })
     return await Promise.all(promises);
 }
-// return true if in range, otherwise false
-function between(x, min, max) {
-    return min < x && x <= max;
-}
+
 /**
     * Checks if the given URL is valid.
     * @param string The URL we are checking for validity.
     * @returns true if valid, otherwise false.
     */
-function isValidUrl(string) {
+function isValidUrl(string, domain) {
     let url;
     try {
         url = new URL(string);
     } catch (err) {
         return false;
     }
-
-    return url.protocol === "http:" || url.protocol === "https:";
+    if (url.hostname.includes('www.')) { url.hostname = url.hostname.slice(4) }
+    domain = domain ? domain : url.hostname;
+    return (url.protocol === "http:" || url.protocol === "https:") && domain === url.hostname;
 }
 /**
  * Check if the given link is invalid in either the first argument (link), or in the quoted message.
@@ -45,8 +47,8 @@ function isValidUrl(string) {
  * @returns Boolean
  */
 function isSocialNotValid(domain, link, quotedM) {
-    return (link === undefined || !isValidUrl(link) || !link.includes(domain))
-        && (quotedM === null || !isValidUrl(link = quotedM.body) || !link.includes(domain));
+    return (link === undefined || !isValidUrl(link, domain))
+        && (quotedM === null || !isValidUrl(link = quotedM.body, domain));
 }
 /**
  * Forward a random message from a given group.
@@ -72,11 +74,14 @@ module.exports = msgHandler = async (client, message) => {
     // bot's prefix.
     const prefix = '!';
 
-    // Return if message is from bot or if its body is undefined or is not a command, or the caption is not a command or (if the chatID
+    // Return if spam or message is from bot or if its body is undefined or is not a command, or the caption is not a command or (if the chatID
     // isn't in the allowed group AND it's not 'Me'). [if body doesn't start with prefix, we can make body =caption to see if it starts with prefix]
-    if ((body === undefined || fromMe)
+    if (spamSet.isSpam(sender.id)
+        || (body === undefined || fromMe)
         || (!body.startsWith(prefix) && (caption === undefined || !(body = caption).startsWith(prefix)))
         || ((!getGroup('Allowed').includes(from) && getGroup('Me') !== from))) return;
+    spamSet.addUser(sender.id);
+
     // get the command from the body sent.
     const command = body.slice(1).trim().split(/ +/).shift().toLowerCase();
     // split the body content into args.
@@ -93,18 +98,17 @@ module.exports = msgHandler = async (client, message) => {
     const isGroupAdmin = groupAdmins.includes(sender.id) || false;
     // if is a group message get the group members
     const groupMembers = isGroupMsg ? await client.getGroupMembersId(groupId) : '';
-    // save for easy reading.
-    const link = args[0];
+    // save for easy access.
+    let link = (quotedMsg != null) ? quotedMsg.body : args[0];
     // get the quoted message if its not null.
     let newMessage = quotedMsg || message;
-
 
 
     switch (command) {
         case 'help':
         case 'commands':
             if (args[0] === undefined)
-                await client.reply(from, '*Available commands:* url, sticker, meme, everyone, kick, instagram, twitter, egg, fart.\nSend "!help [command]" for command info.', id);
+                await client.reply(from, '*Available commands:* url, sticker, meme, everyone, kick, instagram, twitter, compile, egg, fart.\nSend "!help [command]" for command info.', id);
             else
                 switch (args[0]) {
                     case 'url':
@@ -127,6 +131,9 @@ module.exports = msgHandler = async (client, message) => {
                     case 'tw':
                     case 'twitter':
                         await client.reply(from, '*Usage:* reply with !twitter to a twitter video link or send !twitter [tweet with video link].\naliases: [twitter, tw]', id);
+                        break;
+                    case 'compile':
+                        await client.reply(from, '*Usage:* !compile [language] [code]\n*Available languages:* c ,cpp ,c# ,rill ,erlang ,elixir ,haskell ,d ,java ,rust ,python ,python2.7 ,ruby ,scala ,groovy ,nodejs ,nodejs14 ,coffeescript ,spidermonkey ,swift ,perl ,php ,lua ,sql ,pascal ,lisp ,lazyk ,vim ,pypy ,ocaml ,go ,bash ,pony ,crystal ,nim ,openssl ,f# ,r ,typescript ,julia', id);
                         break;
                     case 'egg':
                         await client.reply(from, '*Usage:* !egg and you\'ll get an 🥚\nHAPPY EGGING!', id);
@@ -177,7 +184,9 @@ module.exports = msgHandler = async (client, message) => {
             break;
         case 'url':
             if (isValidUrl(link)) {
-                await client.reply(from, 'Please wait a moment while I do some magic... 🧙‍♂️', id);
+
+                if (await fetcher.fetchHead(link) === 'CONTENT-TOO-LARGE') return await client.reply(from, '📛 Sorry, the file you\'re trying to get is too large to handle...', id);
+                await client.reply(from, '🧙‍♂️ Please wait a moment while I do some magic...', id);
                 let shouldCrop = args[1] === 'true' ? true : false;
                 // if sendStickerfromUrl returns false, means it's not an image/gif.
                 if (!(await client.sendStickerfromUrl(chatId, link, null, { author: 'The Multitasker Bot', keepScale: !shouldCrop, pack: 'Stickers' }))) { await client.reply(from, '📛 Not an image/gif', id); }
@@ -188,7 +197,7 @@ module.exports = msgHandler = async (client, message) => {
         case 's':
         case 'sticker':
             if (!newMessage.mimetype) return client.reply(from, '📛 Sorry, this is not the right way to use this command!\nSee !help for more details.', id)
-            await client.reply(from, 'Please wait a moment while I do some magic... 🧙‍♂️', id);
+            await client.reply(from, '🧙‍♂️ Please wait a moment while I do some magic...', id);
             const mediaData = await decryptMedia(newMessage);
             const Base64 = `data:${newMessage.mimetype};base64,${mediaData.toString('base64')}`;
             let shouldCrop = args[0] === 'true' ? true : false;
@@ -203,7 +212,8 @@ module.exports = msgHandler = async (client, message) => {
                 case 'video/mp4':
                     await client.sendMp4AsSticker(from, Base64, { crop: shouldCrop }, { author: 'The Multitasker Bot', pack: 'Stickers' })
                         .catch(err => {
-                            errLog(err);
+                            errLog(`${err.name} ${err.message}`);
+                            if (err.code === 'ERR_FR_MAX_BODY_LENGTH_EXCEEDED') return client.reply(from, '📛 There was an error processing your sticker.\nThe image/video was too large.', id);
                             client.reply(from, '📛 There was an error processing your sticker.\nMaybe try to edit the length and resend.', id);
                         });
                     break;
@@ -213,7 +223,10 @@ module.exports = msgHandler = async (client, message) => {
             break;
 
         case 'meme':
-            if (args[0] !== undefined && botMaster === sender.id && between(args[0], 0, 10)) {
+            if (socialSpam.isSpam(sender.id)) return client.reply(from, '📛 Sorry, I don\'t like spammers!', id);
+            // add to social spam map for 5 seconds.
+            socialSpam.addUser(sender.id, 5000);
+            if (args[0] !== undefined && botMaster === sender.id && 0 < args[0] && args[0] <= 10) {
                 for (let i = 0; i < args[0]; i++) {
                     let { image, title } = await meme.random();
                     await client.sendImage(from, image, '', title);
@@ -227,7 +240,7 @@ module.exports = msgHandler = async (client, message) => {
         // TO-DO custom meme.
         case 'everyone':
         case 'tagall':
-            if (!isGroupMsg) return client.reply(from, '📛 Sorry, this command can only be used within a group!', id)
+            if (!isGroupMsg) return client.reply(from, '📛 Sorry, this command can only be used within a group!', id);
             if (!isGroupAdmin) return client.reply(from, '📛 Failed, this command can only be used by group admins!', id);
             let mentionlist = [];
             groupMembers.forEach(member => {
@@ -253,58 +266,48 @@ module.exports = msgHandler = async (client, message) => {
         case 'ig':
         case 'insta':
         case 'instagram':
+            if (socialSpam.isSpam(sender.id)) return client.reply(from, '📛 Sorry, I don\'t like spammers!', id);
+            // add to social spam map for 20 seconds.
+            socialSpam.addUser(sender.id, 20000);
             // Return if link isn't valid.
             if (isSocialNotValid('instagram.com', link, newMessage))
-                return client.reply(from, 'Sorry, the link you sent is invalid.\nSee !help for more details.', id);
+                return client.reply(from, '📛 Sorry, the link you sent is invalid.\nSee !help for more details.', id);
 
             await client.reply(from, '_I\'m on it! 🔨_', id)
             // Get videos/images from link.
-            downloader.insta(link).then(async (data) => {
+            downloader.insta(link).then(async (linkList) => {
                 // Then go over the returned list of videos/images.
-                data.forEach(item => {
-                    // If there is a video key in the JSON, get the video.
-                    if (item['video'] !== undefined)
-                        client.sendFileFromUrl(from, item['video'], 'video.mp4', '', null, null, true).catch(err => { errLog(err) })
-                    // Else if the requested item didn't have a video in it.
-                    else
-                        client.sendFileFromUrl(from, item['image'], 'photo.jpg', '', null, null, true).catch(err => { errLog(err) });
+                linkList.forEach(async item => {
+                    client.sendFileFromUrl(from, item, '', '', null, null, true);
                 })
             }).catch((err) => {
-                errLog(err);
-                if (err === 'Not a video') { return client.reply(from, 'Error, there was no video in the link you sent.', id) }
-                client.reply(from, 'Error, private user or wrong link', id)
+                errLog(`${err.name} ${err.message}`);
+                if (err.message === 'Not Found instagram') { return client.reply(from, '📛 Error, the link you sent was invalid.', id) }
+                client.reply(from, '📛 Error, private user or wrong link', id)
             })
             break;
 
+
         case 'tw':
         case 'twitter':
+            if (socialSpam.isSpam(sender.id)) return client.reply(from, '📛 Sorry, I don\'t like spammers!', id);
+            // add to social spam map for 20 seconds.
+            socialSpam.addUser(sender.id, 20000);
             // Return if link isn't valid.
             if (isSocialNotValid('twitter.com', link, newMessage))
                 return client.reply(from, 'Sorry, the link you sent is invalid.\nSee !help for more details.', id);
 
             await client.reply(from, '_I\'m on it! 🔨_', id)
             // Get videos/images from link.
-            downloader.tweet(link).then(async (data) => {
-                let bitrate = 0;
-                // Then go over the returned list of videos and find the max bitrate video.
-                data.forEach(item => {
-                    if (item['bitrate'] !== undefined && bitrate < item['bitrate']) {
-                        bitrate = item['bitrate'];
-                        link = item['url'];
-                    }
-                });
-                await client.sendFileFromUrl(from, link, 'video.mp4', '', null, null, true);
+            downloader.tweet(link).then(async (result) => {
+                if (await fetcher.fetchHead(result) === 'CONTENT-TOO-LARGE') return await client.reply(from, '📛 Sorry, the file you\'re trying to get is too large to handle...', id);
+                await client.sendFileFromUrl(from, result, 'video.mp4', '', null, null, true);
             }).catch((err) => {
                 errLog(err);
                 client.reply(from, 'Error, private user, wrong link or not a video.', id)
             });
             break;
-        case 'egg':
-            await forwardRandomMessageFromGroup(getGroup("ProjectEgg"), client, chatId);
-            break;
-        case 'fart':
-            await forwardRandomMessageFromGroup(getGroup("Fartictionary"), client, chatId);
-            break;
+
 
         case 'membersof':
             // only allows bot master to use 
@@ -322,6 +325,20 @@ module.exports = msgHandler = async (client, message) => {
             // send the list of names to the bot master.
             await client.sendText(botMaster, memberNames.join(', '));
             break;
+
+        case 'compile':
+            let compiler = args.shift();
+            let code = args.join(' ');
+            let result = await compile.compile(compiler, code);
+
+            await client.reply(from, result, id);
+            break;
+        case 'egg':
+            await forwardRandomMessageFromGroup(getGroup("ProjectEgg"), client, chatId);
+            break;
+        case 'fart':
+            await forwardRandomMessageFromGroup(getGroup("Fartictionary"), client, chatId);
+            break;
         // just in case you want to refresh the session.
         case 'refresh':
             if (botMaster !== sender.id) return client.reply(from, '📛 Failed, this command can only be used by the bot master!', id);
@@ -332,5 +349,4 @@ module.exports = msgHandler = async (client, message) => {
 
             break;
     }
-
 }
