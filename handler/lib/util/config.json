@@ -1,0 +1,7 @@
+{
+  "RedAlertsURL": "https://www.tzevaadom.co.il/WarningMessages/Alert/alerts.json",
+  "RedAlertsRequestOptions": {
+    "X-Requested-With": "XMLHttpRequest",
+    "Referer": "https://www.oref.org.il/"
+  }
+}
