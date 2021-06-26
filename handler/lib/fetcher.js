@@ -1,4 +1,4 @@
-const fetch = require('node-fetch')
+const fetch = require('node-fetch');
 const AbortController = require('abort-controller');
 /**
  *Fetch Json from Url
@@ -17,6 +17,17 @@ const fetchJson = (url, options) =>
             })
     )
 
+const fetchHead = (url) => {
+    return fetch(url, { method: 'HEAD' })
+        .then(response => {
+            // return error if more than 30MB
+            if (response.headers.get('content-length') > 31457280) return 'CONTENT-TOO-LARGE';
+            else return true;
+        }).catch(err=>{
+            console.error(err)
+            return 'NO-CONTENT-LENGTH';
+        })
+}
 /**
  * Fetch Text from Url
  *
@@ -26,7 +37,9 @@ const fetchJson = (url, options) =>
 const fetchText = (url, options) => {
     return new Promise((resolve, reject) => {
         return fetch(url, options)
-            .then(response => response.text())
+            .then(response => {
+                response.text()
+            })
             .then(text => resolve(text))
             .catch(err => {
                 console.error(err)
@@ -81,5 +94,6 @@ module.exports = {
     fetchJson,
     fetchText,
     fetchBase64,
-    fetchWithTimeout
+    fetchWithTimeout,
+    fetchHead
 }
