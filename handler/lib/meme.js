@@ -8,7 +8,7 @@ const { fetchJson, fetchBase64 } = require('./fetcher')
  */
 const random = () => new Promise((resolve, reject) => {
     const subreddits = ['dankmemes', 'surrealmemes', 'whitepeopletwitter', 'facepalm', 'funny'
-        , 'cursedcomments', 'blursedimages', 'bikinibottomtwitter', 'hmmm', 'memeeconomy', 'nukedmemes', 'nextfuckinglevel', 'memes', 'ani_bm'
+        , 'cursedcomments', 'blursedimages', 'bikinibottomtwitter', 'hmmm', 'memeeconomy', 'nukedmemes', 'memes', 'ani_bm'
         , 'okbuddyretard', '2meirl4meirl', 'PrequelMemes', 'me_irl']
     const randSub = subreddits[Math.random() * subreddits.length | 0]
     console.log('looking for memes on ' + randSub)
