@@ -1,9 +1,7 @@
 const { fetchWithTimeout } = require('./fetcher')
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const Hjson = require('hjson');
-// file for all configurations.
-const config = Hjson.parse(fs.readFileSync(__dirname + '/util/config.hjson', 'utf8'));
+const config = require('./util/config.json');
 const json = require('./util/cities.json');
 
 var map = fs.readFileSync(__dirname + '/util/map.html', 'utf8');
