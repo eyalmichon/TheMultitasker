@@ -30,6 +30,7 @@
 <!-- |              |      | -->
 ## Dependencies
 - [node.js](https://nodejs.org/en/download/) v14.16.0
+- [npm]() v7.15.1
 - [wa-automate](https://github.com/open-wa/wa-automate-nodejs) v3.16.1
 - [AbortController](https://github.com/mysticatea/abort-controller#readme) v3.0.0
 - [puppeteer](https://github.com/puppeteer/puppeteer#readme) v9.1.1
