@@ -5,7 +5,6 @@
 ##### A WhatsApp bot written in JavaScript and Node.js.
 
 ![forthebadge](https://img.shields.io/badge/Made%20with-Node.js-green)
-![forthebadge](https://img.shields.io/badge/Made%20with-🥚-blue)
 
 
 </div>
@@ -25,13 +24,14 @@
 |       ✅       |     Kick 🦶 a participant or all participants from group.          |
 |       ✅       |     Tag everyone in the group.          |
 |       ✅      |     Get a list of names from a specific group.          |
+|       ✅      |     Compile 👨‍💻 and get output from many languages like Python 🐍, C, Java, etc....          |
+|       ✅      |     Simple spam ⛔ detector          |
 |              |     More to come...?          |
 <!-- |              |      | -->
 ## Dependencies
 - [node.js](https://nodejs.org/en/download/) v14.16.0
 - [wa-automate](https://github.com/open-wa/wa-automate-nodejs) v3.16.1
 - [AbortController](https://github.com/mysticatea/abort-controller#readme) v3.0.0
-- [hjson](https://hjson.github.io/) v3.2.2
 - [puppeteer](https://github.com/puppeteer/puppeteer#readme) v9.1.1
 - [video-url-link](https://github.com/catcto/video-url-link#readme) v0.1.4
 
@@ -44,7 +44,7 @@ then inside the project folder use the following command to install required pac
 ```
 npm install
 ```
-next, you'll need to create a senders file in json format and a config file in [.hjson](https://hjson.github.io/) format (exactly the same as JSON but lets you add comments) which you can use to save your group/private numbers and the URLs/Data for different functions safely without being part of the code.
+next, you'll need to create a senders file in json format which you can use to save your group/private numbers for different functions safely without being part of the code.
 
 Example senders.json:
 ```json
@@ -61,16 +61,7 @@ Example senders.json:
   ],
 }
 ```
-Example config.hjson:
-```json
-{
-    "RedAlertsURL":"https://www.tzevaadom.co.il/WarningMessages/Alert/alerts.json",
-    "RedAlertsRequestOptions":{
-        "X-Requested-With": "XMLHttpRequest",
-        "Referer": "https://www.oref.org.il/"
-    }
-}
-```
+
 ## Running & Usage
 
 ```
