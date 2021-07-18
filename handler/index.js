@@ -120,7 +120,7 @@ module.exports = msgHandler = async (client, message) => {
         case 'help':
         case 'commands':
             if (args[0] === undefined)
-                await client.reply(from, `${b('Available commands:')}\n${m('url, sticker, meme, reddit, instagram, twitter, tiktok, youtube, compile, covid, egg, fart.')}\n${b('Admin commands:')}\n${m('everyone, kick.')}\n${b('More info:')}\n${m('Send "' + prefix + 'help [command]" for command info.')}`, id);
+                await client.reply(from, `${b('Available commands:')}\n${m('url, sticker, meme, reddit, instagram, twitter, tiktok, youtube, youtubemp3, compile, covid, egg, fart.')}\n${b('Admin commands:')}\n${m('everyone, kick.')}\n${b('More info:')}\n${m('Send "' + prefix + 'help [command]" for command info.')}`, id);
             else
                 switch (args[0]) {
                     case 'url':
