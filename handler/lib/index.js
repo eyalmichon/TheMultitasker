@@ -4,4 +4,6 @@ exports.redAlerts = require('./redAlerts');
 exports.senders = require('./util/senders');
 exports.fetcher = require('./fetcher');
 exports.compile = require('./compile');
+exports.corona = require('./corona');
 exports.spam = require('./util/spam');
+exports.converter = require('./converter');
