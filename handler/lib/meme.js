@@ -1,26 +1,11 @@
-const { fetchJson, fetchBase64 } = require('./fetcher')
+const { fetchBase64, fetchHead, MAX_SIZE_ALLOWED } = require('./fetcher')
+const { getFileSize } = require('./converter')
+const reddit = require('./reddit');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(ffmpegPath);
 
-/**
- * Get meme from a random subreddit
- *
- * @param  {String} subreddit
- * @return  {Promise} Return meme from dankmemes, wholesomeanimemes, wholesomememes, MemeEconomy, memes, terriblefacebookmemes, historymemes
- */
-const random = () => new Promise((resolve, reject) => {
-    const subreddits = ['dankmemes', 'surrealmemes', 'whitepeopletwitter', 'facepalm', 'funny'
-        , 'cursedcomments', 'blursedimages', 'bikinibottomtwitter', 'hmmm', 'memeeconomy', 'nukedmemes', 'memes', 'ani_bm'
-        , 'okbuddyretard', '2meirl4meirl', 'PrequelMemes', 'me_irl']
-    const randSub = subreddits[Math.random() * subreddits.length | 0]
-    console.log('looking for memes on ' + randSub)
-    fetchJson('https://meme-api.herokuapp.com/gimme/' + randSub)
-        .then(async (result) => {
-            resolve({ image: await fetchBase64(result.url), title: result.title })
-        })
-        .catch((err) => {
-            console.error(err)
-            reject(err)
-        })
-})
+const subreddits = reddit.subreddits;
 
 /**
  * Create custom meme
@@ -28,7 +13,7 @@ const random = () => new Promise((resolve, reject) => {
  * @param  {String} topText Text on top.
  * @param  {String} bottomText Text on bottom.
  */
-const custom = async (imageUrl, top, bottom) => new Promise((resolve, reject) => {
+const custom = (imageUrl, top, bottom) => new Promise((resolve, reject) => {
     topText = top.trim().replace(/\s/g, '_').replace(/\?/g, '~q').replace(/\%/g, '~p').replace(/\#/g, '~h').replace(/\//g, '~s')
     bottomText = bottom.trim().replace(/\s/g, '_').replace(/\?/g, '~q').replace(/\%/g, '~p').replace(/\#/g, '~h').replace(/\//g, '~s')
     fetchBase64(`https://api.memegen.link/images/custom/${topText}/${bottomText}.png?background=${imageUrl}`, 'image/png')
@@ -39,7 +24,81 @@ const custom = async (imageUrl, top, bottom) => new Promise((resolve, reject) =>
         })
 })
 
+/**
+ * Get a post from a random subreddit
+ *
+ * @returns {Promise} Promise of {type, title, url}
+ * @returns {Promise} Promise of {type, title, path} if type === 'video'
+ */
+const randomRedditPost = () => new Promise(async (resolve, reject) => {
+    reddit.randomPost().then(res => {
+        switch (res.type) {
+            case 'video':
+                if (getFileSize(res.path) > MAX_SIZE_ALLOWED) return resolve(randomRedditPost());
+                break;
+            case 'image/gif':
+                if (fetchHead(res.url) === 'CONTENT_TOO_LARGE') return resolve(randomRedditPost());
+                break;
+            // not yet supported...
+            case 'gfycat':
+            case undefined:
+                return resolve(randomRedditPost());
+            default:
+                break;
+        }
+        resolve(res);
+    }).catch(err => {
+        console.error(err)
+        reject(err);
+    })
+
+});
+/**
+ * Get a post from a specific subreddit
+ *
+ * @returns {Promise} Promise of {type, title, url}
+ * @returns {Promise} Promise of {type, title, path} if type === 'video'
+ */
+const subRedditPost = (sub) => new Promise(async (resolve, reject) => {
+    reddit.postFromSub(sub).then(res => {
+        switch (res.type) {
+            case 'video':
+                if (getFileSize(res.path) > MAX_SIZE_ALLOWED) return resolve(subRedditPost(sub));
+                break;
+            case 'image/gif':
+                if (fetchHead(res.url) === 'CONTENT_TOO_LARGE') return resolve(subRedditPost(sub));
+                break;
+            // not yet supported...
+            case 'gfycat':
+                return resolve(subRedditPost(sub));
+            case undefined:
+                throw 'NO_MEDIA';
+            default:
+                break;
+        }
+        resolve(res);
+    }).catch(err => {
+        reject(err);
+    })
+})
+/**
+ * Get a meme/image from a random subreddit
+ *
+ * @return  {Promise} Return a random image post. {title, url}
+ */
+const randomRedditImg = () => reddit.randomImg();
+/**
+ * Get a meme/image from a specific subreddit
+ *
+ * @return  {Promise} Return an image post. {title, url}
+ */
+const subRedditImg = (sub) => reddit.imgFromSub(sub);
+
 module.exports = {
-    random,
-    custom
+    randomRedditImg,
+    randomRedditPost,
+    subRedditImg,
+    subRedditPost,
+    custom,
+    subreddits
 }
