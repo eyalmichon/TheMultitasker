@@ -3,5 +3,14 @@
   "RedAlertsRequestOptions": {
     "X-Requested-With": "XMLHttpRequest",
     "Referer": "https://www.oref.org.il/"
+  },
+  "CoronaURL": "https://datadashboardapi.health.gov.il/api/queries/_batch",
+  "CoronaOptions": {
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "referrer": "https://datadashboard.health.gov.il/",
+    "body": "{\"requests\":[{\"id\":\"1\",\"queryName\":\"infectedPerDate\",\"single\":false,\"parameters\":{}},{\"id\":\"3\",\"queryName\":\"sickPerDateTwoDays\",\"single\":false,\"parameters\":{}}]}"
   }
 }
