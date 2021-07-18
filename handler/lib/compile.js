@@ -51,27 +51,27 @@ const options = {
     headers: { 'content-type': 'application/json' }
 }
 
-const compile = (lang, code) =>
-    new Promise((resolve, reject) => {
+const compile = (lang, code) => new Promise((resolve, reject) => {
     if (!compilers.hasOwnProperty(lang)) return resolve('📛 Wrong compiler used, please see \'!help compile\' for a list of available compilers.');
     else if (!code) { return resolve('😶 Why did you send an empty code? 😒') }
+
     let compiler = compilers[lang];
-    code = code.replace(/[‘’]/g,'\'').replace(/[“”]/g,'\"');
+    code = code.replace(/[‘’]/g, '\'').replace(/[“”]/g, '\"');
     options.body = {
         code: code,
         compiler: compiler
     }
-        request(options, (error, response, body) => {
-            if (error) {
-                console.error('Request has failed!\nReason:', error);
-                return resolve('🌐 Server error has occurred!, this has nothing to do with me...');
-            }
-            if (body.compiler_error) { resolve(body.compiler_error) }
-            else if (body.program_error) { resolve(body.program_error) }
-            else if (!body.program_message) { resolve('😶 The output was empty, so here\'s a unicorn 🦄') }
-            else { resolve(body.program_message) }
-        });
+    request(options, (error, response, body) => {
+        if (error) {
+            console.error('Request has failed!\nReason:', error);
+            return resolve('🌐 Server error has occurred!, this has nothing to do with me...');
+        }
+        if (body.compiler_error) { resolve(body.compiler_error) }
+        else if (body.program_error) { resolve(body.program_error) }
+        else if (!body.program_message) { resolve('😶 The output was empty, so here\'s a unicorn 🦄') }
+        else { resolve(body.program_message) }
     });
+});
 
 
 
