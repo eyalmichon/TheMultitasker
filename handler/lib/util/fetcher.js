@@ -35,7 +35,7 @@ const fetchJson = (url, options) =>
 const fetchHead = (url) => {
     return fetch(url, { method: 'HEAD' })
         .then(response => {
-            // return error if more than 45MB
+            // return error if more than MAX_SIZE_ALLOWED MB
             if (response.headers.get('content-length') > MAX_SIZE_ALLOWED) return 'CONTENT_TOO_LARGE';
             else return 'OK';
         }).catch(err => {
@@ -49,19 +49,16 @@ const fetchHead = (url) => {
  * @param {String} url
  * @param {Object} options
  */
-const fetchText = (url, options) => {
-    return new Promise((resolve, reject) => {
-        return fetch(url, options)
-            .then(response => {
-                response.text()
-            })
-            .then(text => resolve(text))
-            .catch(err => {
-                console.error(err)
-                reject(err)
-            })
-    })
-}
+const fetchText = (url, options) => new Promise((resolve, reject) => {
+    fetch(url, options)
+        .then(response => response.text())
+        .then(text => resolve(text))
+        .catch(err => {
+            console.error(err)
+            reject(err)
+        })
+})
+
 
 /**
  * Fetch base64 from url

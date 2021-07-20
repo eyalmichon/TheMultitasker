@@ -1,4 +1,4 @@
-const { fetchJson } = require('./fetcher');
+const { fetchJson } = require('./util/fetcher');
 const config = require('./util/config.json');
 
 /**

@@ -1,4 +1,4 @@
-const { fetchWithTimeout } = require('./fetcher')
+const { fetchWithTimeout } = require('./util/fetcher')
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const config = require('./util/config.json');
