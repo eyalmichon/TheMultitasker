@@ -14,7 +14,7 @@ async function handleUnread(client) {
 
 
 const start = async (client = new Client()) => {
-    console.log('The Multitasker', '[Version 1.3]')
+    console.log('The Multitasker', '[Version 1.3.1]')
 
     // // refresh the client every hour.
     // setInterval(() => {

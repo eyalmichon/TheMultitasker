@@ -5,7 +5,7 @@
 ##### A WhatsApp bot written in JavaScript and Node.js.
 
 ![forthebadge](https://img.shields.io/badge/Made%20with-Node.js-8bbf3d)
-![forthebadge](https://img.shields.io/badge/version-1.3.0-blueviolet)
+![forthebadge](https://img.shields.io/badge/version-1.3.1-blueviolet)
 
 
 </div>
@@ -20,7 +20,7 @@
 |       ✅       |     Create stickers from image 📷, video 🎥, gif 👾 or URL 🔗 just by sending them to the bot.          |
 |       ✅       |     Send a random message from a given group to your chat.          |
 |       ✅       |     Download content from Instagram straight to the chat.          |
-|       ✅       |     Download videos from Twitter/Tiktok/YouTube straight to the chat.          |
+|       ✅       |     Download videos from Twitter/Tiktok/Facebook/YouTube straight to the chat.          |
 |       ✅       |     Download YouTube to mp3 straight to the chat.          |
 |       ✅      |     Get a random 🎲 meme/post from a set of subreddits you choose or a specifc one.          |
 |       ✅       |     Kick 🦶 a participant or all participants from group.          |

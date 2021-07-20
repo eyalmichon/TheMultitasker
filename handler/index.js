@@ -112,6 +112,8 @@ module.exports = msgHandler = async (client, message) => {
     const groupMembers = isGroupMsg ? await client.getGroupMembersId(groupId) : '';
     // save for easy access.
     let link = (quotedMsg != null) ? quotedMsg.body : args[0];
+    // Check if it's actually a link.
+    if (!isValidUrl(link)) link = undefined;
     // get the quoted message if its not null.
     let newMessage = quotedMsg || message;
 
@@ -120,7 +122,7 @@ module.exports = msgHandler = async (client, message) => {
         case 'help':
         case 'commands':
             if (args[0] === undefined)
-                await client.reply(from, `${b('Available commands:')}\n${m('url, sticker, meme, reddit, instagram, twitter, tiktok, youtube, youtubemp3, compile, covid, egg, fart.')}\n${b('Admin commands:')}\n${m('everyone, kick.')}\n${b('More info:')}\n${m('Send "' + prefix + 'help [command]" for command info.')}`, id);
+                await client.reply(from, `${b('Available commands:')}\n${m('url, sticker, meme, reddit, instagram, facebook, twitter, tiktok, youtube, youtubemp3, compile, covid, egg, fart.')}\n${b('Admin commands:')}\n${m('everyone, kick.')}\n${b('More info:')}\n${m('Send "' + prefix + 'help [command]" for command info.')}`, id);
             else
                 switch (args[0]) {
                     case 'url':
@@ -146,7 +148,11 @@ module.exports = msgHandler = async (client, message) => {
                         break;
                     case 'tw':
                     case 'twitter':
-                        await client.reply(from, `${b('Usage:')} reply with ${prefix}twitter to a twitter video link or send ${prefix}twitter [tweet with video link].\n${b('Aliases:')} [twitter, tw]`, id);
+                        await client.reply(from, `${b('Usage:')} reply with ${prefix}twitter to a twitter video link or send ${prefix}twitter [link to tweet with video].\n${b('Aliases:')} [twitter, tw]`, id);
+                        break;
+                    case 'fb':
+                    case 'facebook':
+                        await client.reply(from, `${b('Usage:')} reply with ${prefix}facebook to a facebook video link or send ${prefix}facebook [video link].\n${b('Aliases:')} [facebook, fb]`, id);
                         break;
                     case 'tk':
                     case 'tik':
@@ -467,6 +473,29 @@ module.exports = msgHandler = async (client, message) => {
                     else client.reply(from, '📛 Error, wrong link or not a video.', id);
                 })
 
+            break;
+        case 'fb':
+        case 'facebook':
+
+            if (socialSpam.isSpam(sender.id)) return client.reply(from, '📛 Sorry, I don\'t like spammers!', id);
+            // add to social spam set for 20 seconds.
+            if (sender.id !== botMaster)
+                socialSpam.addUser(sender.id, 20000);
+
+            await client.reply(from, '_I\'m on it! 🔨_', id);
+
+            if (link)
+                downloader.facebook(link).then(info => client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true))
+                    .catch(err => {
+                        if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
+                        else client.reply(from, '📛 Error, wrong link or not a video.', id);
+                    })
+            else
+                downloader.facebookRandom().then(info => client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true))
+                    .catch(err => {
+                        if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
+                        else client.reply(from, '📛 Error, wrong link or not a video.', id);
+                    })
             break;
         case 'membersof':
             // only allows bot master to use 

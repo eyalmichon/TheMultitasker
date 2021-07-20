@@ -1,8 +1,8 @@
 const { promisify } = require('util');
-const { getInstaInfo, getTwitterInfo } = require('./util/video-url-link');
+const { getInstaInfo, getTwitterInfo, getFacebookInfo } = require('./util/video-url-link');
 const ytdl = require('ytdl-core');
 const { getVideoMeta } = require('tiktok-scraper');
-const { fetchHead, fetchToFile, MAX_SIZE_ALLOWED } = require('./fetcher');
+const { fetchHead, fetchToFile, MAX_SIZE_ALLOWED } = require('./util/fetcher');
 const { toMP3 } = require('./converter');
 
 const igGetInfo = promisify(getInstaInfo);
@@ -121,9 +121,14 @@ const youtube = (url) => new Promise((resolve, reject) => {
  * @returns {Promise} Returns a Promise of {link, title}
  */
 const youtubeMp3 = (url) => new Promise((resolve, reject) => {
-    console.log('looking for a youtube video on ' + url + ' to mp3')
+    console.log('looking for a youtube video on ' + url + ' to mp3');
     ytdl.getInfo(url).then(response => {
         let link = response.formats.filter(info => info.hasVideo === false && info.contentLength < MAX_SIZE_ALLOWED)[0].url;
+
+        console.log(`Title: ${response.videoDetails.title} Url: ${link}`)
+
+        if (link === null) throw 'LINK_NOT_FOUND';
+
         fetchToFile(link, 'mp3').then(res => {
 
             toMP3(res.filePath).then(output => resolve({ link: output, title: response.videoDetails.title }))
@@ -134,11 +139,53 @@ const youtubeMp3 = (url) => new Promise((resolve, reject) => {
     })
 })
 
+const facebookRandom = () => new Promise(async (resolve, reject) => {
+    console.log('looking for a random facebook video');
+    let url = 'https://www.facebook.com/watch';
+    getFacebookInfo(url).then(async result => {
+        let link;
+        console.log(`Title: ${result.title}\nHD: ${result.download.hd}\nSD: ${result.download.sd}`)
+
+        if (result.download.hd && (await fetchHead(result.download.hd) === 'OK'))
+            link = result.download.hd;
+        else if (result.download.sd && (await fetchHead(result.download.sd) === 'OK'))
+            link = result.download.sd;
+        else
+            link = undefined;
+
+        resolve({ link: link, title: result.title });
+    }).catch(err => {
+        console.error(err);
+        reject(err);
+    })
+})
+
+const facebook = (url) => new Promise(async (resolve, reject) => {
+    console.log('looking for a facebook video on ' + url);
+    getFacebookInfo(url).then(async result => {
+        let link;
+        console.log(`Title: ${result.title}\nHD: ${result.download.hd}\nSD: ${result.download.sd}`)
+
+        if (result.download.hd && (await fetchHead(result.download.hd) === 'OK'))
+            link = result.download.hd;
+        else if (result.download.sd && (await fetchHead(result.download.sd) === 'OK'))
+            link = result.download.sd;
+        else
+            link = undefined;
+
+        resolve({ link: link, title: result.title });
+    }).catch(err => {
+        console.error(err);
+        reject(err);
+    })
+})
 
 module.exports = {
     insta,
     tweet,
     tiktok,
+    facebook,
+    facebookRandom,
     youtube,
     youtubeMp3
 }

@@ -1,5 +1,6 @@
 // Fork of video-url-link fixing run-time issues.
 
+const { fetchText } = require('./fetcher');
 const util = require('util');
 const request = require('request').defaults({ jar: true });
 var _ = require('lodash');
@@ -146,7 +147,60 @@ const getInstaInfo = (url, options, callback) => {
     });
 }
 
+
+/**
+ * Facebook HD and SD video scraper.
+ * @param {String} url The Facebook link of the video.
+ * @returns {Promise} a Promise of { download: { hd , sd }, thumb, title }
+ */
+const getFacebookInfo = (url) => new Promise((resolve, reject) => {
+    let result = {
+        download: {
+            hd: undefined,
+            sd: undefined
+        },
+        thumb: undefined,
+        title: undefined
+    };
+    fetchText(url,
+        {
+            resolveWithFullResponse: true,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.47 Safari/537.36'
+            }
+        })
+        .then(videoPageResponse => {
+            // HD link
+            videoPageResponse.replace(/hd_src_no_ratelimit:"([^"]+)"/, (content, link) => {
+                result.download.hd = link;
+                return content;
+                // SD link
+            }).replace(/sd_src_no_ratelimit:"([^"]+)"/, (content, link) => {
+                result.download.sd = link;
+                return content;
+                // thumb link
+            }).replace(/video_id:"([^"]+)"/, (content, videoId) => {
+                result.thumb = `https://graph.facebook.com/${videoId}/picture`;
+                return content;
+            });
+            // find title
+            let matches;
+            if (matches = videoPageResponse.match(/h2 class="uiHeaderTitle"?[^>]+>(.+?)<\/h2>/)) {
+                result.title = matches[matches.length - 1];
+            } else if (matches = videoPageResponse.match(/title id="pageTitle">(.+?)<\/title>/)) {
+                result.title = matches[matches.length - 1];
+            }
+
+            resolve(result);
+        })
+        .catch(err => {
+            reject(err);
+        })
+
+})
+
 module.exports = {
     getInstaInfo,
-    getTwitterInfo
+    getTwitterInfo,
+    getFacebookInfo
 }
