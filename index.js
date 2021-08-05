@@ -14,7 +14,7 @@ async function handleUnread(client) {
 
 
 const start = async (client = new Client()) => {
-    console.log('The Multitasker', '[Version 1.3.1]')
+    console.log('The Multitasker', '[Version 1.3.2]')
 
     // // refresh the client every hour.
     // setInterval(() => {
@@ -32,7 +32,7 @@ const start = async (client = new Client()) => {
 
         handleUnread(client);
 
-        client.onAnyMessage(message => {
+        client.onMessage(message => {
             // Message Handler
             msgHandler(client, message);
         }).catch(err => {
@@ -66,6 +66,7 @@ const options = {
     // for heroku
     // executablePath: '/app/.apt/usr/bin/google-chrome',
     throwErrorOnTosBlock: false,
+    disableSpins: true,
     chromiumArgs: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
