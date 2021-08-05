@@ -30,19 +30,20 @@ const fetchJson = (url, options) =>
 /**
  * Check if the file located at the url is too large to handle by trying to get the content-length from the header.
  * @param {*} url url of file
- * @returns CONTENT_TOO_LARGE if above MAX_SIZE_ALLOWED, OK if below, NO_CONTENT_LENGTH if there was no content-length in header.
+ * @returns CONTENT_TOO_LARGE if above MAX_SIZE_ALLOWED, OK if below.
  */
-const fetchHead = (url) => {
-    return fetch(url, { method: 'HEAD' })
+const checkSize = (url) => new Promise((resolve, reject) => {
+    fetch(url, { method: 'HEAD' })
         .then(response => {
             // return error if more than MAX_SIZE_ALLOWED MB
-            if (response.headers.get('content-length') > MAX_SIZE_ALLOWED) return 'CONTENT_TOO_LARGE';
-            else return 'OK';
+            if (response.headers.get('content-length') > MAX_SIZE_ALLOWED) return resolve('CONTENT_TOO_LARGE');
+            else return resolve('OK');
         }).catch(err => {
             console.error(err)
-            return 'NO_CONTENT_LENGTH';
+            reject(err);
         })
-}
+})
+
 /**
  * Fetch Text from Url
  *
@@ -131,7 +132,7 @@ module.exports = {
     fetchText,
     fetchBase64,
     fetchWithTimeout,
-    fetchHead,
+    checkSize,
     fetchToFile,
     MAX_SIZE_ALLOWED
 }
