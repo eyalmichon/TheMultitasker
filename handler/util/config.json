@@ -1,0 +1,21 @@
+{
+  "RedAlerts": {
+    "url": "https://www.tzevaadom.co.il/WarningMessages/Alert/alerts.json",
+    "requestOptions": {
+      "X-Requested-With": "XMLHttpRequest",
+      "Referer": "https://www.oref.org.il/"
+    },
+    "Activated": false
+  },
+  "Covid": {
+    "url": "https://datadashboardapi.health.gov.il/api/queries/_batch",
+    "requestOptions": {
+      "method": "POST",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "referrer": "https://datadashboard.health.gov.il/",
+      "body": "{\"requests\":[{\"id\":\"1\",\"queryName\":\"infectedPerDate\",\"single\":false,\"parameters\":{}},{\"id\":\"3\",\"queryName\":\"sickPerDateTwoDays\",\"single\":false,\"parameters\":{}}]}"
+    }
+  }
+}
