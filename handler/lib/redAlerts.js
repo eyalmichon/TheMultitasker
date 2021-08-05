@@ -1,8 +1,8 @@
-const { fetchWithTimeout } = require('./util/fetcher')
+const { fetchWithTimeout } = require('../util/fetcher')
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const config = require('./util/config.json');
-const json = require('./util/cities.json');
+const config = require('../util/config.json');
+const json = require('../util/cities.json');
 
 var map = fs.readFileSync(__dirname + '/util/map.html', 'utf8');
 var isActivated = false;
@@ -83,19 +83,19 @@ async function sleep(millis) {
  * Function is in charge of fetching alerts for red alerts 
  * and sending them with a map or without it.
  * @param client the wa automate client.
- * @param senders the senders JSON object
+ * @param getGroup the senders group JSON object
  */
-const alerts = async (client, senders) => {
+const alerts = async (client, getGroup) => {
 
     // ID for previous alert.
     let prevID = 0;
     let prevJson = {};
-    // site for fetching json data.
-    const redAlertsURL = config["RedAlertsURL"];
+    // url for fetching json data.
+    const redAlertsURL = config.RedAlerts.url;
 
     let requestOptions = {
         method: 'GET',
-        headers: config["RedAlertsRequestOptions"]
+        headers: config.RedAlerts.requestOptions
     };
 
 
@@ -125,7 +125,7 @@ const alerts = async (client, senders) => {
                     alert += "```בוט שומר החומות```";
 
                     // send to groups only alert without image.
-                    senders()["RedAlerts-MessageOnly"].forEach(groupM => {
+                    getGroup('RedAlerts-MessageOnly').forEach(groupM => {
                         client.sendText(groupM, alert);
                     })
 
@@ -140,14 +140,14 @@ const alerts = async (client, senders) => {
                             // save image in base64.
                             var base64 = await page.screenshot({ encoding: "base64" });
                             // send to all group memebers.
-                            senders()["RedAlerts"].forEach(async groupM => {
+                            getGroup('RedAlerts').forEach(async groupM => {
                                 await client.sendImage(groupM, `data:image/png;base64,${base64}`, '', alert);
                             });
                             await browser.close();
                         });
                     }
                     else {
-                        senders()["RedAlerts"].forEach(groupM => {
+                        getGroup('RedAlerts').forEach(groupM => {
                             client.sendText(groupM, alert);
                         });
                     }
@@ -155,7 +155,7 @@ const alerts = async (client, senders) => {
             }
 
         } catch (error) {
-            console.log('fetch timed out!\nError was: ' + error);
+            console.log('Fetch timed out!\nError was: ' + error);
         }
 
         // sleep for 1 second between checking for alerts.

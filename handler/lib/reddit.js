@@ -1,4 +1,4 @@
-const { fetchJson, fetchToFile } = require('./util/fetcher')
+const { fetchJson, fetchToFile } = require('../util/fetcher')
 const { mergeVideoAudio, shrinkVideoSize } = require('./converter')
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');

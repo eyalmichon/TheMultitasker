@@ -1,8 +1,8 @@
 const { promisify } = require('util');
-const { getInstaInfo, getTwitterInfo, getFacebookInfo } = require('./util/video-url-link');
+const { getInstaInfo, getTwitterInfo, getFacebookInfo } = require('../util/video-url-link');
 const ytdl = require('ytdl-core');
 const { getVideoMeta } = require('tiktok-scraper');
-const { fetchHead, fetchToFile, MAX_SIZE_ALLOWED } = require('./util/fetcher');
+const { fetchHead, fetchToFile, MAX_SIZE_ALLOWED } = require('../util/fetcher');
 const { toMP3 } = require('./converter');
 
 const igGetInfo = promisify(getInstaInfo);

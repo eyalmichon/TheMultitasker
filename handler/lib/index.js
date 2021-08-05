@@ -1,9 +1,10 @@
 exports.downloader = require('./downloader');
 exports.meme = require('./meme');
 exports.redAlerts = require('./redAlerts');
-exports.senders = require('./util/senders');
-exports.fetcher = require('./util/fetcher');
+exports.senders = require('../util/senders');
+exports.fetcher = require('../util/fetcher');
 exports.compile = require('./compile');
-exports.corona = require('./corona');
-exports.spam = require('./util/spam');
+exports.covid = require('./covid');
+exports.spam = require('../util/spam');
 exports.converter = require('./converter');
+exports.wolfram = require('./wolfram');
