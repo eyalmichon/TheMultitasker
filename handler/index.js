@@ -1,5 +1,5 @@
 const { decryptMedia } = require('@open-wa/wa-automate');
-const { downloader, meme, redAlerts, fetcher, compile, corona, senders, spam, converter } = require('./lib');
+const { downloader, meme, redAlerts, fetcher, compile, covid, wolfram, senders, spam, converter } = require('./lib');
 
 const sendersFileName = __dirname + '/lib/util/senders.json';
 // Senders file object.
@@ -14,6 +14,8 @@ const botMaster = getGroup('Me');
 const spamSet = new spam.Spam();
 // a spam set to filter out the spammers for social fetching services.
 const socialSpam = new spam.Spam();
+// Set if want to delete the bot's messages after a given time or not.
+var deleteMessages = true;
 
 function errLog(err) { console.error(err, '\n'); }
 /**
@@ -41,6 +43,10 @@ async function getContactsObj(array, client) {
         promises.push(client.getContact(item))
     })
     return await Promise.all(promises);
+}
+function delMsgAfter(object, time = 60) {
+    if (deleteMessages)
+        setTimeout(() => object.client.deleteMessage(object.from, object.msg, false), time * 1000);
 }
 
 /**
@@ -87,7 +93,7 @@ module.exports = msgHandler = async (client, message) => {
     // isn't in the allowed group AND it's not 'Me'). [if body doesn't start with prefix, we can make body =caption to see if it starts with prefix]
 
     if (!sender
-        || (body === undefined || fromMe)
+        || (body === undefined)
         || (!body.startsWith(prefix) && (caption === undefined || !(body = caption).startsWith(prefix)))
         || ((!getGroup('Allowed').includes(from) && getGroup('Me') !== from))) return;
 
@@ -121,71 +127,80 @@ module.exports = msgHandler = async (client, message) => {
     switch (command) {
         case 'help':
         case 'commands':
+            let helpReply = '';
             if (args[0] === undefined)
-                await client.reply(from, `${b('Available commands:')}\n${m('url, sticker, meme, reddit, instagram, facebook, twitter, tiktok, youtube, youtubemp3, compile, covid, egg, fart.')}\n${b('Admin commands:')}\n${m('everyone, kick.')}\n${b('More info:')}\n${m('Send "' + prefix + 'help [command]" for command info.')}`, id);
+                helpReply = `${b('Available commands:')}\n${m('url, sticker, meme, reddit, instagram, facebook, twitter, tiktok, youtube, youtubemp3, compile, wolfram, covid, egg, fart.')}\n${b('Admin commands:')}\n${m('everyone, kick.')}\n${b('More info:')}\n${m('Send "' + prefix + 'help [command]" for command info.')}`;
             else
                 switch (args[0]) {
                     case 'url':
-                        await client.reply(from, `${b('Usage:')} ${prefix}url [image/gif URL goes here] [Option for cropping: true/false (defaults false)]`, id);
+                        helpReply = `${b('Usage:')} ${prefix}url [image/gif URL goes here] [Option for cropping: true/false (defaults false)]`;
                         break;
                     case 's':
                     case 'sticker':
-                        await client.reply(from, `${b('Usage:')} reply with ${prefix}sticker [Option for cropping: true/false (defaults false)] or send the image/gif/video with caption ${prefix}sticker.\n${b('Aliases:')} [sticker, s]`, id);
+                        helpReply = `${b('Usage:')} reply with ${prefix}sticker [Option for cropping: true/false (defaults false)] or send the image/gif/video with caption ${prefix}sticker.\n${b('Aliases:')} [sticker, s]`;
                         break;
                     case 'meme':
-                        await client.reply(from, `${b('Usage:')} ${prefix}meme and you\'ll get random meme from the following subreddits:\n ${meme.subreddits.join(', ')}.\n\nOr !meme [subreddit] to get a random image from that subreddit.`, id);
+                        helpReply = `${b('Usage:')} ${prefix}meme and you\'ll get random meme from the following subreddits:\n ${meme.subreddits.join(', ')}.\n\nOr !meme [subreddit] to get a random image from that subreddit.`;
                         break;
                     case 'rd':
                     case 'reddit':
-                        await client.reply(from, `${b('Usage:')} ${prefix}reddit and you\'ll get random post from the following subreddits:\n ${meme.subreddits.join(', ')}.\n\nOr !reddit [subreddit] to get a random post from that subreddit.`, id);
+                        helpReply = `${b('Usage:')} ${prefix}reddit and you\'ll get random post from the following subreddits:\n ${meme.subreddits.join(', ')}.\n\nOr !reddit [subreddit] to get a random post from that subreddit.`;
                         break;
                     case 'kick':
-                        await client.reply(from, `${b('Usage:')} ${prefix}kick [@tag the people you want to kick]`, id);
+                        helpReply = `${b('Usage:')} ${prefix}kick [@tag the people you want to kick]`;
                         break;
                     case 'ig':
                     case 'instagram':
-                        await client.reply(from, `${b('Usage:')} reply with ${prefix}instagram to an instagram photo/video/story link or send ${prefix}instagram [link].\n${b('Aliases:')} [instagram, ig]`, id);
+                        helpReply = `${b('Usage:')} reply with ${prefix}instagram to an instagram photo/video/story link or send ${prefix}instagram [link].\n${b('Aliases:')} [instagram, ig]`;
                         break;
                     case 'tw':
                     case 'twitter':
-                        await client.reply(from, `${b('Usage:')} reply with ${prefix}twitter to a twitter video link or send ${prefix}twitter [link to tweet with video].\n${b('Aliases:')} [twitter, tw]`, id);
+                        helpReply = `${b('Usage:')} reply with ${prefix}twitter to a twitter video link or send ${prefix}twitter [link to tweet with video].\n${b('Aliases:')} [twitter, tw]`;
                         break;
                     case 'fb':
                     case 'facebook':
-                        await client.reply(from, `${b('Usage:')} reply with ${prefix}facebook to a facebook video link or send ${prefix}facebook [video link].\n${b('Aliases:')} [facebook, fb]`, id);
+                        helpReply = `${b('Usage:')} reply with ${prefix}facebook to a facebook video link or send ${prefix}facebook [video link].\n${b('Aliases:')} [facebook, fb]`;
                         break;
                     case 'tk':
                     case 'tik':
                     case 'tiktok':
-                        await client.reply(from, `${b('Usage:')} reply with ${prefix}tiktok to a tiktok video link or send ${prefix}tiktok [link].\n${b('Aliases:')} [tiktok, tik, tk]`, id);
+                        helpReply = `${b('Usage:')} reply with ${prefix}tiktok to a tiktok video link or send ${prefix}tiktok [link].\n${b('Aliases:')} [tiktok, tik, tk]`;
                         break;
                     case 'yt':
                     case 'youtube':
-                        await client.reply(from, `${b('Usage:')} reply with ${prefix}youtube to a youtube video link or send ${prefix}youtube [video link].\n${b('Aliases:')} [youtube, yt]`, id);
+                        helpReply = `${b('Usage:')} reply with ${prefix}youtube to a youtube video link or send ${prefix}youtube [video link].\n${b('Aliases:')} [youtube, yt]`;
                         break;
                     case 'ytm':
                     case 'yt2mp3':
                     case 'ytmusic':
                     case 'youtubemp3':
-                        await client.reply(from, `${b('Usage:')} reply with ${prefix}youtubemp3 to a youtube video link or send ${prefix}youtubemp3 [video link].\n${b('Aliases:')} [youtubemp3, ytm, yt2mp3, ytmusic]`, id);
+                        helpReply = `${b('Usage:')} reply with ${prefix}youtubemp3 to a youtube video link or send ${prefix}youtubemp3 [video link].\n${b('Aliases:')} [youtubemp3, ytm, yt2mp3, ytmusic]`;
                         break;
                     case 'compile':
-                        await client.reply(from, `${b('Usage:')} ${prefix}compile [language] [code]\n${b('Available languages:')} c ,cpp ,c# ,rill ,erlang ,elixir ,haskell ,d ,java ,rust ,python ,python2.7 ,ruby ,scala ,groovy ,nodejs ,nodejs14 ,coffeescript ,spidermonkey ,swift ,perl ,php ,lua ,sql ,pascal ,lisp ,lazyk ,vim ,pypy ,ocaml ,go ,bash ,pony ,crystal ,nim ,openssl ,f# ,r ,typescript ,julia`, id);
+                        helpReply = `${b('Usage:')} ${prefix}compile [language] [code]\n${b('Available languages:')} c ,cpp ,c# ,rill ,erlang ,elixir ,haskell ,d ,java ,rust ,python ,python2.7 ,ruby ,scala ,groovy ,nodejs ,nodejs14 ,coffeescript ,spidermonkey ,swift ,perl ,php ,lua ,sql ,pascal ,lisp ,lazyk ,vim ,pypy ,ocaml ,go ,bash ,pony ,crystal ,nim ,openssl ,f# ,r ,typescript ,julia`;
+                        break;
+                    case 'wf':
+                    case 'wolf':
+                    case 'wolfram':
+                    case 'wolframalpha':
+                        helpReply = `${b('Usage:')} ${prefix}wolfram [question] and you'll receive an answer from Wolfram Alpha.\n${b('Aliases:')} [wolframalpha, wolfram, wolf, wf]`;
                         break;
                     case 'covid':
                     case 'corona':
-                        await client.reply(from, `${b('Usage:')} ${prefix}covid (or ${prefix}covid [1-7] for number of days to get info about) to get back information about active cases, infected people today, etc...`, id);
+                        helpReply = `${b('Usage:')} ${prefix}covid (or ${prefix}covid [1-7] for number of days to get info about) to get back information about active cases, infected people today, etc...`;
                         break;
                     case 'egg':
-                        await client.reply(from, `${b('Usage:')} ${prefix}egg and you\'ll get an 🥚\nHAPPY EGGING!`, id);
+                        helpReply = `${b('Usage:')} ${prefix}egg and you\'ll get an 🥚\nHAPPY EGGING!`;
                         break;
                     case 'fart':
-                        await client.reply(from, `${b('Usage:')} ${prefix}fart and you\'ll get a 💨\nCan you smell it?!\nAt least try to!`, id);
+                        helpReply = `${b('Usage:')} ${prefix}fart and you\'ll get a 💨\nCan you smell it?!\nAt least try to!`;
                         break;
                     default:
-                        await client.reply(from, `Are you making up commands?\nUse ${prefix}help for ${b('real')} available commands.`, id);
+                        helpReply = `Are you making up commands?\nUse ${prefix}help for ${b('real')} available commands.`;
                         break;
                 }
+            await client.reply(from, helpReply, id)
+                .then(msg => delMsgAfter({ client: client, msg: msg, from: from }))
             break;
         case 'addsender':
             if (from === botMaster && ourSenders.addSender(args[0], args[1]))
@@ -209,7 +224,7 @@ module.exports = msgHandler = async (client, message) => {
                     else {
                         redAlerts.changeState(true);
                         await client.sendText(from, `🚨 Red Alerts has been ${b('activated!')}`);
-                        redAlerts.alerts(client, getSenders);
+                        redAlerts.alerts(client, getGroup);
                     }
                 }
                 if (args[0] === 'off') {
@@ -227,10 +242,17 @@ module.exports = msgHandler = async (client, message) => {
             if (!link) return client.reply(from, '📛 Error, no link', id);
             if (isValidUrl(link)) {
                 if (await fetcher.fetchHead(link) === 'CONTENT_TOO_LARGE') return await client.reply(from, '📛 Sorry, the file you\'re trying to get is too large to handle...', id);
-                await client.reply(from, '🧙‍♂️ Please wait a moment while I do some magic...', id);
-                let shouldCrop = args[1] === 'true' ? true : false;
-                // if sendStickerfromUrl returns false, means it's not an image/gif.
-                if (!(await client.sendStickerfromUrl(chatId, link, null, { author: 'The Multitasker Bot', keepScale: !shouldCrop, pack: 'Stickers' }))) { await client.reply(from, '📛 Not an image/gif', id); }
+                client.reply(from, '🧙‍♂️ Please wait a moment while I do some magic...', id).then(msg => {
+
+                    let shouldCrop = args[1] === 'true' ? true : false;
+                    // if sendStickerfromUrl returns false, means it's not an image/gif.
+                    client.sendStickerfromUrl(chatId, link, null, { author: 'The Multitasker Bot', keepScale: !shouldCrop, pack: 'Stickers' })
+                        .then(stickerRes => {
+
+                            if (!stickerRes) { client.reply(from, '📛 Not an image/gif', id); }
+                            delMsgAfter({ client: client, msg: msg, from: from }, 1)
+                        })
+                })
             }
             else
                 await client.reply(from, `📛 Are you sure this is a valid URL?\nSee ${prefix}help url for more info.`, id);
@@ -239,29 +261,33 @@ module.exports = msgHandler = async (client, message) => {
         case 'sticker':
             if (!newMessage.mimetype) return client.reply(from, `📛 Sorry, this is not the right way to use this command!\nSee ${prefix}help for more details.`, id);
 
-            await client.reply(from, '🧙‍♂️ Please wait a moment while I do some magic...', id);
-            const mediaData = await decryptMedia(newMessage);
-            const Base64 = `data:${newMessage.mimetype};base64,${mediaData.toString('base64')}`;
-            let shouldCrop = args[0] === 'true' ? true : false;
-            switch (newMessage.mimetype) {
-                case 'image/jpeg':
-                    await client.sendImageAsSticker(from, Base64, { author: 'The Multitasker Bot', keepScale: !shouldCrop, pack: 'Stickers' })
-                        .catch(err => {
-                            errLog(err);
-                            client.reply(from, '📛 There was an error processing your sticker.', id);
-                        });
-                    break;
-                case 'video/mp4':
-                    await client.sendMp4AsSticker(from, Base64, { crop: shouldCrop }, { author: 'The Multitasker Bot', pack: 'Stickers' })
-                        .catch(err => {
-                            errLog(`${err.name} ${err.message}`);
-                            if (err.code === 'ERR_FR_MAX_BODY_LENGTH_EXCEEDED') client.reply(from, '📛 There was an error processing your sticker.\nThe image/video was too large.', id);
-                            else client.reply(from, '📛 There was an error processing your sticker.\nMaybe try to edit the length and resend.', id);
-                        });
-                    break;
-                default:
-                    break;
-            }
+            client.reply(from, '🧙‍♂️ Please wait a moment while I do some magic...', id).then(async msg => {
+
+                const mediaData = await decryptMedia(newMessage);
+                const Base64 = `data:${newMessage.mimetype};base64,${mediaData.toString('base64')}`;
+                let shouldCrop = args[0] === 'true' ? true : false;
+                switch (newMessage.mimetype) {
+                    case 'image/jpeg':
+                        await client.sendImageAsSticker(from, Base64, { author: 'The Multitasker Bot', keepScale: !shouldCrop, pack: 'Stickers' })
+                            .catch(err => {
+                                errLog(err);
+                                client.reply(from, '📛 There was an error processing your sticker.', id);
+                            })
+                            .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
+                        break;
+                    case 'video/mp4':
+                        await client.sendMp4AsSticker(from, Base64, { crop: shouldCrop }, { author: 'The Multitasker Bot', pack: 'Stickers' })
+                            .catch(err => {
+                                errLog(`${err.name} ${err.message}`);
+                                if (err.code === 'ERR_FR_MAX_BODY_LENGTH_EXCEEDED') client.reply(from, '📛 There was an error processing your sticker.\nThe image/video was too large.', id);
+                                else client.reply(from, '📛 There was an error processing your sticker.\nMaybe try to edit the length and resend.', id);
+                            })
+                            .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
+                        break;
+                    default:
+                        break;
+                }
+            })
             break;
 
         // TO-DO custom meme.
@@ -300,47 +326,49 @@ module.exports = msgHandler = async (client, message) => {
             if (sender.id !== botMaster)
                 socialSpam.addUser(sender.id, 20000);
 
-            await client.reply(from, '🧙‍♂️ This may take some time...', id);
+            client.reply(from, '🧙‍♂️ This may take some time...', id).then(async msg => {
 
-            const redditPost = [];
-            // get a post from a specific subreddit.
-            if (args[0] !== undefined && args[0].match(/^[0-9a-zA-Z]+$/))
-                redditPost.push(meme.subRedditPost(args[0]))
-            // get a post from a random subreddit.
-            else
-                redditPost.push(meme.randomRedditPost());
+                const redditPost = [];
+                // get a post from a specific subreddit.
+                if (args[0] !== undefined && args[0].match(/^[0-9a-zA-Z]+$/))
+                    redditPost.push(meme.subRedditPost(args[0]))
+                // get a post from a random subreddit.
+                else
+                    redditPost.push(meme.randomRedditPost());
 
-            await Promise.all(redditPost)
-                .then(async promise => {
-                    let post = promise[0];
-                    switch (post.type) {
-                        case 'video':
-                            await client.sendFile(from, post.path, 'the_multitasker.mp4', post.title, id, true)
-                                .then(() => converter.unlinkOutput(post.path));
-                            break;
-                        case 'image/gif':
-                            await client.sendFileFromUrl(from, post.url, '', post.title, id, null, true);
-                            break;
-                        case 'youtube':
-                            downloader.youtube(post.url)
-                                .then(info => { client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true); })
-                                .catch(err => {
-                                    if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
-                                    else if (err.message === 'Not a YouTube domain') client.reply(from, '📛 Error, this is not a Youtube domain.', id);
-                                    else client.reply(from, '📛 Error, wrong link or not a video.', id);
-                                })
-                            break;
-                        default:
-                            break;
-                    }
-                })
-                .catch(err => {
-                    errLog(err);
-                    if (err === 'SUB_ERROR') return client.reply(from, '📛 Error, this subreddit doesn\'t exist.', id);
-                    else if (err === 'NO_MEDIA') return client.reply(from, '📛 Error, this subreddit doesn\'t contain any media.', id);
-                    else if (err === 'PORN_ERROR') return client.reply(from, '📛 Error, this is a porn subreddit. 🔞', id);
-                    else return client.reply(from, '📛 Error has occurred.', id);
-                })
+                await Promise.all(redditPost)
+                    .then(async promise => {
+                        let post = promise[0];
+                        switch (post.type) {
+                            case 'video':
+                                await client.sendFile(from, post.path, 'the_multitasker.mp4', post.title, id, true)
+                                    .then(() => converter.unlinkOutput(post.path));
+                                break;
+                            case 'image/gif':
+                                await client.sendFileFromUrl(from, post.url, '', post.title, id, null, true);
+                                break;
+                            case 'youtube':
+                                downloader.youtube(post.url)
+                                    .then(info => { client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true); })
+                                    .catch(err => {
+                                        if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
+                                        else if (err.message === 'Not a YouTube domain') client.reply(from, '📛 Error, this is not a Youtube domain.', id);
+                                        else client.reply(from, '📛 Error, wrong link or not a video.', id);
+                                    })
+                                break;
+                            default:
+                                break;
+                        }
+                    })
+                    .catch(err => {
+                        errLog(err);
+                        if (err === 'SUB_ERROR') return client.reply(from, '📛 Error, this subreddit doesn\'t exist.', id);
+                        else if (err === 'NO_MEDIA') return client.reply(from, '📛 Error, this subreddit doesn\'t contain any media.', id);
+                        else if (err === 'PORN_ERROR') return client.reply(from, '📛 Error, this is a porn subreddit. 🔞', id);
+                        else return client.reply(from, '📛 Error has occurred.', id);
+                    })
+                    .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
+            })
             break;
         case 'everyone':
         case 'tagall':
@@ -350,7 +378,8 @@ module.exports = msgHandler = async (client, message) => {
             groupMembers.forEach(member => {
                 if ((member !== sender.id) && (member !== botNumber)) mentionlist.push(`@${member.replace('@c.us', '')}`)
             });
-            await client.sendTextWithMentions(from, mentionlist.join(' '));
+            client.sendTextWithMentions(from, mentionlist.join(' '))
+                .then((msg) => delMsgAfter({ client: client, msg: msg, from: from }));
             break;
         case 'kick':
             if (!isGroupMsg) return client.reply(from, '📛 Sorry, this command can only be used within a group!', id)
@@ -378,17 +407,21 @@ module.exports = msgHandler = async (client, message) => {
             if (sender.id !== botMaster)
                 socialSpam.addUser(sender.id, 20000);
 
-            await client.reply(from, '_I\'m on it! 🔨_', id)
-            // Get videos/images from link.
-            downloader.insta(link).then((linkList) => {
-                // Then go over the returned list of videos/images.
-                linkList.forEach(item => {
-                    client.sendFileFromUrl(from, item, '', '', id, null, true);
-                })
-            }).catch((err) => {
-                if (err.message === 'Not Found instagram') client.reply(from, '📛 Error, the link you sent was invalid.', id);
-                else if (err.message === 'Parse Error') client.reply(from, '📛 Error, this is not a valid Instagram link.', id);
-                else client.reply(from, '📛 Error, private user or wrong link', id);
+            client.reply(from, i('I\'m on it! 🔨'), id).then(msg => {
+
+                // Get videos/images from link.
+                downloader.insta(link)
+                    .then((linkList) => {
+                        // Then go over the returned list of videos/images.
+                        linkList.forEach(item => {
+                            client.sendFileFromUrl(from, item, '', '', id, null, true);
+                        })
+                    }).catch((err) => {
+                        if (err.message === 'Not Found instagram') client.reply(from, '📛 Error, the link you sent was invalid.', id);
+                        else if (err.message === 'Parse Error') client.reply(from, '📛 Error, this is not a valid Instagram link.', id);
+                        else client.reply(from, '📛 Error, private user or wrong link', id);
+                    })
+                    .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
             })
             break;
 
@@ -402,17 +435,21 @@ module.exports = msgHandler = async (client, message) => {
             if (sender.id !== botMaster)
                 socialSpam.addUser(sender.id, 20000);
 
-            await client.reply(from, '_I\'m on it! 🔨_', id);
-            // Get videos/images from link.
-            downloader.tweet(link).then(async (result) => {
-                if (result === 'CONTENT_TOO_LARGE') return await client.reply(from, '📛 Sorry, the file you\'re trying to get is too large to handle...', id);
+            client.reply(from, i('I\'m on it! 🔨'), id).then(msg => {
 
-                await client.sendFileFromUrl(from, result, 'the_multitasker.mp4', '', id, null, true);
-            }).catch((err) => {
-                if (err.message === 'Twitter API error') client.reply(from, '📛 Twitter API error, maybe this link is not a valid twitter link.', id);
-                else if (err.message === 'Not a twitter URL') client.reply(from, '📛 Error, this is not a not a twitter URL.', id);
-                else client.reply(from, '📛 Error, private user, wrong link or not a video.', id);
-            });
+                // Get videos/images from link.
+                downloader.tweet(link)
+                    .then(async (result) => {
+                        if (result === 'CONTENT_TOO_LARGE') return await client.reply(from, '📛 Sorry, the file you\'re trying to get is too large to handle...', id);
+
+                        await client.sendFileFromUrl(from, result, 'the_multitasker.mp4', '', id, null, true);
+                    }).catch((err) => {
+                        if (err.message === 'Twitter API error') client.reply(from, '📛 Twitter API error, maybe this link is not a valid twitter link.', id);
+                        else if (err.message === 'Not a twitter URL') client.reply(from, '📛 Error, this is not a not a twitter URL.', id);
+                        else client.reply(from, '📛 Error, private user, wrong link or not a video.', id);
+                    })
+                    .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
+            })
             break;
         case 'tk':
         case 'tik':
@@ -423,13 +460,17 @@ module.exports = msgHandler = async (client, message) => {
             // add to social spam set for 20 seconds.
             if (sender.id !== botMaster)
                 socialSpam.addUser(sender.id, 20000);
-            await client.reply(from, '_I\'m on it! 🔨_', id);
-            downloader.tiktok(link)
-                .then(async (info) => {
-                    await client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, { headers: info.options }, true)
-                }).catch(() => {
-                    client.reply(from, '📛 Error, wrong link or not a video.', id);
-                })
+
+            client.reply(from, i('I\'m on it! 🔨'), id).then(msg => {
+
+                downloader.tiktok(link)
+                    .then(async (info) => {
+                        await client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, { headers: info.options }, true)
+                    }).catch(() => {
+                        client.reply(from, '📛 Error, wrong link or not a video.', id);
+                    })
+                    .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
+            })
             break;
         case 'yt':
         case 'youtube':
@@ -440,15 +481,17 @@ module.exports = msgHandler = async (client, message) => {
             if (sender.id !== botMaster)
                 socialSpam.addUser(sender.id, 20000);
 
-            await client.reply(from, '_I\'m on it! 🔨_', id);
-            downloader.youtube(link)
-                .then(info => { client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true); })
-                .catch(err => {
-                    if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
-                    else if (err.message === 'Not a YouTube domain') client.reply(from, '📛 Error, this is not a Youtube domain.', id);
-                    else client.reply(from, '📛 Error, wrong link or not a video.', id);
-                })
+            client.reply(from, i('I\'m on it! 🔨'), id).then(msg => {
 
+                downloader.youtube(link)
+                    .then(info => client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true))
+                    .catch(err => {
+                        if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
+                        else if (err.message === 'Not a YouTube domain') client.reply(from, '📛 Error, this is not a Youtube domain.', id);
+                        else client.reply(from, '📛 Error, wrong link or not a video.', id);
+                    })
+                    .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
+            })
             break;
         case 'ytm':
         case 'yt2mp3':
@@ -461,17 +504,21 @@ module.exports = msgHandler = async (client, message) => {
             if (sender.id !== botMaster)
                 socialSpam.addUser(sender.id, 20000);
 
-            await client.reply(from, '_I\'m on it! 🔨_', id);
-            downloader.youtubeMp3(link)
-                .then(info => {
-                    client.sendPtt(from, info.link, id)
-                        .then(() => converter.unlinkOutput(info.link))
-                })
-                .catch(err => {
-                    if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
-                    else if (err.message === 'Not a YouTube domain') client.reply(from, '📛 Error, this is not a Youtube domain.', id);
-                    else client.reply(from, '📛 Error, wrong link or not a video.', id);
-                })
+            client.reply(from, i('I\'m on it! 🔨'), id).then(msg => {
+
+
+                downloader.youtubeMp3(link)
+                    .then(info => {
+                        client.sendPtt(from, info.link, id)
+                            .then(() => converter.unlinkOutput(info.link))
+                    })
+                    .catch(err => {
+                        if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
+                        else if (err.message === 'Not a YouTube domain') client.reply(from, '📛 Error, this is not a Youtube domain.', id);
+                        else client.reply(from, '📛 Error, wrong link or not a video.', id);
+                    })
+                    .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
+            })
 
             break;
         case 'fb':
@@ -482,20 +529,23 @@ module.exports = msgHandler = async (client, message) => {
             if (sender.id !== botMaster)
                 socialSpam.addUser(sender.id, 20000);
 
-            await client.reply(from, '_I\'m on it! 🔨_', id);
+            client.reply(from, i('I\'m on it! 🔨'), id).then(msg => {
 
-            if (link)
-                downloader.facebook(link).then(info => client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true))
-                    .catch(err => {
-                        if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
-                        else client.reply(from, '📛 Error, wrong link or not a video.', id);
-                    })
-            else
-                downloader.facebookRandom().then(info => client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true))
-                    .catch(err => {
-                        if (err.name === 'TypeError') client.reply(from, '📛 Error, video ID does not match expected format.', id);
-                        else client.reply(from, '📛 Error, wrong link or not a video.', id);
-                    })
+                if (link)
+                    downloader.facebook(link).then(info => client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true))
+                        .catch(err => {
+                            if (err.name === 'TypeError') client.reply(from, '📛 Error, couldn\'t find video download, maybe the video is not public...', id);
+                            else client.reply(from, '📛 Error, wrong link or not a video.', id);
+                        })
+                        .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
+                else
+                    downloader.facebookRandom().then(info => client.sendFileFromUrl(from, info.link, 'the_multitasker.mp4', info.title, id, null, true))
+                        .catch(err => {
+                            if (err.name === 'TypeError') client.reply(from, '📛 Error, couldn\'t find video download, maybe the video is not public...', id);
+                            else client.reply(from, '📛 Error, wrong link or not a video.', id);
+                        })
+                        .finally(() => delMsgAfter({ client: client, msg: msg, from: from }, 1))
+            })
             break;
         case 'membersof':
             // only allows bot master to use 
@@ -517,10 +567,11 @@ module.exports = msgHandler = async (client, message) => {
         case 'compile':
             let compiler = args.shift();
             let code = args.join(' ');
-            let result = await compile.compile(compiler, code);
-
-            await client.reply(from, result, id);
+            compile.compile(compiler, code)
+                .then(result => client.reply(from, result, id))
+                .then((msg) => delMsgAfter({ client: client, msg: msg, from: from }))
             break;
+
         case 'covid':
         case 'corona':
             if (socialSpam.isSpam(sender.id)) return client.reply(from, '📛 Sorry, I don\'t like spammers!', id);
@@ -528,9 +579,29 @@ module.exports = msgHandler = async (client, message) => {
             if (sender.id !== botMaster)
                 socialSpam.addUser(sender.id, 10000);
 
-            let infectedInfo = await corona.infected(args[0]);
+            covid.infected(args[0])
+                .then(infectedInfo => client.reply(from, infectedInfo, id))
 
-            await client.reply(from, infectedInfo, id);
+            break;
+        case 'wf':
+        case 'wolf':
+        case 'wolfram':
+        case 'wolframalpha':
+            if (args[0] === '-f') {
+                args.shift();
+                let question = args.join(' ');
+                wolfram.getFullAnswer(question)
+                    .then(base64 => {
+                        client.sendFile(from, `data:document/png;base64,${base64}`, `the_multitasker_${question}.png`, '', id, true)
+                    })
+                    .catch(() => client.reply(from, '📛 Error, can\'t answer that question.', id))
+
+            }
+            else
+                wolfram.getAnswer(args.join(' '))
+                    .then(res => client.sendFileFromUrl(from, res.img, 'the_multitasker.gif', res.text, id, null, true))
+                    .catch(() => client.reply(from, '📛 Error, can\'t answer that question.', id))
+
             break;
         case 'egg':
             await forwardRandomMessageFromGroup(getGroup("ProjectEgg"), client, chatId);
