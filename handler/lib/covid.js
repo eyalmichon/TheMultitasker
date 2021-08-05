@@ -1,5 +1,5 @@
-const { fetchJson } = require('./util/fetcher');
-const config = require('./util/config.json');
+const { fetchJson } = require('../util/fetcher');
+const config = require('../util/config.json');
 
 /**
  * This method works by splitting the string into an array using the spread operator, 
@@ -35,8 +35,8 @@ const isInt = string => [...string].every(c => '0123456789'.includes(c));
 * {\"id\":\"31\",\"queryName\":\"spotlightAggregatedPublic\",\"single\":true,\"parameters\":{}},
 * {\"id\":\"34\",\"queryName\":\"spotlightPublic\",\"single\":false,\"parameters\":{}}]}",
 */
-const endpoint = config['CoronaURL'];
-const options = config['CoronaOptions'];
+const endpoint = config.Covid.url;
+const options = config.Covid.requestOptions;
 
 /**
  * get information from the official API.
@@ -44,18 +44,21 @@ const options = config['CoronaOptions'];
  * @returns information about infected people on these days.
  */
 const infected = (days) => new Promise((resolve, reject) => {
+
+    console.log(`looking for last ${days} days of Covid data...`);
+
     if (days === undefined || !isInt(days) || 0 >= days || days > 7)
         days = 1;
     fetchJson(endpoint, options).then(body => {
 
-        let info = body[0]['data'];
-        let activePatients = body[1]['data'];
-        let text = `🟢 Active Cases: ${activePatients[0]['amount'] + activePatients[1]['amount']}\n`;
+        let info = body[0].data;
+        let activePatients = body[1].data;
+        let text = `🟢 Active Cases: ${activePatients[0].amount + activePatients[1].amount}\n`;
         let finalText = [];
         for (let i = 0; i < days; i++) {
             let day = info.pop();
-            text += (`🗓️ Date: ${day['date'].replace(/\T.*$/g, '')}\n🤒 Infected: ${day['amount']}\n🦸‍♂️ Recovered: ${day['recovered']}\n😷 Total Cases: ${day['sum']}`);
-            if (day['coronaEvents']) text += (`\n✨ Event: ${day['coronaEvents']}`);
+            text += (`🗓️ Date: ${day['date'].replace(/\T.*$/g, '')}\n🤒 Infected: ${day.amount}\n🦸‍♂️ Recovered: ${day.recovered}\n😷 Total Cases: ${day.sum}`);
+            if (day.coronaEvents) text += (`\n✨ Event: ${day.coronaEvents}`);
             finalText.push(text);
             text = '';
         }
