@@ -1,4 +1,4 @@
-const { fetchBase64, fetchHead, MAX_SIZE_ALLOWED } = require('../util/fetcher')
+const { fetchBase64, checkSize, MAX_SIZE_ALLOWED } = require('../util/fetcher')
 const { getFileSize } = require('./converter')
 const reddit = require('./reddit');
 
@@ -34,7 +34,7 @@ const randomRedditPost = () => new Promise(async (resolve, reject) => {
                 if (getFileSize(res.path) > MAX_SIZE_ALLOWED) return resolve(randomRedditPost());
                 break;
             case 'image/gif':
-                if (fetchHead(res.url) === 'CONTENT_TOO_LARGE') return resolve(randomRedditPost());
+                if (checkSize(res.url) === 'CONTENT_TOO_LARGE') return resolve(randomRedditPost());
                 break;
             // not yet supported...
             case 'gfycat':
@@ -63,7 +63,7 @@ const subRedditPost = (sub) => new Promise(async (resolve, reject) => {
                 if (getFileSize(res.path) > MAX_SIZE_ALLOWED) return resolve(subRedditPost(sub));
                 break;
             case 'image/gif':
-                if (fetchHead(res.url) === 'CONTENT_TOO_LARGE') return resolve(subRedditPost(sub));
+                if (checkSize(res.url) === 'CONTENT_TOO_LARGE') return resolve(subRedditPost(sub));
                 break;
             // not yet supported...
             case 'gfycat':

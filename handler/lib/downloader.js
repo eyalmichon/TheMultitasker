@@ -2,7 +2,7 @@ const { promisify } = require('util');
 const { getInstaInfo, getTwitterInfo, getFacebookInfo } = require('../util/video-url-link');
 const ytdl = require('ytdl-core');
 const { getVideoMeta } = require('tiktok-scraper');
-const { fetchHead, fetchToFile, MAX_SIZE_ALLOWED } = require('../util/fetcher');
+const { checkSize, fetchToFile, MAX_SIZE_ALLOWED } = require('../util/fetcher');
 const { toMP3 } = require('./converter');
 
 const igGetInfo = promisify(getInstaInfo);
@@ -23,14 +23,13 @@ const insta = (url) => new Promise((resolve, reject) => {
             result.list.forEach(item => {
                 // If there is a video key in the JSON, get the video.
                 if (item.video !== undefined) {
-                    if (fetchHead(item.video) !== 'CONTENT_TOO_LARGE')
+                    if (checkSize(item.video) === 'OK')
                         promises.push(item.video);
                 }
                 // Else if the requested item didn't have a video in it.
                 else
-                    promises.push(item['image'])
+                    promises.push(item.image)
             })
-
             resolve(Promise.all(promises));
         })
         .catch((err) => {
@@ -48,21 +47,20 @@ const tweet = (url) => new Promise((resolve, reject) => {
     console.log('looking for a twitter video on ' + url)
     twtGetInfo(url, {})
         // return the variants list.
-        .then((content) => content['variants'])
-        .then((data) => {
+        .then(content => content.variants)
+        .then(data => {
             let link;
             let bitrate = 0;
             // Then go over the returned list of videos and find the max bitrate video.
             data.forEach(item => {
                 if (item.bitrate !== undefined && bitrate < item.bitrate) {
                     bitrate = item.bitrate;
-                    link = item['url'];
+                    link = item.url;
                 }
             });
-            if (fetchHead(link) === 'CONTENT_TOO_LARGE')
-                resolve('CONTENT_TOO_LARGE');
-            else
-                resolve(link);
+
+            checkSize(link).then(res => (res === 'OK') ? resolve(link) : resolve('CONTENT_TOO_LARGE'))
+
         })
         .catch((err) => {
             console.error(err);
@@ -83,7 +81,7 @@ const tiktok = (url) => new Promise((resolve, reject) => {
         "cookie": "tt_webid_v2=689854141086886123"
     };
     getVideoMeta(url, { noWaterMark: true, hdVideo: true, headers: options })
-        .then((result) => {
+        .then(result => {
             let collector = result.collector[0];
             let info = { options: options, title: collector.text };
             if (collector.videoUrlNoWaterMark) {
@@ -91,7 +89,9 @@ const tiktok = (url) => new Promise((resolve, reject) => {
             } else {
                 info.link = collector.videoUrl;
             }
-            resolve(info);
+
+            checkSize(info.link).then(res => (res === 'OK') ? resolve(info) : resolve('CONTENT_TOO_LARGE'));
+
         }).catch((err) => {
             console.error(err);
             reject(err);
@@ -146,9 +146,9 @@ const facebookRandom = () => new Promise(async (resolve, reject) => {
         let link;
         console.log(`Title: ${result.title}\nHD: ${result.download.hd}\nSD: ${result.download.sd}`)
 
-        if (result.download.hd && (await fetchHead(result.download.hd) === 'OK'))
+        if (result.download.hd && (await checkSize(result.download.hd) === 'OK'))
             link = result.download.hd;
-        else if (result.download.sd && (await fetchHead(result.download.sd) === 'OK'))
+        else if (result.download.sd && (await checkSize(result.download.sd) === 'OK'))
             link = result.download.sd;
         else
             link = undefined;
@@ -166,9 +166,9 @@ const facebook = (url) => new Promise(async (resolve, reject) => {
         let link;
         console.log(`Title: ${result.title}\nHD: ${result.download.hd}\nSD: ${result.download.sd}`)
 
-        if (result.download.hd && (await fetchHead(result.download.hd) === 'OK'))
+        if (result.download.hd && (await checkSize(result.download.hd) === 'OK'))
             link = result.download.hd;
-        else if (result.download.sd && (await fetchHead(result.download.sd) === 'OK'))
+        else if (result.download.sd && (await checkSize(result.download.sd) === 'OK'))
             link = result.download.sd;
         else
             link = undefined;

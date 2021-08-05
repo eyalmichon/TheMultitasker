@@ -241,7 +241,7 @@ module.exports = msgHandler = async (client, message) => {
         case 'url':
             if (!link) return client.reply(from, '📛 Error, no link', id);
             if (isValidUrl(link)) {
-                if (await fetcher.fetchHead(link) === 'CONTENT_TOO_LARGE') return await client.reply(from, '📛 Sorry, the file you\'re trying to get is too large to handle...', id);
+                if (await fetcher.checkSize(link) === 'CONTENT_TOO_LARGE') return await client.reply(from, '📛 Sorry, the file you\'re trying to get is too large to handle...', id);
                 client.reply(from, '🧙‍♂️ Please wait a moment while I do some magic...', id).then(msg => {
 
                     let shouldCrop = args[1] === 'true' ? true : false;
@@ -411,12 +411,12 @@ module.exports = msgHandler = async (client, message) => {
 
                 // Get videos/images from link.
                 downloader.insta(link)
-                    .then((linkList) => {
+                    .then((linkList) =>
                         // Then go over the returned list of videos/images.
-                        linkList.forEach(item => {
-                            client.sendFileFromUrl(from, item, '', '', id, null, true);
-                        })
-                    }).catch((err) => {
+                        linkList.forEach(item =>
+                            client.sendFileFromUrl(from, item, '', '', id, null, true)
+                        )
+                    ).catch((err) => {
                         if (err.message === 'Not Found instagram') client.reply(from, '📛 Error, the link you sent was invalid.', id);
                         else if (err.message === 'Parse Error') client.reply(from, '📛 Error, this is not a valid Instagram link.', id);
                         else client.reply(from, '📛 Error, private user or wrong link', id);
