@@ -1,9 +1,6 @@
-const { fetchBase64, fetchHead, MAX_SIZE_ALLOWED } = require('./util/fetcher')
+const { fetchBase64, fetchHead, MAX_SIZE_ALLOWED } = require('../util/fetcher')
 const { getFileSize } = require('./converter')
 const reddit = require('./reddit');
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-const ffmpeg = require('fluent-ffmpeg');
-ffmpeg.setFfmpegPath(ffmpegPath);
 
 const subreddits = reddit.subreddits;
 
