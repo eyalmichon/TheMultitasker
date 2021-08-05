@@ -33,7 +33,7 @@ const fetchJson = (url, options) =>
  * @returns CONTENT_TOO_LARGE if above MAX_SIZE_ALLOWED, OK if below.
  */
 const checkSize = (url) => new Promise((resolve, reject) => {
-    fetch(url, { method: 'HEAD' })
+    fetch(url, { method: 'HEAD', timeout: 3000 })
         .then(response => {
             // return error if more than MAX_SIZE_ALLOWED MB
             if (response.headers.get('content-length') > MAX_SIZE_ALLOWED) return resolve('CONTENT_TOO_LARGE');
