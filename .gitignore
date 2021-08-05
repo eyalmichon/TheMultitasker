@@ -9,7 +9,6 @@ lerna-debug.log*
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # private files
 secret
-*.txt
 *.data.json
 senders.json
 config.hjson
