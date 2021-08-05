@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        body {
+            font-size: 14px;
+            font-family: 'Roboto';
+            line-height: 1;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        h2 {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+            box-sizing: border-box;
+            color: #678e9c;
+            margin-right: 19px;
+        }
+
+        header {
+            min-height: 30px;
+            background: #f7f7f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px 19px;
+        }
+
+
+        .sections {
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .shadow {
+            box-shadow: 0 0 10px 0 rgb(204 204 204 / 50%), 0 0 1px 0 rgb(204 204 204 / 50%);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            width: MAX_WIDTHpx;
+            position: relative;
+        }
+
+
+
+        .horizontalRule {
+            background-color: #ebebeb;
+            border: 0;
+            outline: none;
+            height: 1px;
+            margin: auto;
+            width: calc(100% - 2 * 19px);
+        }
+
+        .dataSection {
+            display: flex;
+            align-items: flex-end;
+            height: 100%;
+            background: #fff;
+            padding: 6px 19px;
+        }
+
+
+
+        .subSecWithTitle {
+            height: 30px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            padding: 0px 19px;
+            justify-content: space-between;
+            background: #fff;
+        }
+
+        .poweredBy {
+            justify-content: right;
+            font-family: inherit;
+            font-weight: 300;
+            color: #777777;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            padding: 6px 19px;
+        }
+
+        .multitasker {
+            color: #ec561a;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="shadow">
+
+        SECTIONS_PLACE
+
+        <header>
+            <span class="poweredBy">POWERED BY
+
+                <span class="multitasker">THE MULTITASKER</span>
+            </span>
+        </header>
+    </div>
+</body>
+
+</html>
