@@ -1,7 +1,8 @@
 const { decryptMedia } = require('@open-wa/wa-automate');
+
 const { downloader, meme, redAlerts, fetcher, compile, covid, wolfram, senders, spam, converter } = require('./lib');
 
-const sendersFileName = __dirname + '/lib/util/senders.json';
+const sendersFileName = __dirname + '/util/senders.json';
 // Senders file object.
 const ourSenders = new senders.Senders(sendersFileName);
 // senders json object for all senders sorted by use case.

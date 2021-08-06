@@ -1,10 +1,11 @@
 const { fetchWithTimeout } = require('../util/fetcher')
 const fs = require('fs');
+const path = require('path');
 const puppeteer = require('puppeteer');
 const config = require('../util/config.json');
 const json = require('../util/cities.json');
 
-var map = fs.readFileSync(__dirname + '/util/map.html', 'utf8');
+var map = fs.readFileSync(path.join(__dirname, '../util/map.html'), 'utf8');
 var isActivated = false;
 
 /**
