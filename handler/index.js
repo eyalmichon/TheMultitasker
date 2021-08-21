@@ -81,7 +81,8 @@ const msgHandler = async (client, message) => {
     const args = body.trim().split(/ +/).slice(1);
     // add all content in quoted message to the args if it's not null.
     if (quotedMsg && quotedMsg.type === 'chat')
-        args.push(...(quotedMsg.body.trim().split(/ +/)))
+        args.push(...(quotedMsg.body.trim().replace(/\n+/g, ' ').split(/ +/)))
+    console.log(args)
     // Bot's number.
     const botNumber = await client.getHostNumber() + '@c.us';
     // if is a group message get the groups ID.
