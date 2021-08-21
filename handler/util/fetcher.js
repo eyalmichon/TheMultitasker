@@ -1,9 +1,14 @@
 const fetch = require('node-fetch');
 const fs = require('fs');
+const FormData = require('form-data');
+const fileType = require('file-type');
 const AbortController = require('abort-controller');
-const MAX_SIZE_ALLOWED = 47185920;
+const secrets = require('../util/secrets.json');
 
-function getRandomFileName() {
+// 44 MB
+const MAX_SIZE_ALLOWED = 46137344;
+
+const getRandomFileName = () => {
     var timestamp = new Date().toISOString().replace(/[-:.Z]/g, "");
     var random = ("" + Math.random()).substring(2, 6);
     var random_number = timestamp + random;
@@ -30,13 +35,14 @@ const fetchJson = (url, options) =>
 /**
  * Check if the file located at the url is too large to handle by trying to get the content-length from the header.
  * @param {*} url url of file
+ * @param {*} maxSize max size allowed.
  * @returns CONTENT_TOO_LARGE if above MAX_SIZE_ALLOWED, OK if below.
  */
-const checkSize = (url) => new Promise((resolve, reject) => {
+const checkSize = (url, maxSize = MAX_SIZE_ALLOWED) => new Promise((resolve, reject) => {
     fetch(url, { method: 'HEAD', timeout: 3000 })
         .then(response => {
             // return error if more than MAX_SIZE_ALLOWED MB
-            if (response.headers.get('content-length') > MAX_SIZE_ALLOWED) return resolve('CONTENT_TOO_LARGE');
+            if (response.headers.get('content-length') > maxSize) return resolve('CONTENT_TOO_LARGE');
             else return resolve('OK');
         }).catch(err => {
             console.error(err)
@@ -121,10 +127,42 @@ const fetchToFile = (url, extension) => new Promise((resolve, reject) => {
         else {
             resolve({ status: res.status, filePath: null });
         }
-    }).catch(err => {
-        console.error(err);
-        reject(err);
-    });
+    })
+        .catch(err => {
+            console.error(err);
+            reject(err);
+        });
+})
+/**
+ * Upload image to telegra.ph
+ * * Supported mimetype:
+ * - `image/jpeg`
+ * - `image/jpg`
+ * - `image/png`s
+ * @param {Buffer} buffer Image Buffer
+ */
+const uploadImage = (buffer) => new Promise((resolve, reject) => {
+    const { ext } = fileType(buffer)
+    if (![`jpeg`, `jpg`, `png`].includes(ext)) throw 'UNSUPPORTED_FILETYPE';
+
+    let form = new FormData
+    form.append('image', buffer, 'blob')
+    fetch('https://api.imgur.com/3/image/', {
+        method: "post",
+        headers: {
+            Authorization: `Client-ID ${secrets.Imgur.ID}`
+        },
+        body: form
+    })
+        .then(res => res.json())
+        .then(json => {
+            if (json.error) throw json.error
+            resolve(json.data.link);
+        })
+        .catch(err => {
+            console.error(err);
+            reject(err);
+        });
 })
 
 module.exports = {
@@ -134,5 +172,7 @@ module.exports = {
     fetchWithTimeout,
     checkSize,
     fetchToFile,
+    getRandomFileName,
+    uploadImage,
     MAX_SIZE_ALLOWED
 }
