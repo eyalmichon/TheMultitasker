@@ -46,6 +46,7 @@ class Owner {
                         redAlerts.alerts(client, getGroup);
                         text = `🚨 Red Alerts has been ${b('activated!')}`;
                     }
+                    break;
                 case 'off':
                     if (redAlerts.getState()) {
                         redAlerts.changeState(false);
@@ -53,6 +54,7 @@ class Owner {
                     }
                     else
                         text = `🚨 Red Alerts ${b('already')} deactivated!`;
+                    break;
                 default:
                     break;
             }
