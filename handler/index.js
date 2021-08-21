@@ -3,7 +3,7 @@ const commands = new Commands();
 
 const { b, m, i } = require('./util/style');
 
-const { senders, spam, converter } = require('./lib');
+const { senders, spam, converter, redAlerts } = require('./lib');
 
 const sendersFilePath = __dirname + '/util/senders.json';
 // Senders file object.
@@ -20,16 +20,41 @@ const spamSet = new spam.Spam();
 const socialSpam = new spam.Spam();
 // Clean tmp folder in case there are leftovers.
 converter.cleanTmp();
-// Set if want to delete the bot's messages after a given time or not.
-var deleteMessages = true;
 
-
+/**
+ * Delete a message after a certain time.
+ * @param {*} object ogject of {client, waitMsg, from}
+ * @param {*} time time in seconds.
+ */
 function delMsgAfter(object, time = 60) {
-    if (deleteMessages)
-        setTimeout(() => object.client.deleteMessage(object.from, object.waitMsg, false), time * 1000);
+    setTimeout(() => object.client.deleteMessage(object.from, object.waitMsg, false), time * 1000);
 }
 
+/**
+ * Restart all commands after an application crash/restart.
+ * @param {*} client the wa-automate client.
+ * @param {*} cmds array of commands that you wish to try and start after a restart.
+ */
+const restartHandler = async (client, cmds) => {
+    cmds.forEach(cmd => {
+        switch (cmd) {
+            case 'redalerts':
+                if (redAlerts.getState())
+                    commands.execute(cmd, client, getGroup, 'on')
+                break;
+            default:
+                break;
+        }
+    })
+}
 
+/**
+ * Handles message on arrival.
+ * 
+ * @param {*} client the wa-automate client.
+ * @param {*} message the message object.
+ * @returns 
+ */
 const msgHandler = async (client, message) => {
     const { id, from, chatId, sender, isGroupMsg, chat, caption, quotedMsg, mentionedJidList } = message;
     let { body } = message;
@@ -235,4 +260,4 @@ const msgHandler = async (client, message) => {
 
 }
 
-module.exports = { msgHandler }
+module.exports = { msgHandler, restartHandler }

@@ -6,14 +6,15 @@ const config = require('../util/config.json');
 const json = require('../util/cities.json');
 
 var map = fs.readFileSync(path.join(__dirname, '../util/map.html'), 'utf8');
-var isActivated = false;
+var isActivated = config.RedAlerts.Activated;
 
 /**
  * Change the isActivated state from true to false or the other way around.
  * @param {boolean} bool 
  */
 const changeState = (bool) => {
-    isActivated = bool;
+    isActivated = config.RedAlerts.Activated = bool;
+    fs.writeFileSync(path.join(__dirname, '../util/config.json'), JSON.stringify(config))
 }
 /**
  * Get the current state of isAvtivated.
