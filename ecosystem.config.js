@@ -6,7 +6,7 @@ module.exports = {
     error_file: "./logs/pm2/err.log",
     out_file: "./logs/pm2/out.log",
     log: "./logs/pm2/out_err.log",
-    cron_restart: "0 * * * *",
-    max_memory_restart: "500M"
+    cron_restart: "30 */2 * * *",
+    max_memory_restart: "1024M"
   }]
 }
