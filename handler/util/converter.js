@@ -1,7 +1,9 @@
 const fs = require('fs');
+const path = require('path');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
+const tmpFolder = path.join(__dirname, '../tmp/');
 
 /**
  * Append a string to file name.
@@ -71,16 +73,13 @@ const toMP3 = (audioPath) => new Promise((resolve, reject) => {
 /**
  * Deletes a file of a given path.
  * @param {String} path Path of the file you want to delete.
- * @returns true if success, otherwise false.
  */
 const unlinkOutput = (path) => {
     try {
         fs.unlinkSync(path)
-        return true;
     }
     catch (err) {
         console.error(err);
-        return false;
     }
 }
 /**
@@ -96,11 +95,20 @@ const getFileSize = (filePath) => {
         return false;
     }
 }
-
+/**
+ * Clean tmp folder.
+ */
+const cleanTmp = () => {
+    fs.readdirSync(tmpFolder).forEach(file => {
+        if (file !== 'tmp.txt')
+            unlinkOutput(tmpFolder + file)
+    });
+}
 module.exports = {
     mergeVideoAudio,
     shrinkVideoSize,
     getFileSize,
     unlinkOutput,
+    cleanTmp,
     toMP3
 }
