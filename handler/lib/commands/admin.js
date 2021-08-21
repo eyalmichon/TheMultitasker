@@ -23,7 +23,7 @@ class Admin {
                     mentionlist.push(`@${member.replace('@c.us', '')}`)
                 });
             client.sendTextWithMentions(from, mentionlist.join(' '))
-            return {};
+            return { info: true };
         },
         help: () => help.Admin.everyone
     }
@@ -31,12 +31,12 @@ class Admin {
     kick = {
         func: (client, message) => {
             if (message.quotedMsg !== null)
-                client.removeParticipant(message.groupId, message.quotedMsg.sender.id);
+                client.removeParticipant(message.from, message.quotedMsg.sender.id);
 
             message.mentionedJidList.forEach(member => {
-                client.removeParticipant(message.groupId, member);
+                client.removeParticipant(message.from, member);
             })
-            return {};
+            return { info: true };
         },
         help: () => help.Admin.kick
     }
