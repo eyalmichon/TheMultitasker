@@ -1,20 +1,21 @@
 const { create, Client } = require('@open-wa/wa-automate');
-const msgHandler = require('./handler');
+const { msgHandler } = require('./handler');
 
 // Get all unread messages and go over them.
 async function handleUnread(client) {
     const unreadMessages = await client.getAllUnreadMessages();
     unreadMessages.forEach(message => {
-        msgHandler(client, message).catch(err => {
-            console.error(err);
-        })
+        msgHandler(client, message)
+            .catch(err => {
+                console.error(err);
+            })
     });
 }
 
 
 
 const start = async (client = new Client()) => {
-    console.log('The Multitasker', '[Version 1.3.2]')
+    console.log('The Multitasker', '[Version 1.4]')
 
     // // refresh the client every hour.
     // setInterval(() => {
@@ -58,8 +59,8 @@ const options = {
     // log browser errors
     logConsoleErrors: true,
     // try to auto detect chrome location.
-    // useChrome: true
     // run instead of chromium
+    // useChrome: true
     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
     // for linux
     // executablePath: '/usr/bin/google-chrome-stable',
