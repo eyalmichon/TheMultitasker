@@ -94,7 +94,7 @@ class Owner {
                 groupMembers.filter(member => member !== botMaster && member !== botNumber).forEach(member => {
                     client.removeParticipant(groupId, member);
                 })
-                return {};
+                return { info: true };
             }
             else
                 return errors.GROUP;
@@ -158,7 +158,7 @@ class Owner {
             for (let i = 0; i < n; i++) {
                 client.sendTextWithMentions(from, tagText);
             }
-            return {};
+            return { info: true };
         },
         help: () => help.Owner.tag
     }
@@ -168,7 +168,7 @@ class Owner {
         func: (message) => {
             if (message.quotedMsg)
                 console.log(message.quotedMsg.mimetype)
-            return {};
+            return { info: true };
         },
         help: () => help.Owner.m
     }
