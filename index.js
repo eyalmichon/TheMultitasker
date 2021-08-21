@@ -1,5 +1,5 @@
 const { create, Client } = require('@open-wa/wa-automate');
-const { msgHandler } = require('./handler');
+const { msgHandler, restartHandler } = require('./handler');
 
 // Get all unread messages and go over them.
 async function handleUnread(client) {
@@ -23,6 +23,8 @@ const start = async (client = new Client()) => {
     // }, 3600000)
 
     try {
+        // Activate all commands that run in background if they were active before restart.
+        restartHandler(client, ['redalerts'])
 
         // Force it to keep the current session
         client.onStateChanged(state => {
