@@ -1,5 +1,5 @@
 const { fetchJson, fetchToFile } = require('../util/fetcher')
-const { mergeVideoAudio, shrinkVideoSize } = require('./converter')
+const { mergeVideoAudio, shrinkVideoSize } = require('../util/converter')
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -7,7 +7,7 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 // list of subreddits to get a random subreddit from.
 const subreddits = ['dankmemes', 'facepalm', 'funny', 'cursedcomments', 'blursedimages', 'bikinibottomtwitter'
     , 'hmmm', 'memeeconomy', 'memes', 'ani_bm', 'okbuddyretard', '2meirl4meirl', 'PrequelMemes', 'me_irl'
-    , 'forbiddensnacks', 'lifehacks', 'nextfuckinglevel', 'oddlysatisfying', 'shittylifehacks', 'therewasanattempt', 'tihi', 'unexpected'
+    , 'forbiddensnacks', 'nextfuckinglevel', 'oddlysatisfying', 'shittylifehacks', 'therewasanattempt', 'tihi', 'unexpected'
     , 'watchpeopledieinside', 'whatcouldgowrong']
 
 /**
@@ -157,12 +157,14 @@ function getImagePostInfo(link) {
  */
 const getImg = (sub) => new Promise((resolve, reject) => {
     console.log('looking for image posts on ' + sub)
+    // Get 100 posts from top section from sub.
     let link = `https://api.reddit.com/r/${sub}/top.json?limit=100`;
-    getImagePostInfo(link).then(postInfo => {
-        console.log(`Post found: Title: ${postInfo.title} Url: ${postInfo.url} Post Link: https://reddit.com${postInfo.permalink}`)
+    getImagePostInfo(link)
+        .then(postInfo => {
+            console.log(`Post found: Title: ${postInfo.title} Url: ${postInfo.url} Post Link: https://reddit.com${postInfo.permalink}`)
 
-        resolve({ title: postInfo.title, url: postInfo.url });
-    })
+            resolve({ title: postInfo.title, url: postInfo.url });
+        })
         .catch(err => {
             reject(err);
         });
@@ -170,9 +172,13 @@ const getImg = (sub) => new Promise((resolve, reject) => {
 
 /**
  * Get a random image post from reddit.
+ * If no image found, search again recursively.
  * @returns {Promise} Promise of {title, url}
  */
-const randomImg = () => getImg(getRandomSub());
+const randomImg = () => getImg(getRandomSub()).catch(err => {
+    if (err === 'NO_MEDIA') return randomImg(getRandomSub())
+    else return err;
+});
 /**
  * Get an image post from a given subreddit.
  * @returns {Promise} Promise of {title, url}
