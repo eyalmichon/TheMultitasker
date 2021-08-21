@@ -1,25 +1,9 @@
 const { fetchBase64, checkSize, MAX_SIZE_ALLOWED } = require('../util/fetcher')
-const { getFileSize } = require('./converter')
+const { getFileSize } = require('../util/converter')
 const reddit = require('./reddit');
 
 const subreddits = reddit.subreddits;
 
-/**
- * Create custom meme
- * @param  {String} imageUrl URL of the background image.
- * @param  {String} topText Text on top.
- * @param  {String} bottomText Text on bottom.
- */
-const custom = (imageUrl, top, bottom) => new Promise((resolve, reject) => {
-    topText = top.trim().replace(/\s/g, '_').replace(/\?/g, '~q').replace(/\%/g, '~p').replace(/\#/g, '~h').replace(/\//g, '~s')
-    bottomText = bottom.trim().replace(/\s/g, '_').replace(/\?/g, '~q').replace(/\%/g, '~p').replace(/\#/g, '~h').replace(/\//g, '~s')
-    fetchBase64(`https://api.memegen.link/images/custom/${topText}/${bottomText}.png?background=${imageUrl}`, 'image/png')
-        .then((result) => resolve(result))
-        .catch((err) => {
-            console.error(err)
-            reject(err)
-        })
-})
 
 /**
  * Get a post from a random subreddit
@@ -96,6 +80,5 @@ module.exports = {
     randomRedditPost,
     subRedditImg,
     subRedditPost,
-    custom,
     subreddits
 }
