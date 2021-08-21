@@ -1,12 +1,50 @@
 const { promisify } = require('util');
+const path = require('path');
 const { getInstaInfo, getTwitterInfo, getFacebookInfo } = require('../util/video-url-link');
+const youtubedl = require('youtube-dl-exec')
 const ytdl = require('ytdl-core');
 const { getVideoMeta } = require('tiktok-scraper');
-const { checkSize, fetchToFile, MAX_SIZE_ALLOWED } = require('../util/fetcher');
-const { toMP3 } = require('./converter');
+const { checkSize, fetchToFile, getRandomFileName, MAX_SIZE_ALLOWED } = require('../util/fetcher');
+const converter = require('../util/converter');
 
 const igGetInfo = promisify(getInstaInfo);
 const twtGetInfo = promisify(getTwitterInfo);
+
+/**
+ * Download a video using youtube-dl.
+ * @param {String} url 
+ * @returns output path of the video.
+ */
+const video = (url) => new Promise((resolve, reject) => {
+
+    console.log('looking for video content on ' + url);
+
+    const fileName = getRandomFileName();
+    const fullPath = path.join(__dirname, '../tmp/');
+    youtubedl(url, { 'max-filesize': `${MAX_SIZE_ALLOWED}`, 'no-playlist': '', o: `${fullPath + fileName}.%(ext)s` })
+        .then(res => {
+
+            if (res.includes('Aborting')) {
+                console.error(res);
+                return reject('CONTENT_TOO_LARGE');
+            }
+
+            const outputPath = res.match(/Destination: ([^\n]+)/)[1];
+            const fileSize = converter.getFileSize(outputPath);
+            if (fileSize > MAX_SIZE_ALLOWED) {
+                console.error(res);
+                converter.unlinkOutput(outputPath);
+                reject('CONTENT_TOO_LARGE');
+            }
+            else
+                resolve(outputPath);
+
+        })
+        .catch((err) => {
+            console.error(err)
+            reject(err)
+        })
+})
 
 /**
  * Get Instagram Metadata using forked video-url-link
@@ -14,23 +52,29 @@ const twtGetInfo = promisify(getTwitterInfo);
  * @param  {String} url The Instagram URL.
  */
 const insta = (url) => new Promise((resolve, reject) => {
-    console.log('looking for instagram content on ' + url)
+    console.log('looking for instagram content on ' + url);
     const uri = url.replace(/\?.*$/g, '')
     igGetInfo(uri, {})
-        .then((result) => {
+        .then(async (result) => {
             const promises = [];
+            const linkArr = [];
             // Then go over the returned list of videos/images.
             result.list.forEach(item => {
                 // If there is a video key in the JSON, get the video.
-                if (item.video !== undefined) {
-                    if (checkSize(item.video) === 'OK')
-                        promises.push(item.video);
+                if (item.video) {
+                    promises.push(checkSize(item.video)
+                        .then(res => { if (res === 'OK') linkArr.push(item.video) }))
                 }
                 // Else if the requested item didn't have a video in it.
                 else
-                    promises.push(item.image)
+                    linkArr.push(item.image)
             })
-            resolve(Promise.all(promises));
+            await Promise.all(promises)
+
+            if (linkArr.length)
+                resolve(linkArr);
+            else
+                reject('EMPTY')
         })
         .catch((err) => {
             console.error(err)
@@ -92,7 +136,8 @@ const tiktok = (url) => new Promise((resolve, reject) => {
 
             checkSize(info.link).then(res => (res === 'OK') ? resolve(info) : resolve('CONTENT_TOO_LARGE'));
 
-        }).catch((err) => {
+        })
+        .catch((err) => {
             console.error(err);
             reject(err);
         })
@@ -131,7 +176,7 @@ const youtubeMp3 = (url) => new Promise((resolve, reject) => {
 
         fetchToFile(link, 'mp3').then(res => {
 
-            toMP3(res.filePath).then(output => resolve({ link: output, title: response.videoDetails.title }))
+            converter.toMP3(res.filePath).then(output => resolve({ link: output, title: response.videoDetails.title }))
         })
     }).catch(err => {
         console.error(err);
@@ -139,26 +184,6 @@ const youtubeMp3 = (url) => new Promise((resolve, reject) => {
     })
 })
 
-const facebookRandom = () => new Promise(async (resolve, reject) => {
-    console.log('looking for a random facebook video');
-    let url = 'https://www.facebook.com/watch';
-    getFacebookInfo(url).then(async result => {
-        let link;
-        console.log(`Title: ${result.title}\nHD: ${result.download.hd}\nSD: ${result.download.sd}`)
-
-        if (result.download.hd && (await checkSize(result.download.hd) === 'OK'))
-            link = result.download.hd;
-        else if (result.download.sd && (await checkSize(result.download.sd) === 'OK'))
-            link = result.download.sd;
-        else
-            link = undefined;
-
-        resolve({ link: link, title: result.title });
-    }).catch(err => {
-        console.error(err);
-        reject(err);
-    })
-})
 
 const facebook = (url) => new Promise(async (resolve, reject) => {
     console.log('looking for a facebook video on ' + url);
@@ -171,7 +196,7 @@ const facebook = (url) => new Promise(async (resolve, reject) => {
         else if (result.download.sd && (await checkSize(result.download.sd) === 'OK'))
             link = result.download.sd;
         else
-            link = undefined;
+            reject('');
 
         resolve({ link: link, title: result.title });
     }).catch(err => {
@@ -185,7 +210,7 @@ module.exports = {
     tweet,
     tiktok,
     facebook,
-    facebookRandom,
     youtube,
-    youtubeMp3
+    youtubeMp3,
+    video
 }
