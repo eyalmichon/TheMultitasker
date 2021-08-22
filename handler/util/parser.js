@@ -10,19 +10,33 @@ function isValidURL(url) {
 
 const parse = (args) => {
 
-    let options = {};
+    const options = {};
+    const joinedText = [];
+    let key, value, url;
 
     args.forEach(arg => {
+        value = true;
         if (arg[0] === '-') {
-            if (arg.includes('url') || arg.length < 2) return;
-            if (arg[1] === '-')
-                options[arg.slice(2)] = true;
-            else
-                options[arg.slice(1)] = true;
+            if (arg.length < 2) return;
+
+            key = arg.slice(1);
+
+            if (key.includes('=')) {
+                let index = key.indexOf('=');
+                value = key.slice(index + 1, key.length);
+                key = key.slice(0, index);
+            }
+
+            options[key] = value;
         }
-        if (isValidURL(arg))
-            options.url = arg
+        else if (isValidURL(arg))
+            url = arg;
+        else
+            joinedText.push(arg)
     });
+
+    options.url = url;
+    options.joinedText = joinedText.join(' ');
     return options
 }
 
