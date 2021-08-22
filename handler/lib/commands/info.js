@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram } = require("..");
+const { compile, covid, wolfram, parser } = require("..");
 
 class Info {
     // Add type, function and help using spread syntax.
@@ -42,21 +42,23 @@ class Info {
 
     wolfram = {
         func: (args) => {
-            if (args[0] === '-f') {
-                args.shift();
-                let question = args.join(' ');
+            const options = parser.parse(args);
+            let full = !!options.f || !!options.full;
+            let question = options.joinedText;
+
+            if (full)
                 return wolfram.getFullAnswer(question)
                     .then(base64 => returnType.sendFile(`data:document/png;base64,${base64}`, `the_multitasker_${question}.png`))
                     .catch(() => errors.CANT_ANSWER_WOLF)
 
-            }
             else
-                return wolfram.getAnswer(args.join(' '))
+                return wolfram.getAnswer(question)
                     .then(res => returnType.fileFromURL(res.img, 'the_multitasker.gif', res.text))
                     .catch(() => errors.CANT_ANSWER_WOLF)
         },
-        help: () => help.Info.covid
+        help: () => help.Info.wolfram
     }
+
 }
 
 module.exports = { Info }
