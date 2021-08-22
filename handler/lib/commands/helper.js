@@ -119,7 +119,7 @@ const help = {
     Info: {
         compile: `${b('Usage:')} ${prefix}compile [language] [code]\n${b('Available languages:')} c ,cpp ,c# ,rill ,erlang ,elixir ,haskell ,d ,java ,rust ,python ,python2.7 ,ruby ,scala ,groovy ,nodejs ,nodejs14 ,coffeescript ,spidermonkey ,swift ,perl ,php ,lua ,sql ,pascal ,lisp ,lazyk ,vim ,pypy ,ocaml ,go ,bash ,pony ,crystal ,nim ,openssl ,f# ,r ,typescript ,julia`,
         covid: `${b('Usage:')} ${prefix}covid (or ${prefix}covid [1-7] for number of days to get info about) to get back information about active cases, infected people today, etc...`,
-        covid: `${b('Usage:')} ${prefix}wolfram [question] and you'll receive an answer from Wolfram Alpha.\n${b('Options:')}\nfull answer: -f\n${b('Aliases:')} [wolframalpha, wolfram, wolf, wf]`
+        wolfram: `${b('Usage:')} ${prefix}wolfram [question] and you'll receive an answer from Wolfram Alpha.\n${b('Options:')}\nfull answer: -f\n${b('Aliases:')} [wolframalpha, wolfram, wolf, wf]`
     },
     Sticker: {
         sticker: `${b('Usage:')}\n${m(`reply with ${prefix}sticker or send the image/gif/video with caption ${prefix}sticker.`)}\n${b('OR')}\n ${m('Reply to a URL with an image/gif to create the sticker from that instead.')}\n${b('Options:')}\n${m(`- cropping: -c\n- remove background: -r`)}\n${b('Aliases:')}\n${m('[sticker, s]')}`
