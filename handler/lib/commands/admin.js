@@ -15,14 +15,14 @@ class Admin {
         commands.kick = this.addInfo(this.kick)
     }
     everyone = {
-        func: (client, groupMembers, senderID, botNumber) => {
+        func: (client, message, groupMembers, botNumber) => {
             let mentionlist = [];
             groupMembers
-                .filter(member => member !== senderID && member !== botNumber)
+                .filter(member => member !== message.sender.id && member !== botNumber)
                 .forEach(member => {
                     mentionlist.push(`@${member.replace('@c.us', '')}`)
                 });
-            client.sendTextWithMentions(from, mentionlist.join(' '))
+            client.sendTextWithMentions(message.from, mentionlist.join(' '))
             return { info: true };
         },
         help: () => help.Admin.everyone

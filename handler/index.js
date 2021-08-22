@@ -151,7 +151,7 @@ const msgHandler = async (client, message) => {
             switch (command) {
                 case 'everyone':
                 case 'tagall':
-                    result = await commands.execute(command, client, groupMembers, sender.id, botNumber);
+                    result = await commands.execute(command, client, message, groupMembers, botNumber);
                     break;
                 case 'kick':
                     result = await commands.execute(command, client, message);
