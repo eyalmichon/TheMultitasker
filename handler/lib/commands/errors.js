@@ -34,6 +34,7 @@ const errors = {
     UNKNOWN_SOCIAL: addType(`📛 Error, wrong link or not a video.`),
     NOT_SUPPORTED: addType(`📛 Error, site not supported`),
     CANT_ANSWER_WOLF: addType(`📛 Error, can't answer that question.`),
+    NON_FOUND_URBAN: addType(`📛 Error, couldn't find any definitions for this term.`),
 }
 
 module.exports = { errors }

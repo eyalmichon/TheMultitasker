@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser } = require("..");
+const { compile, covid, wolfram, parser, urban } = require("..");
 
 class Info {
     // Add type, function and help using spread syntax.
@@ -20,6 +20,9 @@ class Info {
         commands.wolframalpha = this.alias(this.wolfram)
         commands.wolf = this.alias(this.wolfram)
         commands.wf = this.alias(this.wolfram)
+
+        commands.urban = this.addInfo(this.urban)
+        commands.ud = this.alias(this.urban)
     }
 
     compile = {
@@ -59,6 +62,40 @@ class Info {
         help: () => help.Info.wolfram
     }
 
+    urban = {
+        func: async (args) => {
+            const options = parser.parse(args);
+            let result
+            let text = [];
+            let wotd = !!options.wotd;
+            let random = !!options.r;
+            let term = options.joinedText;
+
+            if (wotd)
+                result = await urban.wordOfTheDay(term);
+            else if (random)
+                result = await urban.random();
+            else {
+                if (!!term)
+                    result = await urban.topResult(term)
+                else
+                    return errors.BAD_CMD
+            }
+
+            if (!result) return errors.NON_FOUND_URBAN
+
+            if (wotd)
+                text.push(`${b('Date:')} ${result.date}`)
+
+            text.push(`${b('Word:')} ${result.word}`)
+            text.push(`${b('Definition:')} ${result.definition}`)
+            text.push(`${b('Example:')} ${result.example}`)
+
+            return returnType.reply(text.join('\n\n'));
+
+        },
+        help: () => help.Info.urban
+    }
 }
 
 module.exports = { Info }

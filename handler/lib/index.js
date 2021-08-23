@@ -10,4 +10,5 @@ exports.compile = require('./compile');
 exports.covid = require('./covid');
 exports.spam = require('../util/spam');
 exports.wolfram = require('./wolfram');
+exports.urban = require('./urban');
 exports.extras = require('./extras');

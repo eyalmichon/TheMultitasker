@@ -7,7 +7,7 @@
 <h5> A WhatsApp bot written in JavaScript and Node.js.</h5>
 
 ![forthebadge](https://img.shields.io/badge/Made%20with-Node.js-8bbf3d)
-![forthebadge](https://img.shields.io/badge/version-1.4-blueviolet)
+![forthebadge](https://img.shields.io/badge/version-1.4.1-blueviolet)
 
 
 </div>
@@ -44,6 +44,7 @@ Command pattern used for easy management of adding more commands.
   - Compile 👨‍💻 and get output from many languages like Python 🐍, C, Java, etc....
   - Get COVID-19 🦠 updates for Israel.
   - Get answers to questions ❓ from WolframAlpha.
+  - Get definition of words / Word of the day / random word from Urban Dictionary.
 
 - ### Forwarder Commands:
   - Forward messages randomly from a chosen group. (group IDs need to be set manually)
