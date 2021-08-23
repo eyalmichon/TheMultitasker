@@ -43,11 +43,11 @@ const options = config.Covid.requestOptions;
  * @param {*} days number of days to get, 1-7
  * @returns information about infected people on these days.
  */
-const infected = (days) => new Promise((resolve, reject) => {
+const infected = (days = '1') => new Promise((resolve, reject) => {
 
     console.log(`looking for last ${days} days of Covid data...`);
 
-    if (days === undefined || !isInt(days) || 0 >= days || days > 7)
+    if (!isInt(days) || 0 >= days || days > 7)
         days = 1;
     fetchJson(endpoint, options).then(body => {
 
