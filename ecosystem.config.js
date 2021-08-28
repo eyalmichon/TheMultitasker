@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: "the-multitasker",
+    name: "the_multitasker",
     script: "./index.js",
     log_date_format: "YYYY-MM-DD HH:mm:ss",
     error_file: "./logs/pm2/err.log",

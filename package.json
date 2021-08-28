@@ -1,10 +1,14 @@
 {
-  "name": "the-multitasker",
-  "version": "1.4.1",
+  "name": "the_multitasker",
+  "version": "1.4.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "gitpush": "git push origin master --tags",
+    "add-commit": "git add release.png package.json package-lock.json CHANGELOG.md && git commit -m \"Release %npm_config_addver%\"",
+    "release-image": "node release-image.js",
+    "release": "npm version --no-git-tag-version %npm_config_newver% && auto-changelog --template changelog-template.hbs -p -u --commit-limit false && npm run release-image && npm run add-commit --addver=%npm_config_newver% && git tag -a %npm_config_newver% -m \"%npm_config_newver%\""
   },
   "author": "Eyal Michon",
   "license": "ISC",
@@ -16,6 +20,8 @@
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@open-wa/wa-automate": "^4.17.1",
     "abort-controller": "^3.0.0",
+    "changelog-parser": "^2.8.0",
+    "command-line-args": "^5.2.0",
     "fetch": "^1.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs": "0.0.1-security",

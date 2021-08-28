@@ -12,6 +12,11 @@
 
 </div>
 
+## Latest Changes
+
+<div align="center">
+   <img src="./release.png"/>
+   </div>
 
 ## Features
 
