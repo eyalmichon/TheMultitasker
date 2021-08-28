@@ -7,7 +7,6 @@
 <h5> A WhatsApp bot written in JavaScript and Node.js.</h5>
 
 ![forthebadge](https://img.shields.io/badge/Made%20with-Node.js-8bbf3d)
-![forthebadge](https://img.shields.io/badge/version-1.4.1-blueviolet)
 
 
 </div>
