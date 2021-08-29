@@ -1,3 +1,4 @@
+const { version } = require('./package.json')
 const { create, Client } = require('@open-wa/wa-automate');
 const { msgHandler, restartHandler } = require('./handler');
 
@@ -15,7 +16,7 @@ async function handleUnread(client) {
 
 
 const start = async (client = new Client()) => {
-    console.log('The Multitasker', '[Version 1.4.1]')
+    console.log(`The Multitasker [Version ${version}]`)
 
     // // refresh the client every hour.
     // setInterval(() => {
@@ -63,6 +64,7 @@ const options = {
     // try to auto detect chrome location.
     // run instead of chromium
     // useChrome: true
+    // custom path windows
     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
     // for linux
     // executablePath: '/usr/bin/google-chrome-stable',
