@@ -35,6 +35,7 @@ const errors = {
     NOT_SUPPORTED: addType(`📛 Error, site not supported`),
     CANT_ANSWER_WOLF: addType(`📛 Error, can't answer that question.`),
     NON_FOUND_URBAN: addType(`📛 Error, couldn't find any definitions for this term.`),
+    WRONG_LANG_CODE: addType(`📛 Error, wrong language code used, please see the help section for this command for all available language codes.`),
 }
 
 module.exports = { errors }

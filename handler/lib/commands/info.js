@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban } = require("..");
+const { compile, covid, wolfram, parser, urban, translate } = require("..");
 
 class Info {
     // Add type, function and help using spread syntax.
@@ -23,6 +23,10 @@ class Info {
 
         commands.urban = this.addInfo(this.urban)
         commands.ud = this.alias(this.urban)
+
+        commands.translate = this.addInfo(this.translate)
+        commands.tran = this.alias(this.translate)
+        commands.tr = this.alias(this.translate)
     }
 
     compile = {
@@ -95,6 +99,22 @@ class Info {
 
         },
         help: () => help.Info.urban
+    }
+
+    translate = {
+        func: (args) => {
+            const options = parser.parse(args);
+
+            const to = options.l || options.lang;
+
+            return translate.text(options.joinedText, to)
+                .then(res => returnType.reply(res))
+                .catch(err => {
+                    if (err === 'WRONG_LANG_CODE') return errors.WRONG_LANG_CODE;
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.translate
     }
 }
 

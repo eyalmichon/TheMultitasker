@@ -49,6 +49,7 @@ Command pattern used for easy management of adding more commands.
   - Get COVID-19 🦠 updates for Israel.
   - Get answers to questions ❓ from WolframAlpha.
   - Get definition of words / Word of the day / random word from Urban Dictionary.
+  - Translate sentences using Google Translate.
 
 - ### Forwarder Commands:
   - Forward messages randomly from a chosen group. (group IDs need to be set manually)
