@@ -71,21 +71,16 @@ const fetchText = (url, options) => new Promise((resolve, reject) => {
  * Fetch base64 from url
  * @param {String} url
  */
-const fetchBase64 = (url, mimetype) => {
-    return new Promise((resolve, reject) => {
-        // console.log('Get base64 from:', url)
-        return fetch(url)
-            .then((res) => {
-                const _mimetype = mimetype || res.headers.get('content-type')
-                res.buffer()
-                    .then((result) => resolve(`data:${_mimetype};base64,` + result.toString('base64')))
-            })
-            .catch((err) => {
-                console.error(err)
-                reject(err)
-            })
-    })
-}
+const fetchBase64 = (url) => new Promise((resolve, reject) => {
+    return fetch(url)
+        .then((res) => res.buffer())
+        .then((buffer) => resolve(buffer.toString('base64')))
+        .catch((err) => {
+            console.error(err)
+            reject(err)
+        })
+})
+
 
 /**
  * use fetch function with a timeout so if it's stuck we can can abort it.
@@ -134,7 +129,7 @@ const fetchToFile = (url, extension) => new Promise((resolve, reject) => {
         });
 })
 /**
- * Upload image to telegra.ph
+ * Upload image to Imgur
  * * Supported mimetype:
  * - `image/jpeg`
  * - `image/jpg`
@@ -145,7 +140,7 @@ const uploadImage = (buffer) => new Promise((resolve, reject) => {
     const { ext } = fileType(buffer)
     if (![`jpeg`, `jpg`, `png`].includes(ext)) throw 'UNSUPPORTED_FILETYPE';
 
-    let form = new FormData
+    let form = new FormData();
     form.append('image', buffer, 'blob')
     fetch('https://api.imgur.com/3/image/', {
         method: "post",
@@ -165,6 +160,27 @@ const uploadImage = (buffer) => new Promise((resolve, reject) => {
         });
 })
 
+/**
+ * Upload image to transfer.sh
+ * 
+ * @param {Buffer} buffer Image Buffer
+ * @returns uploaded file's link.
+ */
+const uploadFile = (buffer) => new Promise((resolve, reject) => {
+    const { ext } = fileType(buffer)
+    fetch(`http://transfer.sh/${getRandomFileName()}.${ext}`, {
+        method: "put",
+        body: buffer
+    })
+        .then(res => res.text())
+        .then(res => resolve(res))
+        .catch(err => {
+            console.error(err);
+            reject(err);
+        })
+})
+
+
 module.exports = {
     fetchJson,
     fetchText,
@@ -174,5 +190,6 @@ module.exports = {
     fetchToFile,
     getRandomFileName,
     uploadImage,
+    uploadFile,
     MAX_SIZE_ALLOWED
 }
