@@ -5,6 +5,13 @@ const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 const tmpFolder = path.join(__dirname, '../tmp/');
 
+const getRandomFileName = () => {
+    var timestamp = new Date().toISOString().replace(/[-:.Z]/g, "");
+    var random = ("" + Math.random()).substring(2, 6);
+    var random_number = timestamp + random;
+    return random_number;
+}
+
 /**
  * Append a string to file name.
  * @param {String} filename the original filename.
@@ -104,11 +111,31 @@ const cleanTmp = () => {
             unlinkOutput(tmpFolder + file)
     });
 }
+
+/**
+ * save binary buffer to a file.
+ * @param {*} buffer the binary data.
+ * @param {*} ext the extention you want the file to have.
+ * @returns path to the file.
+ */
+const saveBinary = (buffer, ext) => {
+    try {
+        const path = tmpFolder + getRandomFileName() + '.' + ext;
+        fs.writeFileSync(path, buffer)
+        return path;
+    } catch (err) {
+        console.error(err);
+        return false;
+    }
+
+}
 module.exports = {
     mergeVideoAudio,
     shrinkVideoSize,
     getFileSize,
     unlinkOutput,
     cleanTmp,
-    toMP3
+    toMP3,
+    saveBinary,
+    ffmpegPath
 }
