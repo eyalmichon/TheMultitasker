@@ -20,32 +20,45 @@ class Sticker {
     sticker = {
         func: async (message, args) => {
             const options = parser.parse(args)
-
+            const quoted = !!message.quotedMsg;
+            const ogMsg = message;
             // if there is a quoted message, use it to make the sticker.
-            if (message.quotedMsg) message = message.quotedMsg;
+            if (quoted) message = message.quotedMsg;
 
             let crop = !!options.c || !!options.crop;
             let rmbg = !!options.r || !!options.rb;
+            let stroke = !!options.s || !!options.stroke;
+            let text = !!options.t || !!options.text;
 
             // if the user tries to make a sticker from a message that has a link in it, change the type to url.
-            if (options.url) message.type = 'url'
+            if (!!options.url) message.type = 'url'
 
             switch (message.type) {
                 case 'image':
                     return decryptMedia(message)
-                        .then(async mediaData => {
-                            var base64 = `data:${message.mimetype};base64,${mediaData.toString('base64')}`;
-
-                            if (rmbg)
-                                base64 = await imageProcessing.removeBG(mediaData);
+                        .then(async buffer => {
+                            var base64 = buffer.toString('base64');
+                            if (rmbg) {
+                                if (!!options.bg || !!options.bgurl) {
+                                    if (quoted)
+                                        options.bg = await decryptMedia(ogMsg);
+                                    base64 = await imageProcessing.removeBG(base64, options);
+                                }
+                                else
+                                    base64 = await imageProcessing.removeBG(base64);
+                            }
+                            if (stroke)
+                                base64 = await imageProcessing.addStroke(base64, options)
+                            if (text)
+                                base64 = await imageProcessing.addText(base64, options)
 
                             return returnType.imgSticker(base64, !crop);
                         })
                         .catch(() => errors.UNKNOWN)
 
                 case 'video':
-                    var mediaData = await decryptMedia(message);
-                    var base64 = `data:${message.mimetype};base64,${mediaData.toString('base64')}`;
+                    var buffer = await decryptMedia(message);
+                    var base64 = buffer.toString('base64');
                     return returnType.videoSticker(base64, crop);
                 case 'url':
                     // Don't allow sending stickers that are more than 10MB large. (10485760 bytes)
