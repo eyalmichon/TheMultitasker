@@ -75,10 +75,10 @@ const msgHandler = async (client, message) => {
     // Add user to spam set if it's not the bot owner.
     if (sender.id !== botMaster)
         spamSet.addUser(sender.id);
-    // get the command from the body sent.
-    const command = body.slice(1).trim().split(/ +/).shift().toLowerCase();
     // split the body content into args.
-    const args = body.trim().split(/ +/).slice(1);
+    const args = body.trim().split(/ +/);
+    // get the command from the body sent.
+    const command = args.shift().slice(1).toLowerCase();
     // add all content in quoted message to the args if it's not null.
     if (quotedMsg && quotedMsg.type === 'chat')
         args.push(...(quotedMsg.body.trim().replace(/\n+/g, ' ').split(/ +/)))
@@ -95,13 +95,12 @@ const msgHandler = async (client, message) => {
 
     let result = {};
     let waitMsg = null;
-
     switch (commands.type(command)) {
         case 'Help':
             // for a command help.
             if (args[0]) {
-                if (commands.type(args[0]))
-                    result = { type: 'reply', info: await commands.help(args[0]) };
+                if (commands.type(args[0].toLowerCase()))
+                    result = { type: 'reply', info: await commands.help(args[0].toLowerCase()) };
                 else
                     result = errors.WRONG_CMD;
             }
@@ -173,7 +172,7 @@ const msgHandler = async (client, message) => {
             break;
         // Social Commands.
         case 'Forwarder':
-            result = await commands.execute(command, client, getGroup, chatId);
+            result = await commands.execute(command, client, getGroup);
             break;
         // Info Commands.
         case 'Info':
@@ -183,7 +182,7 @@ const msgHandler = async (client, message) => {
                 socialSpam.addUser(sender.id, 10000);
 
             waitMsg = client.reply(from, i('🧙‍♂️ This may take some time...'), id);
-            result = await commands.execute(command, args);
+            result = await commands.execute(command, args, message);
 
             break;
         // Sticker Commands.
@@ -192,10 +191,17 @@ const msgHandler = async (client, message) => {
             result = await commands.execute(command, message, args);
 
             break;
+        // Media Commands.
+        case 'Media':
+            waitMsg = client.reply(from, i('🧙‍♂️ Ah, just sit back and i\'ll be right back...'), id);
+            result = await commands.execute(command, args, message);
+
+            break;
         default:
             break;
     }
-    if (!result.info)
+
+    if (!result || !result.info)
         result = errors.BAD_CMD
 
     switch (result.type) {
@@ -239,14 +245,14 @@ const msgHandler = async (client, message) => {
             break;
         case 'sendFile':
             await client.sendFile(from, result.info.path, result.info.fileName, result.info.title, id, true)
-                .then(() => converter.unlinkOutput(result.info.path));
+                .then(() => result.removeFile ? converter.unlinkOutput(result.info.path) : '');
             break;
         case 'sendPtt':
             await client.sendPtt(from, result.info.path, id)
-                .then(() => converter.unlinkOutput(result.info.path))
+                .then(() => result.removeFile ? converter.unlinkOutput(result.info.path) : '')
             break;
         case 'forwardMessage':
-            await client.forwardMessages(result.info.chatID, result.info.msgID);
+            await client.forwardMessages(from, result.info.msgID);
             break;
         case 'sendMaster':
             await client.sendText(botMaster, result.info);
