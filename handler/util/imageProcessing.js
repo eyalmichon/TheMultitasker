@@ -196,8 +196,8 @@ const removeBG = (base64, options = {}) => new Promise((resolve, reject) => {
     if (!!options.bgurl) form.append('bg_image_url', options.bgurl)
     if (!!options.bg) form.append('bg_image_file', options.bg)
 
-    let i = Math.floor(Math.random() * removebg.key.length)
-    let randomKey = removebg.key[i]
+    let i = Math.floor(Math.random() * removebg.length)
+    let randomKey = removebg[i]
     console.log(`Using key number ${i} in from the array.`)
 
     fetcher.fetchJson('https://api.remove.bg/v1.0/removebg', {
