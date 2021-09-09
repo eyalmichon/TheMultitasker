@@ -191,7 +191,7 @@ class Social {
             if (audio)
                 return downloader.youtubeMp3(link)
                     .then(info => {
-                        return returnType.sendPtt(info.link);
+                        return returnType.sendPtt(info.path);
                     })
                     .catch(err => {
                         if (err.name === 'TypeError') return errors.ID_YOUTUBE
@@ -217,10 +217,15 @@ class Social {
         func: (args) => {
             const options = parser.parse(args);
             if (!options.url) return errors.INVALID_LINK
-            let link = options.url;
 
-            return downloader.video(link)
+            let link = options.url;
+            let audio = !!options.a || !!options.audio;
+
+            return downloader.video(link, audio)
                 .then(path => {
+                    if (audio)
+                        return returnType.sendPtt(path);
+
                     return returnType.sendFile(path, 'the_multitasker.mp4');
                 })
                 .catch(err => {
