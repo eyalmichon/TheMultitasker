@@ -6,6 +6,7 @@ const { Info } = require("./info");
 const { Owner } = require("./owner");
 const { Social } = require("./social");
 const { Sticker } = require('./sticker');
+const { Media } = require('./media');
 const { Help } = require('./help');
 
 class Commands {
@@ -18,6 +19,7 @@ class Commands {
         new Forwarder(this.commands);
         new Info(this.commands);
         new Sticker(this.commands);
+        new Media(this.commands);
         // Keep last.
         new Help(this.commands);
     }
