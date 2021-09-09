@@ -11,25 +11,29 @@ const igGetInfo = promisify(getInstaInfo);
 const twtGetInfo = promisify(getTwitterInfo);
 
 /**
- * Download a video using youtube-dl.
+ * Download a video or audio only using youtube-dl.
  * @param {String} url 
+ * @param {Boolean} audio 
  * @returns output path of the video.
  */
-const video = (url) => new Promise((resolve, reject) => {
+const video = (url, audio) => new Promise((resolve, reject) => {
 
     console.log('looking for video content on ' + url);
 
     const fileName = getRandomFileName();
     const fullPath = path.join(__dirname, '../tmp/');
-    youtubedl(url, { 'max-filesize': `${MAX_SIZE_ALLOWED}`, 'no-playlist': '', o: `${fullPath + fileName}.%(ext)s` })
-        .then(res => {
+    const options = { 'max-filesize': `${MAX_SIZE_ALLOWED}`, 'no-playlist': '', o: `${fullPath + fileName}.%(ext)s`, f: "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" };
 
+    if (audio) options["x"] = ''; options["audio-format"] = "mp3"; options["ffmpeg-location"] = converter.ffmpegPath
+
+    youtubedl(url, options)
+        .then(res => {
             if (res.includes('Aborting')) {
                 console.error(res);
                 return reject('CONTENT_TOO_LARGE');
             }
 
-            const outputPath = res.match(/Destination: ([^\n]+)/)[1];
+            const outputPath = res.match(/(?<=Merging formats into ").*?(?=")|(?<=Destination: ).*?(?=\n)/g).pop();
             const fileSize = converter.getFileSize(outputPath);
             if (fileSize > MAX_SIZE_ALLOWED) {
                 console.error(res);
@@ -176,7 +180,7 @@ const youtubeMp3 = (url) => new Promise((resolve, reject) => {
 
         fetchToFile(link, 'mp3').then(res => {
 
-            converter.toMP3(res.filePath).then(output => resolve({ link: output, title: response.videoDetails.title }))
+            converter.toMP3(res.filePath).then(output => resolve({ path: output, title: response.videoDetails.title }))
         })
     }).catch(err => {
         console.error(err);
