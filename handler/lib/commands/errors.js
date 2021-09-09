@@ -21,6 +21,7 @@ const errors = {
     STICKER_TOO_LARGE: addType(`📛 Error, the image/video was too large.`),
     STICKER_RETRY: addType(`📛 There was an error processing your sticker.\nMaybe try to edit the ${b('length')} or ${b('resize')} and resend.`),
     STICKER_NOT_GIF: addType(`📛 Error, not an image/gif`),
+    NOT_IMG: addType(`📛 Error, either the message or the quoted message not an image`),
     PRIVATE_SOCIAL: addType(`📛 Error, private user or wrong link`),
     INVALID_LINK: addType(`📛 Error, the link you sent was invalid.`),
     INVALID_INSTA: addType(`📛 Error, this is not a valid Instagram link.`),
@@ -36,6 +37,10 @@ const errors = {
     CANT_ANSWER_WOLF: addType(`📛 Error, can't answer that question.`),
     NON_FOUND_URBAN: addType(`📛 Error, couldn't find any definitions for this term.`),
     WRONG_LANG_CODE: addType(`📛 Error, wrong language code used, please see the help section for this command for all available language codes.`),
+    NO_RESULT_RECO: addType(`📛 Error, could'nt find any music matching this song.`),
+    WRONG_TYPE_RECO: addType(`📛 Error, only accepting audio messages.`),
+    CONV_VIDEO_TOO_LARGE: addType(`📛 Error, the video you're trying to convert is too large...`),
+    CONV_NOT_VIDEO: addType(`📛 Error, only videos are allowed.`)
 }
 
 module.exports = { errors }

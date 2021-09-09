@@ -41,22 +41,23 @@ const returnType = {
      * @param {String} path DataURL data:image/xxx;base64,xxx or the RELATIVE (should start with ./ or ../) path of the file you want to send.
      * @param {String} fileName the file name that'll be set for the file.
      * @param {String} title the caption to add to the sent message.
+     * @param {Boolean} removeFile boolean if to remove a file after sending it.
      * @returns Object information for sending a local file. 
      */
-    sendFile: (path, fileName, title = '') => { return { type: 'sendFile', info: { path, fileName, title } } },
+    sendFile: (path, fileName, title = '', removeFile = true) => { return { type: 'sendFile', info: { path, fileName, title }, removeFile } },
     /**
      * Object information for sending a local music file as push to talk.
      * @param {String} path DataURL data:image/xxx;base64,xxx or the RELATIVE (should start with ./ or ../) path of the file you want to send.
+     * @param {Boolean} removeFile boolean if to remove a file after sending it.
      * @returns Object information for sending a local music file.
      */
-    sendPtt: (path) => { return { type: 'sendPtt', info: { path } } },
+    sendPtt: (path, removeFile = true) => { return { type: 'sendPtt', info: { path }, removeFile } },
     /**
      * Object information for forwarding a message with its ID to a chat with a chatID.
-     * @param {String} chatID the chat to forward to.
      * @param {String} msgID the message ID being forwarded. 
      * @returns Object information for forwarding a message.
      */
-    forwardMessage: (chatID, msgID) => { return { type: 'forwardMessage', info: { chatID, msgID } } },
+    forwardMessage: (msgID) => { return { type: 'forwardMessage', info: { msgID } } },
     /**
      * Object information for sending a sticker from an image.
      * @param {String} base64 the image's base64.
@@ -108,7 +109,7 @@ const help = {
         twitter: `${b('Usage:')} reply with ${prefix}twitter to a twitter video link or send ${prefix}twitter [link to tweet with video].\n${b('Aliases:')} [twitter, tw]`,
         tiktok: `${b('Usage:')} reply with ${prefix}tiktok to a tiktok video link or send ${prefix}tiktok [link].\n${b('Aliases:')} [tiktok, tik, tk]`,
         facebook: `${b('Usage:')} reply with ${prefix}facebook to a facebook video link or send ${prefix}facebook [video link] or send !facebook for a random video from facebook.\n${b('Aliases:')} [facebook, fb]`,
-        youtube: `${b('Usage:')} reply with ${prefix}youtube to a youtube video link or send ${prefix}youtube [video link].\n${b('Options:')}\n${m(`- audio only: -a`)}\n${b('Aliases:')} [youtube, yt]`,
+        youtube: `${b('Usage:')} reply with ${prefix}youtube to a youtube video link or send ${prefix}youtube [video link].\n${b('Options:')}\n${m(`• audio only: -a`)}\n${b('Aliases:')} [youtube, yt]`,
         video: `${b('Usage:')} reply with ${prefix}video to a video link or send ${prefix}video [video link].\n${b('Aliases:')} [video, v]`,
     },
     Forwarder: {
@@ -119,15 +120,20 @@ const help = {
     Info: {
         compile: `${b('Usage:')} ${prefix}compile [language] [code]\n${b('Available languages:')} c ,cpp ,c# ,rill ,erlang ,elixir ,haskell ,d ,java ,rust ,python ,python2.7 ,ruby ,scala ,groovy ,nodejs ,nodejs14 ,coffeescript ,spidermonkey ,swift ,perl ,php ,lua ,sql ,pascal ,lisp ,lazyk ,vim ,pypy ,ocaml ,go ,bash ,pony ,crystal ,nim ,openssl ,f# ,r ,typescript ,julia`,
         covid: `${b('Usage:')} ${prefix}covid (or ${prefix}covid [1-7] for number of days to get info about) to get back information about active cases, infected people today, etc...`,
-        wolfram: `${b('Usage:')} ${prefix}wolfram [question] and you'll receive an answer from Wolfram Alpha.\n${b('Options:')}\nfull answer: -f\n${b('Aliases:')} [wolframalpha, wolfram, wolf, wf]`,
-        urban: `${b('Usage:')} ${prefix}urban [term] and you'll receive the top definition for that term from Urban Dictionary.\n${b('Options:')}\n${m(`- Word of the day:[how many days ago? 0-9] -wotd\n- random: -r`)}\n${b('Aliases:')} [urban, ud]`,
-        translate: `${b('Usage:')} ${prefix}translate [text] and you'll receive the translation for the text from Google Translate.\n${b('Options:')}\n(defaults to english if no option used)\n${m(`- translate to: -l=[code] or -lang=[code]`)}\n${b('Language codes:')}\nAfrikaans = *af*, Albanian = *sq*, Amharic = *am*, Arabic = *ar*, Armenian = *hy*, Azerbaijani = *az*, Basque = *eu*, Belarusian = *be*, Bengali = *bn*, Bosnian = *bs*, Bulgarian = *bg*, Catalan = *ca*, Cebuano = *ceb*, Chinese (Simplified) = *zh-CN*, Chinese (Traditional) = *zh-TW*, Corsican = *co*, Croatian = *hr*, Czech = *cs*, Danish = *da*, Dutch = *nl*, English = *en*, Esperanto = *eo*, Estonian = *et*, Finnish = *fi*, French = *fr*, Frisian = *fy*, Galician = *gl*, Georgian = *ka*, German = *de*, Greek = *el*, Gujarati = *gu*, Haitian Creole = *ht*, Hausa = *ha*, Hawaiian = *haw*, Hebrew = *iw*, Hindi = *hi*, Hmong = *hmn*, Hungarian = *hu*, Icelandic = *is*, Igbo = *ig*, Indonesian = *id*, Irish = *ga*, Italian = *it*, Japanese = *ja*, Kannada = *kn*, Kazakh = *kk*, Khmer = *km*, Korean = *ko*, Kurdish = *ku*, Kyrgyz = *ky*, Lao = *lo*, Latvian = *lv*, Lithuanian = *lt*, Luxembourgish = *lb*, Macedonian = *mk*, Malagasy = *mg*, Malay = *ms*, Malayalam = *ml*, Maltese = *mt*, Maori = *mi*, Marathi = *mr*, Mongolian = *mn*, Myanmar (Burmese) = *my*, Nepali = *ne*, Norwegian = *no*, Nyanja (Chichewa) = *ny*, Pashto = *ps*, Persian = *fa*, Polish = *pl*, Portuguese (Portugal, Brazil) = *pt*, Punjabi = *pa*, Romanian = *ro*, Russian = *ru*, Samoan = *sm*, Scots Gaelic = *gd*, Serbian = *sr*, Sesotho = *st*, Shona = *sn*, Sindhi = *sd*, Sinhala (Sinhalese) = *si*, Slovak = *sk*, Slovenian = *sl*, Somali = *so*, Spanish = *es*, Sundanese = *su*, Swahili = *sw*, Swedish = *sv*, Tagalog (Filipino) = *tl*, Tajik = *tg*, Tamil = *ta*, Telugu = *te*, Thai = *th*, Turkish = *tr*, Turkmen = *tk*, Ukrainian = *uk*, Urdu = *ur*, Uzbek = *uz*, Vietnamese = *vi*, Welsh = *cy*, Xhosa = *xh*, Yiddish = *yi*, Yoruba = *yo*, Zulu = *zu*\n${b('Aliases:')} [translate, tran, tr]`,
+        wolfram: `${b('Usage:')} ${prefix}wolfram [question] and you'll receive an answer from Wolfram Alpha.\n${b('Options:')}\n• full answer: -f\n${b('Aliases:')} [wolframalpha, wolfram, wolf, wf]`,
+        urban: `${b('Usage:')} ${prefix}urban [term] and you'll receive the top definition for that term from Urban Dictionary.\n${b('Options:')}\n${m(`• Word of the day: [how many days ago? 0-9] -wotd\n• random: -r`)}\n${b('Aliases:')} [urban, ud]`,
+        translate: `${b('Usage:')} ${prefix}translate [text] and you'll receive the translation for the text from Google Translate.\n${b('Options:')}\n(defaults to english if no option used)\n${m(`• translate to: -l=[code] or -lang=[code]`)}\n${b('Language codes:')}\nAfrikaans = *af*, Albanian = *sq*, Amharic = *am*, Arabic = *ar*, Armenian = *hy*, Azerbaijani = *az*, Basque = *eu*, Belarusian = *be*, Bengali = *bn*, Bosnian = *bs*, Bulgarian = *bg*, Catalan = *ca*, Cebuano = *ceb*, Chinese (Simplified) = *zh-CN*, Chinese (Traditional) = *zh-TW*, Corsican = *co*, Croatian = *hr*, Czech = *cs*, Danish = *da*, Dutch = *nl*, English = *en*, Esperanto = *eo*, Estonian = *et*, Finnish = *fi*, French = *fr*, Frisian = *fy*, Galician = *gl*, Georgian = *ka*, German = *de*, Greek = *el*, Gujarati = *gu*, Haitian Creole = *ht*, Hausa = *ha*, Hawaiian = *haw*, Hebrew = *iw*, Hindi = *hi*, Hmong = *hmn*, Hungarian = *hu*, Icelandic = *is*, Igbo = *ig*, Indonesian = *id*, Irish = *ga*, Italian = *it*, Japanese = *ja*, Kannada = *kn*, Kazakh = *kk*, Khmer = *km*, Korean = *ko*, Kurdish = *ku*, Kyrgyz = *ky*, Lao = *lo*, Latvian = *lv*, Lithuanian = *lt*, Luxembourgish = *lb*, Macedonian = *mk*, Malagasy = *mg*, Malay = *ms*, Malayalam = *ml*, Maltese = *mt*, Maori = *mi*, Marathi = *mr*, Mongolian = *mn*, Myanmar (Burmese) = *my*, Nepali = *ne*, Norwegian = *no*, Nyanja (Chichewa) = *ny*, Pashto = *ps*, Persian = *fa*, Polish = *pl*, Portuguese (Portugal, Brazil) = *pt*, Punjabi = *pa*, Romanian = *ro*, Russian = *ru*, Samoan = *sm*, Scots Gaelic = *gd*, Serbian = *sr*, Sesotho = *st*, Shona = *sn*, Sindhi = *sd*, Sinhala (Sinhalese) = *si*, Slovak = *sk*, Slovenian = *sl*, Somali = *so*, Spanish = *es*, Sundanese = *su*, Swahili = *sw*, Swedish = *sv*, Tagalog (Filipino) = *tl*, Tajik = *tg*, Tamil = *ta*, Telugu = *te*, Thai = *th*, Turkish = *tr*, Turkmen = *tk*, Ukrainian = *uk*, Urdu = *ur*, Uzbek = *uz*, Vietnamese = *vi*, Welsh = *cy*, Xhosa = *xh*, Yiddish = *yi*, Yoruba = *yo*, Zulu = *zu*\n${b('Aliases:')} [translate, tran, tr]`,
+        recognizeMusic: `${b('Usage:')} reply with ${prefix}recognize to an audio message or a video.\n${b('Options:')}\n${m(`• All results: -f or -full`)}\n${b('Aliases:')} [recognize, rec, rm]`,
     },
     Sticker: {
-        sticker: `${b('Usage:')}\n${m(`reply with ${prefix}sticker or send the image/gif/video with caption ${prefix}sticker.`)}\n${b('OR')}\n ${m('Reply to a URL with an image/gif to create the sticker from that instead.')}\n${b('Options:')}\n${m(`- cropping: -c\n- remove background: -r`)}\n${b('Aliases:')}\n${m('[sticker, s]')}`
+        sticker: `${b('Usage:')}\n${m(`reply with ${prefix}sticker or send the image/gif/video with caption ${prefix}sticker.`)}\n${b('OR')}\n ${m('Reply to a URL of an image/gif to create the sticker from that instead.')}\n${b('Options:')}\n${m(`• cropping: -c\n• remove background (images): -r\n • background: -bg\n • background from url: -bgurl=[image link]\n• Stroke:\n • size: -size=[1-10]\n • color: -color=[color name or #hex]\n • alpha: -alpha=[0-255]\n• Text:\n • stroke color: -scolor=[color name or #hex]\n • fill color: -fcolor=[color name or #hex]\n • size: -fsize=[number 1-1000]\n(for background: send an image (which you want it\'s background removed), then quote the image with the background picture you want)`)}\n${b('Aliases:')}\n${m('[sticker, s]')}`
+    },
+    Media: {
+        removebg: `${b('Usage:')}\n${m(`reply with ${prefix}removebg to an image or send the image with caption ${prefix}removebg to receive a file without the image background.`)}\n${b('Options:')}\n${m(`• remove background (only images): -r\n• background: -bg\n• background from url: -bgurl=[image link]\n• Stroke:\n • size: -size=[1-10]\n • color: -color=[color name or #hex]\n • alpha: -alpha=[0-255]\n• Text:\n • stroke color: -scolor=[color name or #hex]\n • fill color: -fcolor=[color name or #hex]\n • size: -fsize=[number 1-1000]\n(for background: send an image (which you want it\'s background removed), then quote the image with the background picture you want)`)}\n${b('Aliases:')}\n${m('[removebg, rmbg]')}`,
+        videotomp3: `${b('Usage:')}\n${m(`reply with ${prefix}videotomp3 to a video or send the video with caption ${prefix}videotomp3 to receive the audio of the video file.`)}\n${b('Aliases:')}\n${m('[videotomp3, v2mp3, v2m]')}`,
     },
     Help: {
-        help: `Oh, I see you've found the 🐰 🥚\n${b('What did you expect to find here...?')}\n\nWell if you're already here, I have a cool story for you which starts like this...\n\n`
+        help: `Oh, I see you've found the 🐰 🥚\n${b('What did you expect to find here...? ')}\n\nWell if you're already here, I have a cool story for you which starts like this...\n\n`
     }
 }
 

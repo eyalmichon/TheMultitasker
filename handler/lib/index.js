@@ -12,4 +12,5 @@ exports.spam = require('../util/spam');
 exports.wolfram = require('./wolfram');
 exports.urban = require('./urban');
 exports.translate = require('./translate');
+exports.recognize = require('./recognize');
 exports.extras = require('./extras');
