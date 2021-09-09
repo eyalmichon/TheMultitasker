@@ -20,8 +20,8 @@ class Forwarder {
 
                 if (!this.groupsDB[name]) {
 
-                    this.groupsDB[name] = [];
                     let messagesArr = await client.loadAndGetAllMessagesInChat(fromID, false);
+                    this.groupsDB[name] = [];
                     messagesArr.forEach(message => {
                         this.groupsDB[name].push(message.id);
                     });
@@ -54,22 +54,22 @@ class Forwarder {
     }
 
     egg = {
-        func: async (client, getGroup, chatID) => {
+        func: async (client, getGroup) => {
             // get all messages from given group.
             // In order for this to WORK you'll need to have the senders file with the group ID.
             let ids = await this.getIDsFromDB(client, 'egg', getGroup("ProjectEgg"))
             let id = this.getRandomID(ids)
-            return returnType.forwardMessage(chatID, id)
+            return returnType.forwardMessage(id)
         },
         help: () => help.Forwarder.egg
     }
     fart = {
-        func: async (client, getGroup, chatID) => {
+        func: async (client, getGroup) => {
             // get all messages from given group.
             // In order for this to WORK you'll need to have the senders file with the group ID.
             let ids = await this.getIDsFromDB(client, 'fart', getGroup("Fartictionary"))
             let id = this.getRandomID(ids)
-            return returnType.forwardMessage(chatID, id)
+            return returnType.forwardMessage(id)
         },
         help: () => help.Forwarder.fart
     }
