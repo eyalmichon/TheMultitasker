@@ -1,4 +1,4 @@
-const { fetchBase64, checkSize, MAX_SIZE_ALLOWED } = require('../util/fetcher')
+const { checkSize, MAX_SIZE_ALLOWED } = require('../util/fetcher')
 const { getFileSize } = require('../util/converter')
 const reddit = require('./reddit');
 
