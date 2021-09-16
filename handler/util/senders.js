@@ -1,11 +1,21 @@
 const fs = require('fs');
+const path = require('path')
+const sendersPath = path.join(__dirname, 'senders.json');
 
 class Senders {
-    constructor(sendersFileName) {
+    constructor() {
         // file for all senders sorted by use reason. should look something like this:
         // {"Me": "","RedAlerts-MessageOnly": [],"RedAlerts":[]}
-        this.senders = JSON.parse(fs.readFileSync(sendersFileName, 'utf8'));
-        this.sendersFileName = sendersFileName;
+        if (!fs.existsSync(sendersPath)) {
+            console.error(`Couldn't find senders.json in ${sendersPath}, creating it...\nPLEASE FILL OUT YOUR NUMBER IN THE "Me" KEY.`)
+            fs.writeFileSync(sendersPath, `{
+                "Me": "Enter your number here -> ******@c.us",
+                "Allowed": [],
+                "RedAlerts-MessageOnly": [],
+                "RedAlerts": [],
+            }`)
+        }
+        this.senders = require('./senders.json')
     }
     // return the whole senders json object.
     getSenders() { return this.senders; }
@@ -13,6 +23,7 @@ class Senders {
     getGroup(group) { return this.senders[group]; }
 
     // check if we got a correct number, this is the best we can do I guess...
+    // Might want to delete or replace prefix.
     isCorrectNumber(num) {
         return num.startsWith('972') && (num.endsWith('@c.us') || num.endsWith('@g.us')) && (num.length === 17 || num.length === 28);
 
@@ -35,7 +46,7 @@ class Senders {
             return false;
         if (!this.senders[group].includes(number)) {
             this.senders[group].push(number);
-            fs.writeFileSync(this.sendersFileName, JSON.stringify(this.senders));
+            fs.writeFileSync(sendersPath, JSON.stringify(this.senders));
         }
         return true;
     }
@@ -51,7 +62,7 @@ class Senders {
             return false;
         if (this.senders[group].includes(number)) {
             this.senders[group] = this.removeFromArray(this.senders[group], number);
-            fs.writeFileSync(this.sendersFileName, JSON.stringify(this.senders));
+            fs.writeFileSync(sendersPath, JSON.stringify(this.senders));
         }
         return true;
     }

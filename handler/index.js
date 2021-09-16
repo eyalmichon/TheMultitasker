@@ -1,13 +1,14 @@
 const { Commands, prefix, errors } = require('./lib/commands');
-const commands = new Commands();
-
+const { BlackList } = require('./util/blacklist');
 const { b, m, i } = require('./util/style');
-
 const { senders, spam, converter, redAlerts } = require('./lib');
 
-const sendersFilePath = __dirname + '/util/senders.json';
+const commands = new Commands();
+const blackList = new BlackList();
+
+
 // Senders file object.
-const mySenders = new senders.Senders(sendersFilePath);
+const mySenders = new senders.Senders();
 // senders json object for all senders sorted by use case.
 const getSenders = () => { return mySenders.getSenders(); }
 // Get a specific group.
@@ -28,6 +29,17 @@ converter.cleanTmp();
  */
 function delMsgAfter(object, time = 60) {
     setTimeout(() => object.client.deleteMessage(object.from, object.waitMsg, false), time * 1000);
+}
+
+const autoRemoveHandler = (client, message) => {
+    if (message.subtype && ['add', 'invite'].includes(message.subtype)) {
+        const prefixes = blackList.getPrefixes();
+        message.recipients.forEach(recipient => {
+            const isPrefix = prefixes.filter(prefix => recipient.startsWith(prefix))
+            if (isPrefix.length > 0)
+                client.removeParticipant(message.from, recipient)
+        })
+    }
 }
 
 /**
@@ -58,7 +70,7 @@ const restartHandler = async (client, cmds) => {
 const msgHandler = async (client, message) => {
     const { id, from, chatId, sender, isGroupMsg, chat, caption, quotedMsg, mentionedJidList } = message;
     let { body } = message;
-
+    let groupBlackList = blackList.getGroup(from);
     // if we don't send anything mark the chat as seen so we don't get it again on the next startup.
     client.sendSeen(chatId);
 
@@ -69,7 +81,8 @@ const msgHandler = async (client, message) => {
     if (!sender
         || (!body)
         || (!body.startsWith(prefix) && (!caption || !(body = caption).startsWith(prefix)))
-        || ((!getGroup('Allowed').includes(from) && getGroup('Me') !== from))) return;
+        || (!getGroup('Allowed').includes(from) && getGroup('Me') !== from)
+        || (!!groupBlackList && groupBlackList.includes(sender.id))) return;
 
     if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
     // Add user to spam set if it's not the bot owner.
@@ -121,6 +134,16 @@ const msgHandler = async (client, message) => {
                 case 'rmvsender':
                     result = await commands.execute(command, mySenders, args[0], args[1]);
                     break;
+                case 'blacklist':
+                case 'black':
+                case 'unblacklist':
+                case 'unblack':
+                    result = await commands.execute(command, blackList, message, botMaster);
+                    break;
+                case 'addprefix':
+                case 'rmprefix':
+                    result = await commands.execute(command, blackList, args[0]);
+                    break;
                 case 'kickall':
                     result = await commands.execute(command, client, groupMembers, groupId, botMaster, botNumber);
                     break;
@@ -134,9 +157,6 @@ const msgHandler = async (client, message) => {
                     break;
                 case 'tag':
                     result = await commands.execute(command, client, mentionedJidList, from, args[0]);
-                    break;
-                case 'm':
-                    result = await commands.execute(command, message);
                     break;
                 default:
                     result = await commands.execute(command, message);
@@ -188,12 +208,12 @@ const msgHandler = async (client, message) => {
         // Sticker Commands.
         case 'Sticker':
             waitMsg = client.reply(from, i('🧙‍♂️ Please wait a moment while I do some magic...'), id);
-            result = await commands.execute(command, message, args);
+            result = await commands.execute(command, args, message);
 
             break;
         // Media Commands.
         case 'Media':
-            waitMsg = client.reply(from, i('🧙‍♂️ Ah, just sit back and i\'ll be right back...'), id);
+            waitMsg = client.reply(from, i('🧙‍♂️ Just sit back, enjoy the view, and i\'ll be right back...'), id);
             result = await commands.execute(command, args, message);
 
             break;
@@ -266,4 +286,4 @@ const msgHandler = async (client, message) => {
 
 }
 
-module.exports = { msgHandler, restartHandler }
+module.exports = { msgHandler, restartHandler, autoRemoveHandler }
