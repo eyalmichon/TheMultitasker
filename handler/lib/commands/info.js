@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban, translate, recognize } = require("..");
+const { compile, covid, wolfram, parser, urban, translate, recognize, nikud } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Info {
@@ -32,6 +32,10 @@ class Info {
         commands.recognize = this.addInfo(this.recognizeMusic)
         commands.rec = this.alias(this.recognizeMusic)
         commands.rm = this.alias(this.recognizeMusic)
+
+        commands.nikud = this.addInfo(this.nikud)
+        commands.nik = this.alias(this.nikud)
+        commands.נקד = this.alias(this.nikud)
     }
 
     compile = {
@@ -139,6 +143,22 @@ class Info {
                 })
         },
         help: () => help.Info.recognizeMusic
+    }
+
+    nikud = {
+        func: async (args, message) => {
+            const options = parser.parse(args);
+            if (message.quotedMsg) message = message.quotedMsg;
+
+            if (message.type !== 'chat') return errors.ONLY_TEXT
+
+            return nikud.nikud(options.joinedText)
+                .then(text => returnType.reply(text))
+                .catch(err => {
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.nikud
     }
 }
 

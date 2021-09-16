@@ -13,4 +13,5 @@ exports.wolfram = require('./wolfram');
 exports.urban = require('./urban');
 exports.translate = require('./translate');
 exports.recognize = require('./recognize');
+exports.nikud = require('./nikud');
 exports.extras = require('./extras');

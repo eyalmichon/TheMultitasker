@@ -17,5 +17,19 @@
             "referrer": "https://datadashboard.health.gov.il/",
             "body": "{\"requests\":[{\"id\":\"1\",\"queryName\":\"infectedPerDate\",\"single\":false,\"parameters\":{}},{\"id\":\"3\",\"queryName\":\"sickPerDateTwoDays\",\"single\":false,\"parameters\":{}}]}"
         }
+    },
+    "Nikud": {
+        "url": "https://nakdan-3-0a.loadbalancer.dicta.org.il/api",
+        "requestOptions": {
+            "method": "POST",
+            "headers": {
+                "accept": "*/*",
+                "content-type": "text/plain;charset=UTF-8",
+                "sec-ch-ua": "\"Google Chrome\";v=\"93\", \" Not;A Brand\";v=\"99\", \"Chromium\";v=\"93\"",
+                "sec-fetch-site": "same-site"
+            },
+            "referrer": "https://nakdan.dicta.org.il/",
+            "referrerPolicy": "strict-origin-when-cross-origin"
+        }
     }
 }
