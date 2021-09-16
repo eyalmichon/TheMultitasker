@@ -1,4 +1,5 @@
 const { fetchJson } = require("../util/fetcher");
+const { isInt } = require("../util/utilities");
 
 /* Urban Dictionary API:
 http://api.urbandictionary.com/v0/autocomplete-extra?term=word
@@ -9,14 +10,6 @@ http://api.urbandictionary.com/v0/random
 http://api.urbandictionary.com/v0/words_of_the_day
 */
 
-/**
- * This method works by splitting the string into an array using the spread operator, 
- * and then uses the every() method to test whether all elements (characters) in the 
- * array are included in the string of digits '0123456789'.
- * @param {*} string 
- * @returns 
- */
-const isInt = string => [...string].every(c => '0123456789'.includes(c));
 
 /**
  * Get the top result on Urban Dictionary by best rated one.

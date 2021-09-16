@@ -1,28 +1,23 @@
 const { fetcher } = require('../lib/index');
 const FormData = require('form-data');
+// must be before canvas.
+const sharp = require('sharp');
 const { createCanvas, loadImage, registerFont } = require('canvas')
 const Color = require('color');
 const { removebg } = require('./secrets.json');
+const { isInt } = require('./utilities');
 registerFont('./handler/util/fonts/SecularOne-Regular.ttf', { family: 'Secular' })
 
 
-/**
- * This method works by splitting the string into an array using the spread operator, 
- * and then uses the every() method to test whether all elements (characters) in the 
- * array are included in the string of digits '0123456789'.
- * @param {*} string 
- * @returns true if the string is an integer.
- */
-const isInt = string => !!parseInt(string) && [...string].every(c => '0123456789'.includes(c));
 
-// helper function for stroke.
-// Using https://github.com/parmanoir/Meijster-distance
 /**
+ * helper function for stroke.
+ * Using https://github.com/parmanoir/Meijster-distance
  * 
- * @param {*} binaryImage 
- * @param {*} width 
- * @param {*} height 
- * @returns 
+ * @param {*} binaryImage the image in binary form.
+ * @param {*} width width of the picture.
+ * @param {*} height height of the picture.
+ * @returns array of distances.
  */
 function computeDistances(binaryImage, width, height) {
     // First phase
@@ -96,10 +91,10 @@ function computeDistances(binaryImage, width, height) {
 
     return dt
 }
-// helper function for stroke.
 /**
+ * helper function for stroke.
  * 
- * @param {*} ctx 
+ * @param {*} ctx canvas context
  * @param {*} threshold 
  * @returns 
  */
@@ -137,7 +132,7 @@ function wrapLines(ctx, words, fontSize, maxWidth, maxRows) {
         word = words[i];
         w = word ? ctx.measureText(word).width : 0;
         if (w) {
-            width = width + space + w;
+            width += space + w;
         }
         if (w > maxWidth || word.length > 20) {
             lines.push(word);
@@ -182,16 +177,16 @@ function getWords(text) {
         .replace(/\s\s/g, ' ').replace('`', ' ').replace(/(\r|\n)/g, ' ' + ' ').split(' ')
 }
 /**
- * Trys to remove the background of a given base64 encoded image.
- * @param {*} base64 the base64 image string.
- * @param {*} options {bgurl: "[some image url]", bg: "[base64 of an image]"}
- * @returns base64 image without it's background OR it's background replaced with another.
+ * Trys to remove the background of a given buffer.
+ * @param {*} buffer the buffer image string.
+ * @param {*} options {bgurl: "[some image url]", bg: "[buffer of an image]"}
+ * @returns buffer image without it's background OR it's background replaced with another.
  */
-const removeBG = (base64, options = {}) => new Promise((resolve, reject) => {
+const removeBG = (buffer, options = {}) => new Promise((resolve, reject) => {
     console.log('Trying to remove background...');
 
     let form = new FormData();
-    form.append('image_file_b64', base64)
+    form.append('image_file', buffer)
     form.append('size', 'auto')
     if (!!options.bgurl) form.append('bg_image_url', options.bgurl)
     if (!!options.bg) form.append('bg_image_file', options.bg)
@@ -209,15 +204,14 @@ const removeBG = (base64, options = {}) => new Promise((resolve, reject) => {
         .then(res => {
             if (res.errors) throw res.errors;
 
-            resolve(res.data.result_b64);
+            resolve(new Buffer.from(res.data.result_b64, 'base64'));
         })
         .catch(err => {
             console.error(err);
             console.log('Trying another API...');
-            let buffer = new Buffer.from(base64, 'base64')
             fetcher.uploadImage(buffer)
                 .then(imgLink => fetcher.fetchBase64('https://bg.experte.de/?url=' + imgLink))
-                .then(base64 => resolve(base64))
+                .then(base64 => resolve(new Buffer.from(base64, 'base64')))
                 .catch(err => {
                     console.error(err);
                     reject(err);
@@ -232,11 +226,11 @@ const removeBG = (base64, options = {}) => new Promise((resolve, reject) => {
  *      thickness: the size of the stroke.
  *      color: the color of the stroke.
  *      alpha: the transparency of the stroke.
- * @param {*} base64 the base64 image string.
+ * @param {*} buffer the buffer image string.
  * @param {*} options {size: "[0-10]", color: "[color name or #hex]", alpha: "[0-255]"}
- * @returns base64 image of the image with a stroke added.
+ * @returns buffer image of the image with a stroke added.
  */
-const addStroke = (base64, options = {}) => new Promise((resolve, reject) => {
+const addStroke = (buffer, options = {}) => new Promise((resolve, reject) => {
     console.log('Adding a stroke...')
 
     let thickness = options.size;
@@ -254,7 +248,6 @@ const addStroke = (base64, options = {}) => new Promise((resolve, reject) => {
     catch { color = Color('white') }
     const colorArray = color.array().concat(color.alpha() * alpha)
 
-    const buffer = new Buffer.from(base64, 'base64');
     const canvas = createCanvas()
     const ctx = canvas.getContext('2d')
 
@@ -284,7 +277,7 @@ const addStroke = (base64, options = {}) => new Promise((resolve, reject) => {
             ctx.drawImage(img, 0, 0)
 
             const outBuffer = canvas.toBuffer('image/png')
-            resolve(outBuffer.toString('base64'));
+            resolve(outBuffer);
         })
         .catch(err => {
             console.error(err);
@@ -299,11 +292,12 @@ const addStroke = (base64, options = {}) => new Promise((resolve, reject) => {
  *      scolor: the color of the stroke.
  *      fcolor: the color of the text fill.
  *      fsize: the size of the font.
- * @param {*} base64 the base64 image string.
- * @param {*} options {scolor: "[color name or #hex]", fcolor: "[color name or #hex]", fsize: "[number]"}
+ *      rows: the max number of rows for the text.
+ * @param {*} buffer the buffer image.
+ * @param {*} options {scolor: "[color name or #hex]", fcolor: "[color name or #hex]", fsize: "[number]", rows: "[number]"}
  * @returns 
  */
-const addText = (base64, options = {}) => new Promise((resolve, reject) => {
+const addText = (buffer, options = {}) => new Promise((resolve, reject) => {
 
     let textArray = options.joinedText.split('|');
     const topText = !!textArray[0] ? textArray[0].trim() : '';
@@ -328,7 +322,6 @@ const addText = (base64, options = {}) => new Promise((resolve, reject) => {
     if (!isInt(options.rows) || options.rows < 1 || 6 < options.rows)
         options.rows = 3;
 
-    const buffer = new Buffer.from(base64, 'base64');
     const canvas = createCanvas()
     const ctx = canvas.getContext('2d')
 
@@ -373,7 +366,7 @@ const addText = (base64, options = {}) => new Promise((resolve, reject) => {
             }
 
             const outBuffer = canvas.toBuffer('image/png')
-            resolve(outBuffer.toString('base64'));
+            resolve(outBuffer);
         })
         .catch(err => {
             console.error(err);
@@ -387,5 +380,6 @@ const addText = (base64, options = {}) => new Promise((resolve, reject) => {
 module.exports = {
     removeBG,
     addStroke,
-    addText
+    addText,
+    sharp
 }
