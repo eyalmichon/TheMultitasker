@@ -2,7 +2,6 @@ const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
 const { compile, covid, wolfram, parser, urban, translate, recognize } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
-const fs = require("fs");
 
 class Info {
     // Add type, function and help using spread syntax.
@@ -132,7 +131,6 @@ class Info {
             if (!['ptt', 'audio', 'video'].includes(message.type)) return errors.WRONG_TYPE_RECO
 
             const data = await decryptMedia(message);
-            fs.writeFileSync('./test.mp3', data)
             return recognize.music(data)
                 .then(res => full ? returnType.reply(res.join('\n\n')) : returnType.reply(res[0]))
                 .catch(err => {
