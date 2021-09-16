@@ -12,7 +12,8 @@ secret
 secrets.json
 *.data.json
 senders.json
-config.hjson
+groups.json
+prefix.json
 # Runtime data
 pids
 *.pid
