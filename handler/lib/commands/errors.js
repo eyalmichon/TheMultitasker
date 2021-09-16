@@ -16,6 +16,7 @@ const errors = {
     NO_LINK: addType(`📛 Error, no link found.`),
     BAD_CMD: addType(`📛 Error, this is not the right way to use this command!\nCheck ${prefix}help command for more details.`),
     WRONG_CMD: addType(`📛 Error, are you making up commands?\nUse ${prefix}help for ${b(`real`)} available commands.`),
+    ONLY_TEXT: addType(`📛 Error, only text messages are allowed.`),
     SPAM: addType(`📛 Sorry, I don\'t like spammers!`),
     STICKER_ERR: addType(`📛 There was an error processing your sticker.`),
     STICKER_TOO_LARGE: addType(`📛 Error, the image/video was too large.`),
