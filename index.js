@@ -1,6 +1,6 @@
 const { version } = require('./package.json')
 const { create, Client } = require('@open-wa/wa-automate');
-const { msgHandler, restartHandler } = require('./handler');
+const { msgHandler, restartHandler, autoRemoveHandler } = require('./handler');
 
 // Get all unread messages and go over them.
 async function handleUnread(client) {
@@ -34,13 +34,17 @@ const start = async (client = new Client()) => {
             if (state === 'CONFLICT' || state === 'DISCONNECTED') client.forceRefocus();
         })
 
-        handleUnread(client);
+        await handleUnread(client);
 
         client.onMessage(message => {
             // Message Handler
             msgHandler(client, message);
         }).catch(err => {
             console.error(err);
+        })
+
+        client.onAnyMessage(message => {
+            autoRemoveHandler(client, message);
         })
 
     } catch (err) {
