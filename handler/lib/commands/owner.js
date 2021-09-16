@@ -29,9 +29,23 @@ class Owner {
 
         commands.tag = this.addInfo(this.tag);
 
+        commands.blacklist = this.addInfo(this.addUserToBlackList)
+        commands.black = this.alias(this.addUserToBlackList)
+
+        commands.unblacklist = this.addInfo(this.removeUserFromBlackList)
+        commands.unblack = this.alias(this.removeUserFromBlackList)
+
+        commands.addprefix = this.addInfo(this.addPrefixBlackList)
+
+        commands.rmprefix = this.addInfo(this.removePrefixBlackList)
+
         commands.m = this.addInfo(this.m);
 
         commands.up = this.addInfo(this.uploadImg)
+
+        commands.send = this.addInfo(this.uploadImg)
+
+
     }
 
     redAlerts = {
@@ -85,6 +99,95 @@ class Owner {
             return returnType.reply(text);
         },
         help: () => help.Owner.removeSender
+    }
+
+    addUserToBlackList = {
+        func: (blackList, message, botMaster) => {
+            let groupID = message.from;
+            let user = !!message.quotedMsg ? message.quotedMsg.sender.id : message.mentionedJidList[0]
+            if (!user || user === botMaster || !message.isGroupMsg) return returnType.reply('⛔ Error, wrong usage.')
+
+            let text = '';
+            switch (blackList.addUserToList(groupID, user)) {
+                case 'USER_EXISTS':
+                    text = `User already exists in the black list for this group.`;
+                    break;
+                case true:
+                    text = `User has been added successfully!`;
+                    break;
+                case false:
+                    text = `⛔ Error, check logs.`;
+                    break;
+                default:
+                    text = `⛔ Unknown Error`;
+            }
+            return returnType.reply(text);
+        },
+        help: () => help.Owner.addUserToBlackList
+    }
+    removeUserFromBlackList = {
+        func: (blackList, message) => {
+            let groupID = message.from;
+            let user = !!message.quotedMsg ? message.quotedMsg.sender.id : message.mentionedJidList[0]
+            if (!user || !message.isGroupMsg) return returnType.reply('⛔ Error, wrong usage.')
+
+            let text = '';
+            switch (blackList.removeUserFromList(groupID, user)) {
+                case 'NO_USERS':
+                    text = `⛔ Error, there are no users in this group's black list.`;
+                    break;
+                case true:
+                    text = `User has been removed successfully!`;
+                    break;
+                case false:
+                    text = `⛔ Error, check logs.`;
+                    break;
+                default:
+                    text = `⛔ Unknown Error`;
+            }
+            return returnType.reply(text);
+        },
+        help: () => help.Owner.removeUserFromBlackList
+    }
+    addPrefixBlackList = {
+        func: (blackList, num) => {
+            let text = '';
+            switch (blackList.addPrefix(num)) {
+                case 'PREFIX_EXISTS':
+                    text = `Prefix already exists.`;
+                    break;
+                case 'PREFIX_BAD_FORMAT':
+                    text = `Prefix not in the right format, ex: 972`;
+                    break;
+                case true:
+                    text = `Prefix added successfully!`;
+                    break;
+                default:
+                    text = `Unknown Error`;
+            }
+            return returnType.reply(text);
+        },
+        help: () => help.Owner.addPrefixBlackList
+    }
+    removePrefixBlackList = {
+        func: (blackList, num) => {
+            let text = '';
+            switch (blackList.removePrefix(num)) {
+                case 'PREFIX_NOT_FOUND':
+                    text = `I didn't find ${num} in the blacklist.`;
+                    break;
+                case true:
+                    text = `Prefix removed successfully!`;
+                    break;
+                case false:
+                    text = `⛔ Error, check logs.`;
+                    break;
+                default:
+                    text = `Unknown Error`;
+            }
+            return returnType.reply(text);
+        },
+        help: () => help.Owner.removePrefixBlackList
     }
 
     kickAll = {
@@ -185,6 +288,7 @@ class Owner {
         },
         help: () => ''
     }
+
 }
 
 module.exports = { Owner }
