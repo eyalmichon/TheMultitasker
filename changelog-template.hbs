@@ -37,7 +37,7 @@ href}}[`#{{id}}`]({{href}}){{/if}}{{/each}}
 {{/each}}
 {{/if}}
 
-{{#commit-list commits heading='### Commits' exclude='(Release v)'}}
+{{#commit-list commits heading='### Commits' exclude='(Release v)|(small fix: )'}}
 - {{#if breaking}}**Breaking change:** {{/if}}{{subject}} {{#if href}}[`{{shorthash}}`]({{href}}){{/if}}
 {{/commit-list}}
 
