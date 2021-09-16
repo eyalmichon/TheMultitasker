@@ -1,5 +1,5 @@
 const { fetchJson } = require('../util/fetcher');
-const config = require('../util/config.json');
+const { Covid } = require('../util/config.json');
 const { isInt } = require('../util/utilities');
 
 /**
@@ -27,8 +27,8 @@ const { isInt } = require('../util/utilities');
 * {\"id\":\"31\",\"queryName\":\"spotlightAggregatedPublic\",\"single\":true,\"parameters\":{}},
 * {\"id\":\"34\",\"queryName\":\"spotlightPublic\",\"single\":false,\"parameters\":{}}]}",
 */
-const endpoint = config.Covid.url;
-const options = config.Covid.requestOptions;
+const endpoint = Covid.url;
+const options = Covid.requestOptions;
 
 /**
  * get information from the official API.
