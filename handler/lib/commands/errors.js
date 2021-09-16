@@ -22,6 +22,7 @@ const errors = {
     STICKER_TOO_LARGE: addType(`📛 Error, the image/video was too large.`),
     STICKER_RETRY: addType(`📛 There was an error processing your sticker.\nMaybe try to edit the ${b('length')} or ${b('resize')} and resend.`),
     STICKER_NOT_GIF: addType(`📛 Error, not an image/gif`),
+    TEXT_TOO_LONG: addType(`📛 Error, the text exceeds the limit.`),
     NOT_IMG: addType(`📛 Error, either the message or the quoted message not an image`),
     PRIVATE_SOCIAL: addType(`📛 Error, private user or wrong link`),
     INVALID_LINK: addType(`📛 Error, the link you sent was invalid.`),

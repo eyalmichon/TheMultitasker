@@ -7,7 +7,7 @@ const Color = require('color');
 const { removebg } = require('./secrets.json');
 const { isInt } = require('./utilities');
 registerFont('./handler/util/fonts/SecularOne-Regular.ttf', { family: 'Secular' })
-
+const MAX_CHARS = 5000;
 
 
 /**
@@ -304,6 +304,7 @@ const addText = (buffer, options = {}) => new Promise((resolve, reject) => {
     const bottomText = !!textArray[1] ? textArray[1].trim() : '';
     console.log(`Adding text... Got Top: ${topText}, and Bottom: ${bottomText}`)
 
+    if (topText.length > MAX_CHARS || bottomText.length > MAX_CHARS) return reject('TOO_LONG')
     // color for stroke.
     let strokeColor = (options.scolor === undefined || options.scolor === true) ? 'black' : options.scolor;
     try { Color(strokeColor) }

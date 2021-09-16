@@ -54,6 +54,10 @@ class Media {
                 let base64 = buffer.toString('base64');
                 return returnType.sendFile(`data:document/png;base64,${base64}`, `the_multitasker.png`, '', false)
             })
+                .catch((err) => {
+                    if (err === 'TOO_LONG') return errors.TEXT_TOO_LONG
+                    return errors.UNKNOWN
+                })
         },
         help: () => help.Media.removebg
     }
@@ -93,6 +97,10 @@ class Media {
                 if (file) return returnType.sendFile(`data:document/png;base64,${base64}`, `the_multitasker.png`, '', false)
                 else return returnType.sendFile(`data:image/png;base64,${base64}`, `the_multitasker.png`, '', false)
             })
+                .catch((err) => {
+                    if (err === 'TOO_LONG') return errors.TEXT_TOO_LONG
+                    return errors.UNKNOWN
+                })
         },
         help: () => help.Media.removebg
     }
