@@ -58,7 +58,6 @@ class Sticker {
                             return returnType.imgSticker(buffer, !crop);
                         })
                         .catch((err) => {
-                            if (err === 'TOO_LONG') return errors.TEXT_TOO_LONG
                             return errors.UNKNOWN
                         })
 

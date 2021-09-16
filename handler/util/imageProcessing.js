@@ -7,7 +7,7 @@ const Color = require('color');
 const { removebg } = require('./secrets.json');
 const { isInt } = require('./utilities');
 registerFont('./handler/util/fonts/SecularOne-Regular.ttf', { family: 'Secular' })
-const MAX_CHARS = 5000;
+const MAX_WORDS = 500;
 
 
 /**
@@ -147,6 +147,8 @@ function wrapLines(ctx, words, fontSize, maxWidth, maxRows) {
     if (len !== i || line !== '') {
         lines.push(line.trim());
     }
+    if (words.length > MAX_WORDS || fontSize === 0)
+        return { lines: lines, fontSize: 1 };
     lines.forEach(line => {
         if (ctx.measureText(line).width > maxWidth)
             noFit = true
@@ -304,7 +306,6 @@ const addText = (buffer, options = {}) => new Promise((resolve, reject) => {
     const bottomText = !!textArray[1] ? textArray[1].trim() : '';
     console.log(`Adding text... Got Top: ${topText}, and Bottom: ${bottomText}`)
 
-    if (topText.length > MAX_CHARS || bottomText.length > MAX_CHARS) return reject('TOO_LONG')
     // color for stroke.
     let strokeColor = (options.scolor === undefined || options.scolor === true) ? 'black' : options.scolor;
     try { Color(strokeColor) }

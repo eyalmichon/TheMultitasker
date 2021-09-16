@@ -55,7 +55,6 @@ class Media {
                 return returnType.sendFile(`data:document/png;base64,${base64}`, `the_multitasker.png`, '', false)
             })
                 .catch((err) => {
-                    if (err === 'TOO_LONG') return errors.TEXT_TOO_LONG
                     return errors.UNKNOWN
                 })
         },
@@ -98,7 +97,6 @@ class Media {
                 else return returnType.sendFile(`data:image/png;base64,${base64}`, `the_multitasker.png`, '', false)
             })
                 .catch((err) => {
-                    if (err === 'TOO_LONG') return errors.TEXT_TOO_LONG
                     return errors.UNKNOWN
                 })
         },
