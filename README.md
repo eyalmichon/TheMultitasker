@@ -20,7 +20,7 @@
 ## Features
 
 Command pattern used for easy management of adding more commands.
-<!--  -->
+
 - ### Owner Commands 👑:
   - Send Red Alerts 🚀 as message with (or without) location on GoogleMaps.
   - Add and remove senders from sending groups (senders.json) straight from Whatsapp.
@@ -28,6 +28,7 @@ Command pattern used for easy management of adding more commands.
   - Get a list of names from a specific group.
   - Get all group IDs of the groups sent to owner.
   - Spam-tag someone to get their attention.
+  - Blacklist 📛 for country codes and participants
 
 - ### Admin Commands 💼:
   - Tag everyone in the group.
@@ -52,7 +53,7 @@ Command pattern used for easy management of adding more commands.
   - Translate sentences using Google Translate.
   - Recognize music 👂🎶.
 
-- ### Forwarder Commands:
+- ### Forwarder Commands ⏩:
   - Forward messages randomly from a chosen group. (group IDs need to be set manually)
 
 - ### Sticker Commands 😀:
@@ -64,13 +65,15 @@ Command pattern used for easy management of adding more commands.
   - video 🎥
   - gif 👾
   - URL 🔗
+  - Stickers 😃
 
-- ### Media Commands:
+- ### Media Commands 🖼:
   - Remove background:
     - add stroke.
     - add text.
     - change background.
   - Convert video to voice message.
+  - Sticker to image.
 
 
 ## Dependencies
