@@ -18,7 +18,7 @@ class Sticker {
     }
 
     sticker = {
-        func: async (message, args) => {
+        func: async (args, message) => {
             const options = parser.parse(args)
             const quoted = !!message.quotedMsg;
             const ogMsg = message;
@@ -35,24 +35,27 @@ class Sticker {
 
             switch (message.type) {
                 case 'image':
+                case 'sticker':
                     return decryptMedia(message)
                         .then(async buffer => {
-                            var base64 = buffer.toString('base64');
+                            if (message.type === 'sticker')
+                                buffer = await imageProcessing.sharp(buffer).toFormat('png').toBuffer()
+
                             if (rmbg) {
                                 if (!!options.bg || !!options.bgurl) {
                                     if (quoted)
                                         options.bg = await decryptMedia(ogMsg);
-                                    base64 = await imageProcessing.removeBG(base64, options);
+                                    buffer = await imageProcessing.removeBG(buffer, options);
                                 }
                                 else
-                                    base64 = await imageProcessing.removeBG(base64);
+                                    buffer = await imageProcessing.removeBG(buffer);
                             }
                             if (stroke)
-                                base64 = await imageProcessing.addStroke(base64, options)
+                                buffer = await imageProcessing.addStroke(buffer, options)
                             if (text)
-                                base64 = await imageProcessing.addText(base64, options)
+                                buffer = await imageProcessing.addText(buffer, options)
 
-                            return returnType.imgSticker(base64, !crop);
+                            return returnType.imgSticker(buffer, !crop);
                         })
                         .catch(() => errors.UNKNOWN)
 
@@ -64,7 +67,6 @@ class Sticker {
                     // Don't allow sending stickers that are more than 10MB large. (10485760 bytes)
                     if (await fetcher.checkSize(options.url, 10485760) === 'CONTENT_TOO_LARGE') return errors.CONTENT_TOO_LARGE
                     return returnType.urlSticker(options.url, !crop)
-                case 'sticker':
 
                 case 'chat':
                 case 'audio':
