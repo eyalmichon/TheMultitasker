@@ -3,7 +3,7 @@ const { Nikud } = require('../util/config.json')
 const options = Nikud.requestOptions
 
 const nikud = (text) => new Promise((resolve, reject) => {
-
+    console.log(`Getting nikud for ${text}`)
     const body = {
         task: "nakdan",
         data: text,
@@ -20,11 +20,10 @@ const nikud = (text) => new Promise((resolve, reject) => {
         .then(res => {
             const words = [];
             res.forEach(word => {
-                if (word.word !== ' ')
-                    if (!!word.options.length) words.push(word.options[0][0].replace('|', ''))
-                    else words.push(word.word)
+                if (!!word.options.length) words.push(word.options[0][0].replace('|', ''))
+                else words.push(word.word)
             })
-            resolve(words.join(' '))
+            resolve(words.join(''))
         })
         .catch(err => {
             console.error(err);
