@@ -104,7 +104,7 @@ const help = {
     },
     Admin: {
         everyone: `${b('Usage:')} ${prefix}everyone\nTags everyone in the group.\n${b('Aliases:')}\n[everyone, tagall]`,
-        kick: `${b('Usage:')} ${prefix}kick [@someone] or reply to a message send by the user with ${prefix}kick\nKicks 🦶 a participant from the group.`,
+        kick: `${b('Usage:')} ${prefix}kick [@someone] or reply to a message sent by the user with ${prefix}kick\nKicks 🦶 a participant from the group.`,
     },
     Social: {
         meme: `${b('Usage:')} ${prefix}meme and you\'ll get random meme from the following subreddits:\n SUBS_LIST.\n\nOr ${prefix}meme [subreddit] to get a random image from that subreddit.`,
@@ -122,7 +122,7 @@ const help = {
 
     },
     Info: {
-        compile: `${b('Usage:')} ${prefix}compile [language] [code]\n${b('Available languages:')} c ,cpp ,c# ,rill ,erlang ,elixir ,haskell ,d ,java ,rust ,python ,python2.7 ,ruby ,scala ,groovy ,nodejs ,nodejs14 ,coffeescript ,spidermonkey ,swift ,perl ,php ,lua ,sql ,pascal ,lisp ,lazyk ,vim ,pypy ,ocaml ,go ,bash ,pony ,crystal ,nim ,openssl ,f# ,r ,typescript ,julia`,
+        compile: `${b('Usage:')} ${prefix}compile [language] [code]\n${b('Available languages:')} c, cpp, c#, rill, erlang, elixir, haskell, d, java, rust, python, python2.7, ruby, scala, groovy, nodejs, nodejs14, coffeescript, spidermonkey, swift, perl, php, lua, sql, pascal, lisp, lazyk, vim, pypy, ocaml, go, bash, pony, crystal, nim, openssl, f#, r, typescript, julia`,
         covid: `${b('Usage:')} ${prefix}covid (or ${prefix}covid [1-7] for number of days to get info about) to get back information about active cases, infected people today, etc...`,
         wolfram: `${b('Usage:')} ${prefix}wolfram [question] and you'll receive an answer from Wolfram Alpha.\n${b('Options:')}\n• full answer: -f\n${b('Aliases:')} [wolframalpha, wolfram, wolf, wf]`,
         urban: `${b('Usage:')} ${prefix}urban [term] and you'll receive the top definition for that term from Urban Dictionary.\n${b('Options:')}\n${m(`• Word of the day: [how many days ago? 0-9] -wotd\n• random: -r`)}\n${b('Aliases:')} [urban, ud]`,
