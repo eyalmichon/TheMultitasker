@@ -100,7 +100,7 @@ class Media {
                     return errors.UNKNOWN
                 })
         },
-        help: () => help.Media.removebg
+        help: () => help.Media.toimage
     }
 
 
