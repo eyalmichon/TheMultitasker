@@ -207,6 +207,13 @@ const msgHandler = async (client, message) => {
             break;
         // Sticker Commands.
         case 'Sticker':
+            if (quotedMsg) {
+                message.quotedMsg = await client.getMessageById(quotedMsg.id)
+                if (!message.quotedMsg) {
+                    await client.loadEarlierMessages(from)
+                    message.quotedMsg = await client.getMessageById(quotedMsg.id)
+                }
+            }
             waitMsg = client.reply(from, i('🧙‍♂️ Please wait a moment while I do some magic...'), id);
             result = await commands.execute(command, args, message);
 
@@ -218,8 +225,11 @@ const msgHandler = async (client, message) => {
 
             break;
         default:
+            result = errors.WRONG_CMD
             break;
     }
+
+    waitMsg = await waitMsg
 
     if (!result || !result.info)
         result = errors.BAD_CMD
@@ -257,7 +267,7 @@ const msgHandler = async (client, message) => {
                 })
             break;
         case 'fileFromURL':
-            await client.sendFileFromUrl(from, result.info.url, result.info.fileName, result.info.title, id, result.info.options, true);
+            await client.sendFileFromUrl(from, result.info.url, result.info.fileName, result.info.title, id, result.info.options, true, result.info.ptt);
             break;
         case 'filesFromURL':
             result.info
@@ -281,7 +291,6 @@ const msgHandler = async (client, message) => {
             break;
     }
 
-    waitMsg = await waitMsg
     if (!!waitMsg) delMsgAfter({ client, waitMsg, from }, 1)
 
 }
