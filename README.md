@@ -37,13 +37,12 @@ Command pattern used for easy management of adding more commands.
 - ### Social Commands 🌐:
   - Get a random 🎲 meme/post from a set of subreddits you choose or a specifc one.
   - Download all types of content from Instagram.
-  - Download videos from:
+  - Download video/audio from:
     - Twitter
     - Tiktok
     - Facebook
     - YouTube
     - [and more...](http://ytdl-org.github.io/youtube-dl/supportedsites.html)
-  - Download audio from YouTube and any site from the list above.
 
 - ### Info Commands ℹ:
   - Compile 👨‍💻 and get output from many languages like Python 🐍, C, Java, etc....
@@ -52,20 +51,26 @@ Command pattern used for easy management of adding more commands.
   - Get definition of words / Word of the day / random word from Urban Dictionary.
   - Translate sentences using Google Translate.
   - Recognize music 👂🎶.
+  - Fix grammar.
+  - Text to speech.
+  - Translate with context.
+  - Synonyms & Antonyms.
+  - Conjugate words/sentences.
 
 - ### Forwarder Commands ⏩:
   - Forward messages randomly from a chosen group. (group IDs need to be set manually)
 
 - ### Sticker Commands 😀:
   Create stickers from:
-  - image 📷:
+  - Image 📷:
     - add stroke.
     - add text.
     - change background.
-  - video 🎥
-  - gif 👾
+  - Video 🎥
+  - GIF 👾
   - URL 🔗
   - Stickers 😃
+  - Chat messages 💬
 
 - ### Media Commands 🖼:
   - Remove background:
@@ -80,7 +85,7 @@ Command pattern used for easy management of adding more commands.
 - [node.js](https://nodejs.org/en/download/) >= v14.16.0
 - [npm]() >= v7.15.1
 - [python](https://www.python.org/) >= v2.7
-- [wa-automate](https://github.com/open-wa/wa-automate-nodejs) v4.17.1
+- [wa-automate](https://github.com/open-wa/wa-automate-nodejs) >= v4.17.1
 - [puppeteer](https://github.com/puppeteer/puppeteer#readme) v10.2.0
 - on Windows [Microsoft Visual C++ 2010 Service Pack 1 Redistributable Package (x86)](https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe)
 
