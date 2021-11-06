@@ -18,10 +18,10 @@ async function handleUnread(client) {
 const start = async (client = new Client()) => {
     console.log(`The Multitasker [Version ${version}]`)
 
-    // // refresh the client every hour.
-    // setInterval(() => {
-    //     client.refresh();
-    // }, 3600000)
+    // refresh the client every hour.
+    setInterval(() => {
+        client.refresh();
+    }, 3600000)
 
     try {
         // Activate all commands that run in background if they were active before restart.
