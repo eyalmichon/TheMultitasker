@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban, translate, recognize, nikud } = require("..");
+const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Info {
@@ -36,6 +36,20 @@ class Info {
         commands.nikud = this.addInfo(this.nikud)
         commands.nik = this.alias(this.nikud)
         commands.נקד = this.alias(this.nikud)
+
+        commands.grammar = this.addInfo(this.grammar)
+        commands.gram = this.alias(this.grammar)
+
+        commands.tts = this.addInfo(this.tts)
+
+        commands.context = this.addInfo(this.context)
+        commands.cont = this.alias(this.context)
+
+        commands.synonym = this.addInfo(this.synonym)
+        commands.syno = this.alias(this.synonym)
+
+        commands.conjugate = this.addInfo(this.conjugate)
+        commands.conj = this.alias(this.conjugate)
     }
 
     compile = {
@@ -119,6 +133,7 @@ class Info {
             return translate.text(options.joinedText, to)
                 .then(res => returnType.reply(res))
                 .catch(err => {
+                    console.error(err);
                     if (err === 'WRONG_LANG_CODE') return errors.WRONG_LANG_CODE;
                     return errors.UNKNOWN;
                 })
@@ -138,6 +153,7 @@ class Info {
             return recognize.music(data)
                 .then(res => full ? returnType.reply(res.join('\n\n')) : returnType.reply(res[0]))
                 .catch(err => {
+                    console.error(err);
                     if (err === 'NO_RESULT') return errors.NO_RESULT_RECO;
                     return errors.UNKNOWN;
                 })
@@ -155,10 +171,109 @@ class Info {
             return nikud.nikud(options.joinedText)
                 .then(text => returnType.reply(text))
                 .catch(err => {
+                    console.error(err);
                     return errors.UNKNOWN;
                 })
         },
         help: () => help.Info.nikud
+    }
+
+    grammar = {
+        func: (args, message) => {
+            const options = parser.parse(args);
+            const lang = options.l || options.lang;
+            if (message.quotedMsg) message = message.quotedMsg;
+
+            if (message.type !== 'chat') return errors.ONLY_TEXT
+
+            return reverso.grammar(options.joinedText, lang)
+                .then(text => returnType.reply(text))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.grammar
+    }
+    tts = {
+        func: (args, message) => {
+            const options = parser.parse(args);
+            const lang = options.l || options.lang;
+            if (message.quotedMsg) message = message.quotedMsg;
+
+            if (message.type !== 'chat') return errors.ONLY_TEXT
+
+            return reverso.tts(options.joinedText, lang)
+                .then(path => returnType.sendPtt(path))
+                .catch(err => {
+                    console.log(err)
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.tts
+    }
+    context = {
+        func: (args, message) => {
+            const options = parser.parse(args);
+            const from = options.fl || options.froml || options.fromlang;
+            const to = options.tl || options.tol || options.tolang;
+            if (message.quotedMsg) message = message.quotedMsg;
+
+            if (message.type !== 'chat') return errors.ONLY_TEXT
+
+            return reverso.context(options.joinedText, from, to)
+                .then(result => {
+                    const text = []
+                    const langs = result.shift()
+                    result.forEach(item => {
+                        text.push(`${langs.from}: ${item.from}\n${langs.to}: ${item.to}`)
+                    })
+                    return returnType.reply(text.join('\n\n'))
+                })
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.context
+    }
+    synonym = {
+        func: (args, message) => {
+            const options = parser.parse(args);
+            const lang = options.l || options.lang;
+            if (message.quotedMsg) message = message.quotedMsg;
+
+            if (message.type !== 'chat') return errors.ONLY_TEXT
+
+            return reverso.synonym(options.joinedText, lang)
+                .then(result => returnType.reply(`${b('Synonyms:')} ${result.synonyms.join(', ')}\n\n${b('Antonyms:')} ${result.antonyms.join(', ')}`))
+                .catch(err => {
+                    console.log(err)
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.synonym
+    }
+    conjugate = {
+        func: (args, message) => {
+            const options = parser.parse(args);
+            const lang = options.l || options.lang;
+            const hq = !!options.hq || !!options.hd;
+            if (message.quotedMsg) message = message.quotedMsg;
+
+            if (message.type !== 'chat') return errors.ONLY_TEXT
+
+            return reverso.conjugator(options.joinedText, lang, hq)
+                .then(base64 => {
+                    if (hq) return returnType.sendFile(`data:document/png;base64,${base64}`, `the_multitasker_${options.joinedText}.png`, '', false)
+                    else return returnType.sendFile(`data:image/png;base64,${base64}`, `the_multitasker_${options.joinedText}.png`, '', false)
+                })
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.conjugate
     }
 }
 
