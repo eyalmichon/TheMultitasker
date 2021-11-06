@@ -19,7 +19,7 @@ class Help {
         for (const [key, value] of Object.entries(sections)) {
             text.push(`${b(key + ':')}\n${m(value.join(', '))}`)
         }
-        text.push(`${b(`Usage: `)} ${prefix}[command]\nFor more information about each command use ${prefix}help [command]`)
+        text.push(`${b(`Usage:`)} ${prefix}[command]\n\nFor more information about each command use ${prefix}help [command]`)
         text.push(i('The Multitasker 🧙‍♂️'))
 
         return text.join('\n\n');
