@@ -19,9 +19,10 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@iamtraction/google-translate": "^1.1.2",
-    "@open-wa/wa-automate": "^4.21.1",
+    "@open-wa/wa-automate": "^4.23.7",
     "abort-controller": "^3.0.0",
     "changelog-parser": "^2.8.0",
+    "cheerio": "^1.0.0-rc.10",
     "color": "^4.0.1",
     "command-line-args": "^5.2.0",
     "fetch": "^1.1.0",
@@ -32,6 +33,7 @@
     "puppeteer": "^10.2.0",
     "sharp": "^0.29.1",
     "tiktok-scraper": "^1.4.36",
+    "user-agents": "^1.0.784",
     "youtube-dl-exec": "^1.2.4",
     "ytdl-core": "^4.9.1"
   }
