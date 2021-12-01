@@ -1,16 +1,19 @@
 const { version } = require('./package.json')
 const { create, Client } = require('@open-wa/wa-automate');
-const { msgHandler, restartHandler, autoRemoveHandler } = require('./handler');
+const { msgHandler, restartHandler, autoRemoveHandler, forwardHandler, welcomeMsgHandler } = require('./handler');
 
 // Get all unread messages and go over them.
 async function handleUnread(client) {
     const unreadMessages = await client.getAllUnreadMessages();
+    const promises = [];
     unreadMessages.forEach(message => {
-        msgHandler(client, message)
-            .catch(err => {
-                console.error(err);
-            })
+        promises.push(msgHandler(client, message))
+        promises.push(forwardHandler(client, message))
     });
+    await Promise.all(promises)
+        .catch(err => {
+            console.error(err);
+        })
 }
 
 
@@ -39,12 +42,17 @@ const start = async (client = new Client()) => {
         client.onMessage(message => {
             // Message Handler
             msgHandler(client, message);
+
+            forwardHandler(client, message)
         }).catch(err => {
             console.error(err);
         })
 
         client.onAnyMessage(message => {
             autoRemoveHandler(client, message);
+            welcomeMsgHandler(client, message);
+        }).catch(err => {
+            console.error(err);
         })
 
     } catch (err) {
