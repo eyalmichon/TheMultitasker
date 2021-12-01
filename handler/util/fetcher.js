@@ -80,6 +80,19 @@ const fetchBase64 = (url) => new Promise((resolve, reject) => {
             reject(err)
         })
 })
+/**
+ * Fetch buffer from url
+ * @param {String} url
+ */
+const fetchBuffer = (url) => new Promise((resolve, reject) => {
+    return fetch(url)
+        .then((res) => res.buffer())
+        .then((buffer) => resolve(buffer))
+        .catch((err) => {
+            console.error(err)
+            reject(err)
+        })
+})
 
 
 /**
@@ -109,10 +122,10 @@ const fetchWithTimeout = async (url, requestOptions, timeout) => {
  * @param {*} extension extension of file.
  * @returns a Promise which holds {status, filePath}
  */
-const fetchToFile = (url, extension) => new Promise((resolve, reject) => {
+const fetchToFile = (url, extension, options = {}) => new Promise((resolve, reject) => {
     const fileName = getRandomFileName();
     const filePath = `./handler/tmp/${fileName}.${extension}`;
-    fetch(url).then(res => {
+    fetch(url, options).then(res => {
         if (res.status === 200) {
 
             res.body.pipe(fs.createWriteStream(filePath))
@@ -180,16 +193,22 @@ const uploadFile = (buffer) => new Promise((resolve, reject) => {
         })
 })
 
+const fetchFileType = (buffer) => {
+    try { return fileType(buffer).ext }
+    catch { return null }
+}
 
 module.exports = {
     fetchJson,
     fetchText,
     fetchBase64,
+    fetchBuffer,
     fetchWithTimeout,
     checkSize,
     fetchToFile,
     getRandomFileName,
     uploadImage,
     uploadFile,
+    fetchFileType,
     MAX_SIZE_ALLOWED
 }
