@@ -1,0 +1,10 @@
+{
+    "languages": [
+        "eng",
+        "heb"
+    ],
+    "prefixMsg": {
+        "eng": "forwarded from",
+        "heb": "הועבר מ"
+    }
+}

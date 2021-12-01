@@ -14,6 +14,9 @@ secrets.json
 senders.json
 groups.json
 prefix.json
+forwardDB.json
+messagesDB.json
+
 # Runtime data
 pids
 *.pid
