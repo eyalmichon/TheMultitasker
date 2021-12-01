@@ -39,12 +39,28 @@ class Owner {
 
         commands.rmprefix = this.addInfo(this.removePrefixBlackList)
 
+        commands.addforwarder = this.addInfo(this.addForwarder)
+
+        commands.rmforwarder = this.addInfo(this.removeForwarder)
+
+        commands.addgroupforwarder = this.addInfo(this.addGroupToForwarder)
+        commands.addgf = this.alias(this.addGroupToForwarder)
+
+        commands.rmgroupforwarder = this.addInfo(this.removeGroupFromForwarder)
+        commands.rmgf = this.alias(this.removeGroupFromForwarder)
+
+        commands.setlanguageforwarder = this.addInfo(this.setLanguageForwarder)
+        commands.slf = this.alias(this.setLanguageForwarder)
+
+        commands.setmaxmsgsforwarder = this.addInfo(this.setMaxMsgsForwarder)
+        commands.smmf = this.alias(this.setMaxMsgsForwarder)
+
+        commands.setprefixforwarder = this.addInfo(this.setPrefixForwarder)
+        commands.spf = this.alias(this.setPrefixForwarder)
+
         commands.m = this.addInfo(this.m);
 
         commands.up = this.addInfo(this.uploadImg)
-
-        commands.send = this.addInfo(this.uploadImg)
-
 
     }
 
@@ -78,10 +94,10 @@ class Owner {
     }
 
     addSender = {
-        func: (senders, group, id) => {
+        func: (senders, group, id, lang) => {
             let text = '';
-            if (senders.addSender(group, id))
-                text = `📧 Sender has been ${b('added')} to senders json`;
+            if (senders.addSender(group, id, lang))
+                text = `📧 Sender has been ${b('added')} to senders`;
             else
                 text = `📛 Group name or number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
@@ -93,12 +109,123 @@ class Owner {
         func: (senders, group, id) => {
             let text = '';
             if (senders.removeSender(group, id))
-                text = `📧 Sender has been ${b('removed')} from senders json`;
+                text = `📧 Sender has been ${b('removed')} from senders`;
             else
                 text = `📛 Group name or number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
         help: () => help.Owner.removeSender
+    }
+
+    addForwarder = {
+        func: (forwarders, group, args) => {
+            // get the language from args[0] if args[1] is empty
+            let lang = args[1] || args[0];
+            // if args[1] is empty, get group ID from 'group'
+            let groupID = !!args[1] ? args[0] : group;
+            let text = '';
+            if (forwarders.addForwarder(groupID, lang))
+                text = `📧 Forwarder has been ${b('added')} to forwardDB`;
+            else
+                text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
+            return returnType.reply(text);
+        },
+        help: () => ''
+    }
+    removeForwarder = {
+        func: (forwarders, group, args) => {
+            // if args[0] is empty, get group ID from 'group'
+            let groupID = !!args[0] ? args[0] : group;
+            let text = '';
+            if (forwarders.removeForwarder(groupID))
+                text = `📧 Forwarder has been ${b('removed')} from forwardDB`;
+            else
+                text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
+            return returnType.reply(text);
+        },
+        help: () => ''
+    }
+    addGroupToForwarder = {
+        func: (forwarders, group, args) => {
+            // get the group from args[0] if args[1] is empty
+            let groupID = args[1] || args[0];
+            // if args[1] is empty, get group ID from 'group'
+            let forwarder = !!args[1] ? args[0] : group;
+            let text = '';
+            if (forwarders.addGroup(forwarder, groupID))
+                text = `📧 Group has been ${b('added')} to ${forwarder} in forwardDB`;
+            else
+                text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
+            return returnType.reply(text);
+        },
+        help: () => ''
+    }
+    removeGroupFromForwarder = {
+        func: (forwarders, group, args) => {
+            // get the group from args[0] if args[1] is empty
+            let groupID = args[1] || args[0];
+            // if args[1] is empty, get group ID from 'group'
+            let forwarder = !!args[1] ? args[0] : group;
+            let text = '';
+            if (forwarders.removeGroup(forwarder, groupID))
+                text = `📧 Group has been ${b('removed')} from ${forwarder} in forwardDB`;
+            else
+                text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
+            return returnType.reply(text);
+        },
+        help: () => ''
+    }
+    setLanguageForwarder = {
+        func: (forwarders, group, args) => {
+            // get the language from args[0] if args[1] is empty
+            let lang = args[1] || args[0];
+            // if args[1] is empty, get group ID from 'group'
+            let forwarder = !!args[1] ? args[0] : group;
+            let text = '';
+            if (forwarders.setLanguage(forwarder, lang))
+                text = `📧 Group language has been ${b('set')} to ${lang} for ${forwarder} in forwardDB`;
+            else
+                text = `📛 Language given "${lang}" was ${b('incorrect!')} [Are you the master of the bot?!?]`;
+            return returnType.reply(text);
+        },
+        help: () => ''
+    }
+    setMaxMsgsForwarder = {
+        func: (forwarders, group, args) => {
+            // get the language from args[0] if args[1] is empty
+            let n = args[1] || args[0];
+            // if args[1] is empty, get group ID from 'group'
+            let forwarder = !!args[1] ? args[0] : group;
+            let text = '';
+            if (forwarders.setMaxMsgs(forwarder, n))
+                text = `📧 Group maxMsgs has been ${b('set')} to ${n} for ${forwarder} in forwardDB`;
+            else
+                text = `📛 maxMsgs number given "${n}" or Forwarder "${forwarder} were ${b('incorrect!')} [Are you the master of the bot?!?]`;
+            return returnType.reply(text);
+        },
+        help: () => help.Owner.setMaxMsgsForwarder
+    }
+    setPrefixForwarder = {
+        func: (forwarders, group, args) => {
+            const options = parser.parse(args);
+
+            // if args[0] is empty, get group ID from 'group'
+            let forwarder = options.joinedText || group;
+
+            let result = '';
+            if (options.prefix || options.p)
+                result = forwarders.setPrefixMsgBool(forwarder)
+            else if (options.name || options.n)
+                result = forwarders.setNameBool(forwarder)
+
+            let text = '';
+            if (result)
+                text = `📧 Group prefix message has been ${b('changed')} for ${forwarder} in forwardDB`;
+            else
+                text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
+            return returnType.reply(text);
+        },
+        help: () => ''
     }
 
     addUserToBlackList = {
@@ -150,9 +277,13 @@ class Owner {
         help: () => help.Owner.removeUserFromBlackList
     }
     addPrefixBlackList = {
-        func: (blackList, num) => {
+        func: (blackList, group, args) => {
+            // get the prefix from args[0] if args[1] is empty
+            let num = args[1] || args[0];
+            // if args[1] is empty, get group ID from 'group'
+            let groupID = !!args[1] ? args[0] : group;
             let text = '';
-            switch (blackList.addPrefix(num)) {
+            switch (blackList.addPrefix(groupID, num)) {
                 case 'PREFIX_EXISTS':
                     text = `Prefix already exists.`;
                     break;
@@ -170,9 +301,13 @@ class Owner {
         help: () => help.Owner.addPrefixBlackList
     }
     removePrefixBlackList = {
-        func: (blackList, num) => {
+        func: (blackList, group, args) => {
+            // get the prefix from args[0] if args[1] is empty
+            let num = args[1] || args[0];
+            // if args[1] is empty, get group ID from 'group'
+            let groupID = !!args[1] ? args[0] : group;
             let text = '';
-            switch (blackList.removePrefix(num)) {
+            switch (blackList.removePrefix(groupID, num)) {
                 case 'PREFIX_NOT_FOUND':
                     text = `I didn't find ${num} in the blacklist.`;
                     break;
