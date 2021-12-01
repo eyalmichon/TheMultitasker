@@ -1,10 +1,13 @@
 const { Commands, prefix, errors } = require('./lib/commands');
 const { BlackList } = require('./util/blacklist');
 const { b, m, i } = require('./util/style');
+const localizations = require('./util/localizations.json')
 const { senders, spam, converter, redAlerts } = require('./lib');
+const { Forwarder } = require('./util/forwarder');
 
 const commands = new Commands();
 const blackList = new BlackList();
+const myForwarder = new Forwarder()
 
 
 // Senders file object.
@@ -31,20 +34,40 @@ function delMsgAfter(object, time = 60) {
     setTimeout(() => object.client.deleteMessage(object.from, object.waitMsg, false), time * 1000);
 }
 
+/**
+ * 
+ * @param {import('@open-wa/wa-automate').Client} client 
+ * @param {import('@open-wa/wa-automate').Message} message 
+ */
 const autoRemoveHandler = (client, message) => {
-    if (message.subtype && ['add', 'invite'].includes(message.subtype)) {
-        const prefixes = blackList.getPrefixes();
+    if (!!message.subtype && ['add', 'invite'].includes(message.subtype)) {
+        const prefixes = blackList.getPrefixes(message.from);
+        if (!!prefixes && !!prefixes.length)
+            message.recipients.forEach(recipient => {
+                const isPrefix = prefixes.filter(prefix => recipient.startsWith(prefix))
+                if (isPrefix.length > 0)
+                    client.removeParticipant(message.from, recipient)
+            })
+    }
+}
+
+/**
+ * 
+ * @param {import('@open-wa/wa-automate').Client} client 
+ * @param {import('@open-wa/wa-automate').Message} message 
+ */
+const welcomeMsgHandler = (client, message) => {
+    if (!!message.subtype && ['add', 'invite'].includes(message.subtype) && getGroup('WelcomeMsg')[message.from]) {
+        const lang = getGroup('WelcomeMsg')[message.from]
         message.recipients.forEach(recipient => {
-            const isPrefix = prefixes.filter(prefix => recipient.startsWith(prefix))
-            if (isPrefix.length > 0)
-                client.removeParticipant(message.from, recipient)
+            client.sendTextWithMentions(message.from, `${localizations.welcomeMsg[lang].before} @${recipient.replace('@c.us', '')}, ${localizations.welcomeMsg[lang].after} ${message.chat.name}`)
         })
     }
 }
 
 /**
  * Restart all commands after an application crash/restart.
- * @param {*} client the wa-automate client.
+ * @param {import('@open-wa/wa-automate').Client} client the wa-automate client.
  * @param {*} cmds array of commands that you wish to try and start after a restart.
  */
 const restartHandler = async (client, cmds) => {
@@ -61,28 +84,130 @@ const restartHandler = async (client, cmds) => {
 }
 
 /**
+ * Forward messages to a group from specified groups.
+ * @param {import('@open-wa/wa-automate').Client} client 
+ * @param {import('@open-wa/wa-automate').Message} message 
+ * @returns 
+ */
+const forwardHandler = async (client, message) => {
+    const { id, from, sender, caption, quotedMsg, type, mentionedJidList } = message;
+    // try to get the forwarder from the forwardDB.
+    const forwarderObj = myForwarder.getForwarder(from);
+    // if the message doesn't have a sender or the group is not a forwarder, return.
+    if (!sender || !forwarderObj) return;
+    // if mentioned, replace mentions with the names of the people mentioned in bold.
+    if (!!mentionedJidList.length) {
+        const mentionObjPromises = []
+        mentionedJidList.forEach(mention => mentionObjPromises.push(client.getContact(mention)))
+        const mentionsObj = await Promise.all(mentionObjPromises)
+        // if returns null.
+        if (!!mentionsObj[0])
+            message.caption ? mentionsObj.forEach(obj => message.caption = message.caption.replace(/@\d*/, b(obj.pushname || obj.name))) :
+                mentionsObj.forEach(obj => message.body = message.body.replace(/@\d*/, b(obj.pushname || obj.name)))
+    }
+    // get all group messages.
+    const forwarderMsgs = myForwarder.getGroupMessages(from);
+    // if messages in DB are over the limit, delete the difference.
+    if (forwarderObj.maxMsgs && myForwarder.getGroupMessagesLength(from) > forwarderObj.maxMsgs)
+        myForwarder.removeMessages(from, myForwarder.getGroupMessagesLength(from) - forwarderObj.maxMsgs)
+    // boolean to check if messages is a quoted message.
+    const isQuoted = !!quotedMsg;
+    // if quoted, get all IDs for the relevant quoted message.
+    const quotedReplyIDs = isQuoted ? forwarderMsgs[quotedMsg.id] : null
+
+    const isAddMsg = (forwarderObj.isPrefixMsg || forwarderObj.isName)
+
+    const name = sender.pushname || sender.formattedName;
+    // beginning of message.
+    let addedMsg = ``
+    if (isAddMsg) {
+        const addedMsgArr = []
+        // if prefix needed add it.
+        if (forwarderObj.isPrefixMsg) addedMsgArr.push(`${myForwarder.getPrefixMsg(forwarderObj.lang)}`)
+        // if name needed add it.
+        if (forwarderObj.isName) addedMsgArr.push(`${b(name)}`)
+        addedMsg = addedMsgArr.join(' ') + ':'
+    }
+
+    // promise array for awaiting IDs later.
+    const promiseMsgIDArray = []
+    switch (type) {
+        case 'chat':
+            forwarderObj.groups.forEach(group => {
+                isQuoted && !!quotedReplyIDs[group] ? promiseMsgIDArray.push(client.reply(group, (isAddMsg) ? [addedMsg, message.body].join('\n\n') : message.body, quotedReplyIDs[group])) :
+                    promiseMsgIDArray.push(client.sendText(group, (isAddMsg) ? [addedMsg, message.body].join('\n\n') : message.body))
+            })
+            break;
+        case 'image':
+        case 'video':
+            let media = await client.decryptMedia(message)
+            forwarderObj.groups.forEach(group => promiseMsgIDArray.push(client.sendFile(group, media, '', (isAddMsg) ? (!!caption ? [addedMsg, caption].join('\n\n') : addedMsg) : '', isQuoted && !!quotedReplyIDs[group] ? quotedReplyIDs[group] : null, true)))
+            break;
+        case 'sticker':
+        case 'ptt':
+        case 'audio':
+        case 'document':
+        case 'vcard':
+        case 'location':
+            forwarderObj.groups.forEach(async group => {
+                const msg = await client.forwardMessages(group, message.id)
+                promiseMsgIDArray.push(msg[0])
+                client.reply(group, (isAddMsg) ? addedMsg : '', isQuoted && !!quotedReplyIDs[group] ? quotedReplyIDs[group] : msg[0])
+            })
+            break;
+    }
+    // wait for all messages to get an ID
+    const msgIDArray = await Promise.all(promiseMsgIDArray)
+
+    const msgIDObject = {}
+    forwarderObj.groups.forEach((group, i) => msgIDObject[group] = msgIDArray[i])
+    // add all message IDs sent to this messages.
+    forwarderMsgs[id] = msgIDObject
+    // for each group add the forwarded message as an object with the other messages associated with it as its objects.
+    forwarderObj.groups.forEach(group => {
+        const groupObj = myForwarder.getForwarder(group);
+        if (!!groupObj) {
+            // if messages in DB are over the limit, delete the difference.
+            if (groupObj.maxMsgs && myForwarder.getGroupMessagesLength(group) > groupObj.maxMsgs)
+                myForwarder.removeMessages(group, myForwarder.getGroupMessagesLength(group) - groupObj.maxMsgs)
+
+            const msgObject = {}
+            msgObject[from] = id;
+            groupObj.groups.forEach(group => {
+                if (group != from)
+                    msgObject[group] = msgIDObject[group]
+            })
+            // add all ids to the group by the message id of that group
+            myForwarder.getGroupMessages(group)[msgIDObject[group]] = msgObject;
+        }
+    })
+
+    myForwarder.writeToMessagesDB();
+}
+
+/**
  * Handles message on arrival.
  * 
- * @param {*} client the wa-automate client.
- * @param {*} message the message object.
+ * @param {import('@open-wa/wa-automate').Client} client the wa-automate client.
+ * @param {import('@open-wa/wa-automate').Message} message the message object.
  * @returns 
  */
 const msgHandler = async (client, message) => {
-    const { id, from, chatId, sender, isGroupMsg, chat, caption, quotedMsg, mentionedJidList } = message;
+    const { id, from, sender, isGroupMsg, chat, caption, quotedMsg, mentionedJidList } = message;
     let { body } = message;
     let groupBlackList = blackList.getGroup(from);
     // if we don't send anything mark the chat as seen so we don't get it again on the next startup.
-    client.sendSeen(chatId);
+    client.sendSeen(from);
 
 
 
     // Return if sender is null or if it's body is undefined or is not a command, or the caption is not a command or (if the chatID
     // isn't in the allowed group AND it's not 'Me'). [if body doesn't start with prefix, we can make body = caption to see if it starts with prefix]
     if (!sender
+        || (!!groupBlackList && groupBlackList.includes(sender.id))
         || (!body)
         || (!body.startsWith(prefix) && (!caption || !(body = caption).startsWith(prefix)))
-        || (!getGroup('Allowed').includes(from) && getGroup('Me') !== from)
-        || (!!groupBlackList && groupBlackList.includes(sender.id))) return;
+        || (!getGroup('Allowed').includes(from) && getGroup('Me') !== from)) return;
 
     if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
     // Add user to spam set if it's not the bot owner.
@@ -132,7 +257,7 @@ const msgHandler = async (client, message) => {
                 case 'addsender':
                 case 'rmsender':
                 case 'rmvsender':
-                    result = await commands.execute(command, mySenders, args[0], args[1]);
+                    result = await commands.execute(command, mySenders, args[0], args[1], args[2]);
                     break;
                 case 'blacklist':
                 case 'black':
@@ -142,7 +267,21 @@ const msgHandler = async (client, message) => {
                     break;
                 case 'addprefix':
                 case 'rmprefix':
-                    result = await commands.execute(command, blackList, args[0]);
+                    result = await commands.execute(command, blackList, from, args);
+                    break;
+                case 'addforwarder':
+                case 'rmforwarder':
+                case 'addgroupforwarder':
+                case 'addgf':
+                case 'rmgroupforwarder':
+                case 'rmgf':
+                case 'setlanguageforwarder':
+                case 'slf':
+                case 'setmaxmsgsforwarder':
+                case 'smmf':
+                case 'setprefixforwarder':
+                case 'spf':
+                    result = await commands.execute(command, myForwarder, from, args);
                     break;
                 case 'kickall':
                     result = await commands.execute(command, client, groupMembers, groupId, botMaster, botNumber);
@@ -208,10 +347,14 @@ const msgHandler = async (client, message) => {
         // Sticker Commands.
         case 'Sticker':
             if (quotedMsg) {
-                message.quotedMsg = await client.getMessageById(quotedMsg.id)
-                if (!message.quotedMsg) {
-                    await client.loadEarlierMessages(from)
-                    message.quotedMsg = await client.getMessageById(quotedMsg.id)
+                // try to get the message object by ID.
+                message.quotedMsg = await client.getMessageById(quotedMsg.id);
+                // load earlier messages until getting the message object by ID.
+                while (!message.quotedMsg) {
+                    if (!message.quotedMsg) {
+                        await client.loadEarlierMessages(from);
+                        message.quotedMsg = await client.getMessageById(quotedMsg.id);
+                    }
                 }
             }
             waitMsg = client.reply(from, i('🧙‍♂️ Please wait a moment while I do some magic...'), id);
@@ -295,4 +438,4 @@ const msgHandler = async (client, message) => {
 
 }
 
-module.exports = { msgHandler, restartHandler, autoRemoveHandler }
+module.exports = { msgHandler, restartHandler, autoRemoveHandler, forwardHandler, welcomeMsgHandler }
