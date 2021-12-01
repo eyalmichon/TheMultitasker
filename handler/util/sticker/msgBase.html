@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<!-- saved from url=(0025)https://web.whatsapp.com/ -->
+<html class="js serviceworker adownload cssanimations csstransitions webp webp-alpha webp-animation webp-lossless"
+    dir="LTR" loc="en" lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>(3) WhatsApp</title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="description" content="Quickly send and receive WhatsApp messages right from your computer.">
+    <style>
+        #app,
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            padding: 0;
+            margin: 0
+        }
+
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0
+        }
+
+        #initial_startup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            user-select: none;
+            background-color: #f0f0f0;
+            position: fixed;
+            top: 0;
+            left: 0
+        }
+
+        .dark #initial_startup {
+            background-color: #131c21
+        }
+
+        #initial_startup .graphic {
+            margin-top: -40px;
+            color: #bfbfbf
+        }
+
+        .dark #initial_startup .graphic {
+            color: #6c7175
+        }
+
+        #initial_startup .graphic .resume-logo {
+            transform: translateX(calc(50% - 52px / 2))
+        }
+
+        #initial_startup .graphic::after {
+            content: '';
+            position: relative;
+            top: -100%;
+            left: calc(50% - 72px * 2 - 72px / 2);
+            display: block;
+            width: calc(72px * 3);
+            height: 100%;
+            background: linear-gradient(to right, rgba(240, 240, 240, .5) 0, rgba(240, 240, 240, .5) 33.33%, rgba(240, 240, 240, 0) 44.1%, rgba(240, 240, 240, 0) 55.8%, rgba(240, 240, 240, .5) 66.66%, rgba(240, 240, 240, .5) 100%);
+            opacity: 1;
+            animation: shimmer 1.5s linear .6s infinite
+        }
+
+        @keyframes shimmer {
+            from {
+                left: calc(50% - 72px * 2 - 72px / 2)
+            }
+
+            to {
+                left: calc(50% - 72px / 2)
+            }
+        }
+
+        .dark #initial_startup .graphic::after {
+            background: linear-gradient(to right, rgba(19, 28, 33, .5) 0, rgba(19, 28, 33, .5) 33.33%, rgba(19, 28, 33, 0) 44.1%, rgba(19, 28, 33, 0) 55.8%, rgba(19, 28, 33, .5) 66.66%, rgba(19, 28, 33, .5) 100%)
+        }
+
+        #initial_startup .progress {
+            position: relative;
+            width: 420px;
+            height: 3px;
+            margin-top: 40px
+        }
+
+        #initial_startup .progress progress {
+            vertical-align: top
+        }
+
+        #initial_startup .main {
+            margin-top: 40px;
+            font-size: 17px;
+            color: #525252
+        }
+
+        .dark #initial_startup .main {
+            color: #f1f1f2e0
+        }
+
+        #initial_startup .secondary {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #00000073
+        }
+
+        .dark #initial_startup .secondary {
+            color: #f1f1f273
+        }
+
+        #initial_startup .secondary span {
+            vertical-align: middle;
+            display: inline-block;
+            margin-bottom: 2px
+        }
+
+        progress {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 3px;
+            border: none;
+            margin: 0;
+            color: #00d9bb;
+            background-color: #e6e6e6
+        }
+
+        progress[value]::-webkit-progress-bar {
+            background-color: #e6e6e6
+        }
+
+        .dark progress,
+        .dark progress[value]::-webkit-progress-bar {
+            background-color: #2a2f32
+        }
+
+        progress[value]::-moz-progress-bar,
+        progress[value]::-webkit-progress-value {
+            background-color: #00d9bb;
+            transition: width .45s ease
+        }
+    </style>
+</head>
+
+<body class="web dark vsc-initialized">
+    <div class="_2wUmf _21bY5 message-in focusable-list-item"><span></span>
+        <div id="msg" class="cvjcv _1Ilru _8YVHI"><span id="tail" data-testid="tail-in" data-icon="tail-in"
+                class="_3nrYb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 13" width="8" height="13">
+                    <path opacity=".13" fill="#0000000"
+                        d="M1.533 3.568L8 12.193V1H2.812C1.042 1 .474 2.156 1.533 3.568z"></path>
+                    <path fill="currentColor" d="M1.533 2.568L8 11.193V0H2.812C1.042 0 .474 1.156 1.533 2.568z"></path>
+                </svg></span>
+            <div class="Nm1g1 _22AX6">
+                <div class="_22Msk">
+                    <!-- TOP_PHONE_NAME -->
+                    <!-- FORWARDED_ICON -->
+                    <!-- BASE_PTT_AND_AUDIO -->
+
+                    <!-- IMAGE_CLOSING_DIV -->
+                    <!-- REPLY_TO_BASE -->
+                    <!-- IMAGE_MESSAGE -->
+
+                    <!-- REPLY_WITH_SIVG -->
+                    <!-- TEXT_OF_MESSAGE -->
+                    <!-- TIME_OF_MESSAGE -->
+                    <!-- IMAGE_CLOSING_DIV -->
+                </div><span></span>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    // regex for finding unicode of rtl letters
+    const rtl_re = /[\u0591-\u07FF]/;
+    let inner_text = document.getElementById('inner_text').textContent;
+    let dir = rtl_re.test(inner_text) ? 'rtl' : 'ltr'
+    document.getElementById('text_align').setAttribute('dir', dir)
+    document.getElementById('icon').style.margin = dir === 'rtl' ? '0px 0px 0px 3px' : '0px 3px 0px 0px'
+</script>
+
+</html>

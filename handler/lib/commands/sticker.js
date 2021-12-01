@@ -1,7 +1,8 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
 const { decryptMedia } = require("@open-wa/wa-automate");
-const { parser, imageProcessing, fetcher } = require("..");
+const { parser, imageProcessing, fetcher, sticker } = require("..");
+const { fetchFileType } = require("../../util/fetcher");
 
 class Sticker {
 
@@ -20,30 +21,134 @@ class Sticker {
     sticker = {
         func: async (args, message) => {
             const options = parser.parse(args)
-            const quoted = !!message.quotedMsg;
+            const isQuoted = !!message.quotedMsg;
             const ogMsg = message;
             // if there is a quoted message, use it to make the sticker.
-            if (quoted) message = message.quotedMsg;
+            if (isQuoted) message = message.quotedMsg;
 
             let crop = !!options.c || !!options.crop;
             let rmbg = !!options.r || !!options.rb;
             let stroke = !!options.s || !!options.stroke;
             let text = !!options.t || !!options.text;
 
+            let reply = !!options.rep || !!options.reply
+            let msg = !!options.m || !!options.message
+            let time = options.time
+            let phone = options.phone || options.p
+            let name = options.name || options.n
+
+            if (reply && isQuoted) {
+                const replyMsg = !!message.quotedMsg ? message : ogMsg
+                const repliedMsg = !!message.quotedMsg ? message.quotedMsg : message
+                // check if needs to be changed.
+                if (typeof (phone) === 'string') phone = phone.replace(/_/g, ' ');
+                else {
+                    phone = replyMsg.sender.formattedName
+                    name = replyMsg.sender.pushname
+                    if (typeof (name) === 'string') name = name.replace(/_/g, ' ');
+                }
+                // the phone and name for the replied message.
+                let rphone = options.rphone || options.rp
+                let rname = options.rname || options.rn
+                if (typeof (rphone) === 'string') rphone = rphone.replace(/_/g, ' ');
+                else {
+                    rphone = repliedMsg.sender.formattedName
+                    rname = repliedMsg.sender.pushname
+                    if (typeof (rname) === 'string') rname = rname.replace(/_/g, ' ');
+                }
+
+                const replyOptions = { phone, name, type: replyMsg.type }
+                const repliedOptions = { phone: rphone, name: rname, type: repliedMsg.type }
+
+                switch (repliedMsg.type) {
+                    case 'chat':
+                        repliedOptions.text = repliedMsg.body
+                        break;
+                    case 'sticker':
+                        repliedOptions.buffer = await decryptMedia(repliedMsg);
+                        break;
+                    case 'image':
+                    case 'video':
+                        repliedOptions.buffer = await decryptMedia(repliedMsg)
+                        if (!!repliedMsg.caption) repliedOptions.text = repliedMsg.caption
+                        if (['gif', null].includes(fetchFileType(repliedOptions.buffer))) repliedOptions.type = 'GIF'
+                        if (repliedMsg.type === 'video')
+                            repliedOptions.buffer = Buffer.from(repliedMsg.mediaData.preview._b64, 'base64')
+                        break;
+                    case 'document':
+                        repliedOptions.document = repliedMsg.filename
+                        repliedOptions.buffer = Buffer.from(repliedMsg.mediaData.preview._b64, 'base64')
+                        break;
+                    case 'ptt':
+                    case 'audio':
+                        repliedOptions.time = options.rl || options.rlength || (`${('0' + Math.floor(repliedMsg.duration / 60)).slice(-2)}:${('0' + repliedMsg.duration % 60).slice(-2)}`)
+                        break;
+                }
+
+                switch (replyMsg.type) {
+                    case 'chat':
+                        replyOptions.text = options.joinedText;
+                        break;
+                    case 'sticker':
+                        replyOptions.buffer = await decryptMedia(replyMsg);
+                        break;
+                    case 'image':
+                        replyOptions.buffer = await decryptMedia(replyMsg);
+                        replyOptions.width = replyMsg.width;
+                        replyOptions.height = replyMsg.height;
+                        if (!!replyMsg.caption) replyOptions.text = replyMsg.caption
+                        break;
+                    case 'video':
+                        replyOptions.buffer = await decryptMedia(replyMsg);
+                        replyOptions.width = replyMsg.width;
+                        replyOptions.height = replyMsg.height;
+                        if (!!replyMsg.caption) replyOptions.text = replyMsg.caption
+                        if (['gif', null].includes(fetchFileType(replyOptions.buffer))) replyOptions.type = 'GIF'
+                        replyOptions.time = options.l || options.length || (`${('0' + Math.floor(replyMsg.duration / 60)).slice(-2)}:${('0' + replyMsg.duration % 60).slice(-2)}`)
+                        replyOptions.buffer = Buffer.from(replyMsg.mediaData.preview._b64, 'base64')
+                        break;
+                    case 'ptt':
+                        let profilePicURL = message.sender.profilePicThumbObj.eurl
+                        repliedOptions.buffer = !!profilePicURL ? await fetcher.fetchBuffer(profilePicURL) : null;
+                        replyOptions.time = options.l || options.length || (`${('0' + Math.floor(replyMsg.duration / 60)).slice(-2)}:${('0' + replyMsg.duration % 60).slice(-2)}`)
+                        break;
+                    case 'audio':
+                        break;
+                    case 'document':
+                        break;
+                }
+
+                const replyBuffer = await sticker.reply(replyOptions, repliedOptions, time)
+                return returnType.imgSticker(replyBuffer, !crop)
+            }
+
+
+            if (typeof (phone) === 'string') phone = phone.replace(/_/g, ' ');
+            else {
+                phone = message.sender.formattedName
+                name = message.sender.pushname
+                if (typeof (name) === 'string') name = name.replace(/_/g, ' ');
+            }
+
             // if the user tries to make a sticker from a message that has a link in it, change the type to url.
             if (!!options.url) message.type = 'url'
 
             switch (message.type) {
-                case 'image':
                 case 'sticker':
+                case 'image':
                     return decryptMedia(message)
                         .then(async buffer => {
                             if (message.type === 'sticker')
                                 buffer = await imageProcessing.sharp(buffer).toFormat('png').toBuffer()
 
+                            if (msg)
+                                buffer = message.type === 'sticker' ?
+                                    await sticker.sticker(time, phone, name, buffer) :
+                                    await sticker.image(options.joinedText || message.caption, time, phone, name, { buffer, width: message.width, height: message.height })
+
                             if (rmbg) {
                                 if (!!options.bg || !!options.bgurl) {
-                                    if (quoted)
+                                    if (isQuoted)
                                         options.bg = await decryptMedia(ogMsg);
                                     buffer = await imageProcessing.removeBG(buffer, options);
                                 }
@@ -58,21 +163,32 @@ class Sticker {
                             return returnType.imgSticker(buffer, !crop);
                         })
                         .catch((err) => {
+                            console.error(err);
                             return errors.UNKNOWN
                         })
 
                 case 'video':
-                    var buffer = await decryptMedia(message);
-                    var base64 = buffer.toString('base64');
-                    return returnType.videoSticker(base64, crop);
+                    return decryptMedia(message).then(buffer => {
+                        let base64 = buffer.toString('base64');
+                        return returnType.videoSticker(base64, crop);
+                    })
                 case 'url':
                     // Don't allow sending stickers that are more than 10MB large. (10485760 bytes)
                     if (await fetcher.checkSize(options.url, 10485760) === 'CONTENT_TOO_LARGE') return errors.CONTENT_TOO_LARGE
                     return returnType.urlSticker(options.url, !crop)
-
                 case 'chat':
+                    return sticker.text(options.joinedText, time, phone, name)
+                        .then(base64 => returnType.imgSticker(base64, !crop))
                 case 'audio':
+                    var length = options.l || options.length || (`${('0' + Math.floor(message.duration / 60)).slice(-2)}:${('0' + message.duration % 60).slice(-2)}`)
+                    return sticker.audio(time, phone, name, length)
+                        .then(base64 => returnType.imgSticker(base64, !crop))
                 case 'ptt':
+                    var length = options.l || options.length || (`${('0' + Math.floor(message.duration / 60)).slice(-2)}:${('0' + message.duration % 60).slice(-2)}`)
+                    let profilePicURL = message.sender.profilePicThumbObj.eurl
+                    let profilePic = !!profilePicURL ? await fetcher.fetchBuffer(profilePicURL) : null;
+                    return sticker.ptt(time, phone, name, length, profilePic)
+                        .then(base64 => returnType.imgSticker(base64, !crop))
                 case 'document':
                 default:
                     return errors.BAD_CMD;
