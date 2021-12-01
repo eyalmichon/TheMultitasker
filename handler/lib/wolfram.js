@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const { query } = require("mathram");
 const fs = require('fs')
 const path = require('path');
-var wolfHTML = fs.readFileSync(path.join(__dirname, '../util/wolf.html'), 'utf8');
+var wolfHTML = fs.readFileSync(path.join(__dirname, '../util/wolfram/wolf.html'), 'utf8');
 
 /**
  * Get the first answer that shows up in wolfram.
