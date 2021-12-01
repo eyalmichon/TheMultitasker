@@ -1,0 +1,16 @@
+{
+    "languages": [
+        "eng",
+        "heb"
+    ],
+    "welcomeMsg": {
+        "heb": {
+            "before": "שלום לך",
+            "after": "ברוך הבא ל-"
+        },
+        "eng": {
+            "before": "Hello",
+            "after": "welcome to"
+        }
+    }
+}
