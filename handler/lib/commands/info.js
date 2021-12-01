@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso } = require("..");
+const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Info {
@@ -50,6 +50,9 @@ class Info {
 
         commands.conjugate = this.addInfo(this.conjugate)
         commands.conj = this.alias(this.conjugate)
+
+        commands.thisdoesntexist = this.addInfo(this.thisDoesntExist)
+        commands.tde = this.alias(this.thisDoesntExist)
     }
 
     compile = {
@@ -274,6 +277,42 @@ class Info {
                 })
         },
         help: () => help.Info.conjugate
+    }
+    thisDoesntExist = {
+        func: (args) => {
+            const types = ['person', 'cat', 'horse', 'rental', 'waifu', 'question',
+                'chemical', 'word', 'city', 'simpsons', 'art', 'video', 'ideas', 'lyrics']
+            const options = parser.parse(args);
+            const hq = !!options.hq || !!options.hd;
+            let type = null;
+            types.forEach(t => {
+                if (options[t]) {
+                    type = t
+                    return;
+                }
+            })
+            if (!type)
+                type = types[Math.floor(Math.random() * types.length)]
+
+            return doesntExist.thisDoesntExist(type, options)
+                .then(result => {
+                    switch (result.type) {
+                        case 'text':
+                            return returnType.reply(result.info);
+                        case 'img':
+                            if (hq) return returnType.sendFile(`data:document/png;base64,${result.info}`, `the_multitasker_${options.joinedText}.png`, '', false)
+                            else return returnType.sendFile(`data:image/png;base64,${result.info}`, `the_multitasker_${options.joinedText}.png`, '', false)
+                        case 'videoLink':
+                            return downloader.video(result.info)
+                                .then(path => returnType.sendFile(path))
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.thisDoesntExist
     }
 }
 

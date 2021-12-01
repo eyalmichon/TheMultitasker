@@ -15,5 +15,6 @@ exports.translate = require('./translate');
 exports.recognize = require('./recognize');
 exports.nikud = require('./nikud');
 exports.reverso = require('./reverso');
+exports.doesntExist = require('./doesntExist');
 exports.sticker = require('./sticker');
 exports.extras = require('./extras');
