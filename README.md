@@ -4,7 +4,7 @@
 
 <h1>𝚝𝚑𝚎_𝚖𝚞𝚕𝚝𝚒𝚝𝚊𝚜𝚔𝚎𝚛;</h1>
 
-<h5> A WhatsApp bot written in JavaScript and Node.js.</h5>
+<h5>A WhatsApp bot written in JavaScript and Node.js.</h5>
 
 ![forthebadge](https://img.shields.io/badge/Made%20with-Node.js-8bbf3d)
 
@@ -29,6 +29,8 @@ Command pattern used for easy management of adding more commands.
   - Get all group IDs of the groups sent to owner.
   - Spam-tag someone to get their attention.
   - Blacklist 📛 for country codes and participants
+  - Expand groups with build-in [Group Expander](https://github.com/eyalmichon/group-expander).
+  - Set ON/OFF: get a welcome message when someone joines the group.
 
 - ### Admin Commands 💼:
   - Tag everyone in the group.
@@ -56,6 +58,7 @@ Command pattern used for easy management of adding more commands.
   - Translate with context.
   - Synonyms & Antonyms.
   - Conjugate words/sentences.
+  - get this doesn't exist content from [this](https://thisxdoesnotexist.com/) collection
 
 - ### Forwarder Commands ⏩:
   - Forward messages randomly from a chosen group. (group IDs need to be set manually)
@@ -70,7 +73,7 @@ Command pattern used for easy management of adding more commands.
   - GIF 👾
   - URL 🔗
   - Stickers 😃
-  - Chat messages 💬
+  - All types of chat messages 💬
 
 - ### Media Commands 🖼:
   - Remove background:
@@ -86,7 +89,7 @@ Command pattern used for easy management of adding more commands.
 - [npm]() >= v7.15.1
 - [python](https://www.python.org/) >= v2.7
 - [wa-automate](https://github.com/open-wa/wa-automate-nodejs) >= v4.17.1
-- [puppeteer](https://github.com/puppeteer/puppeteer#readme) v10.2.0
+- [puppeteer](https://github.com/puppeteer/puppeteer#readme) >= v10.2.0
 - on Windows [Microsoft Visual C++ 2010 Service Pack 1 Redistributable Package (x86)](https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe)
 
 
@@ -115,12 +118,9 @@ Same thing for regular users (which is the phone number with @c.us appended)
     "****-****@g.us",
     "****@c.us"
   ],
-  "RedAlerts-MessageOnly": [
-    ""
-  ],
-  "RedAlerts": [
-    ""
-  ],
+  "WelcomeMsg": ["****-****@g.us"],
+  "RedAlerts-MessageOnly": [""],
+  "RedAlerts": [""],
   ...
 }
 ```
