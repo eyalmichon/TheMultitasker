@@ -45,7 +45,7 @@ const returnType = {
      * @param {Boolean} removeFile boolean if to remove a file after sending it.
      * @returns Object information for sending a local file. 
      */
-    sendFile: (path, fileName = 'the_multitasker.mp4', title = '', removeFile = true) => { return { type: 'sendFile', info: { path, fileName, title }, removeFile } },
+    sendFile: (path, fileName, title = '', removeFile = true) => { return { type: 'sendFile', info: { path, fileName, title }, removeFile } },
     /**
      * Object information for sending a local music file as push to talk.
      * @param {String} path DataURL data:image/xxx;base64,xxx or the RELATIVE (should start with ./ or ../) path of the file you want to send.
