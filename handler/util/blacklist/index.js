@@ -15,7 +15,7 @@ class BlackList {
 
         if (!fs.existsSync(prefixPath)) {
             console.error(`Couldn't find prefix.json in ${prefixPath}, creating it...`)
-            fs.writeFileSync(prefixPath, '{"prefixes":[]}')
+            fs.writeFileSync(prefixPath, '{}')
 
         }
         this.prefix = require('./prefix.json')
@@ -54,27 +54,32 @@ class BlackList {
         else return 'NO_USERS'
     }
 
-    getPrefixes() { return this.prefix.prefixes }
-    addPrefix(num) {
-        if (isInt(num) && 0 < num.length && num.length < 7) {
-            if (!this.prefix.prefixes.includes(num)) {
-                this.prefix.prefixes.push(num)
-                try {
-                    fs.writeFileSync(prefixPath, JSON.stringify(this.prefix))
-                }
-                catch (err) {
-                    console.error(err)
-                    return false;
-                }
-                return true;
+    getPrefixes(id) { return this.prefix[id] }
+    addPrefix(groupID, num) {
+        if (isInt(num) && 0 < num.length) {
+            if (!this.prefix[groupID]) {
+                this.prefix[groupID] = []
             }
-            else return 'PREFIX_EXISTS';
+
+            if (this.prefix[groupID].includes(num)) return 'PREFIX_EXISTS';
+
+            this.prefix[groupID].push(num)
+            try {
+                fs.writeFileSync(prefixPath, JSON.stringify(this.prefix))
+            }
+            catch (err) {
+                console.error(err)
+                return false;
+            }
+            return true;
+
+
         }
         else return 'PREFIX_BAD_FORMAT';
     }
-    removePrefix(num) {
-        if (this.prefix.prefixes.includes(num)) {
-            this.prefix.prefixes = removeFromArray(this.prefix.prefixes, num)
+    removePrefix(groupID, num) {
+        if (this.prefix[groupID].includes(num)) {
+            this.prefix[groupID] = removeFromArray(this.prefix[groupID], num)
             try {
                 fs.writeFileSync(prefixPath, JSON.stringify(this.prefix))
             }
