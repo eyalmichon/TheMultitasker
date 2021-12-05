@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader } = require("..");
+const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Info {
@@ -53,6 +53,9 @@ class Info {
 
         commands.thisdoesntexist = this.addInfo(this.thisDoesntExist)
         commands.tde = this.alias(this.thisDoesntExist)
+
+        commands.emojigenerator = this.addInfo(this.emojiGenerator)
+        commands.randemoji = this.alias(this.emojiGenerator)
     }
 
     compile = {
@@ -313,6 +316,18 @@ class Info {
                 })
         },
         help: () => help.Info.thisDoesntExist
+    }
+
+    emojiGenerator = {
+        func: (args) => {
+            const n = parseInt(args[0])
+            if (!!n && n < 1000)
+                return extras.randomEmoji(n)
+                    .then(emojis => returnType.reply(emojis))
+            else
+                return errors.EMOJI_GEN_ERROR;
+        },
+        help: () => help.Info.emojiGenerator
     }
 }
 

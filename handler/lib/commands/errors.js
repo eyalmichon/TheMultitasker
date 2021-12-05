@@ -42,7 +42,8 @@ const errors = {
     NO_RESULT_RECO: addType(`📛 Error, could'nt find any music matching this song.`),
     WRONG_TYPE_RECO: addType(`📛 Error, only accepting audio messages.`),
     CONV_VIDEO_TOO_LARGE: addType(`📛 Error, the video you're trying to convert is too large...`),
-    CONV_NOT_VIDEO: addType(`📛 Error, only videos are allowed.`)
+    CONV_NOT_VIDEO: addType(`📛 Error, only videos are allowed.`),
+    EMOJI_GEN_ERROR: addType(`📛 Error, wrong number.`)
 }
 
 module.exports = { errors }
