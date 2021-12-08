@@ -133,6 +133,7 @@ class Forwarder {
             delete groupMsgs[id]
             i--;
         }
+        this.writeToMessagesDB();
         return n;
     }
     /**

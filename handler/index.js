@@ -105,13 +105,14 @@ const forwardHandler = async (client, message) => {
             message.caption ? mentionsObj.forEach(obj => message.caption = message.caption.replace(/@\d*/, b(obj.pushname || obj.name))) :
                 mentionsObj.forEach(obj => message.body = message.body.replace(/@\d*/, b(obj.pushname || obj.name)))
     }
-    // get all group messages.
-    const forwarderMsgs = myForwarder.getGroupMessages(from);
     // if messages in DB are over the limit, delete the difference.
     if (forwarderObj.maxMsgs && myForwarder.getGroupMessagesLength(from) > forwarderObj.maxMsgs)
-        myForwarder.removeMessages(from, myForwarder.getGroupMessagesLength(from) - forwarderObj.maxMsgs)
+        // remove the amount of messages that passed the limit + 20% more.
+        myForwarder.removeMessages(from, myForwarder.getGroupMessagesLength(from) * 1.2 - forwarderObj.maxMsgs)
     // boolean to check if messages is a quoted message.
     const isQuoted = !!quotedMsg;
+    // get all group messages.
+    const forwarderMsgs = myForwarder.getGroupMessages(from);
     // if quoted, get all IDs for the relevant quoted message.
     const quotedReplyIDs = isQuoted ? forwarderMsgs[quotedMsg.id] : null
 
@@ -134,14 +135,14 @@ const forwardHandler = async (client, message) => {
     switch (type) {
         case 'chat':
             forwarderObj.groups.forEach(group => {
-                isQuoted && !!quotedReplyIDs[group] ? promiseMsgIDArray.push(client.reply(group, (isAddMsg) ? [addedMsg, message.body].join('\n\n') : message.body, quotedReplyIDs[group])) :
+                isQuoted && !!quotedReplyIDs?.group ? promiseMsgIDArray.push(client.reply(group, (isAddMsg) ? [addedMsg, message.body].join('\n\n') : message.body, quotedReplyIDs[group])) :
                     promiseMsgIDArray.push(client.sendText(group, (isAddMsg) ? [addedMsg, message.body].join('\n\n') : message.body))
             })
             break;
         case 'image':
         case 'video':
             let media = await client.decryptMedia(message)
-            forwarderObj.groups.forEach(group => promiseMsgIDArray.push(client.sendFile(group, media, '', (isAddMsg) ? (!!caption ? [addedMsg, caption].join('\n\n') : addedMsg) : '', isQuoted && !!quotedReplyIDs[group] ? quotedReplyIDs[group] : null, true)))
+            forwarderObj.groups.forEach(group => promiseMsgIDArray.push(client.sendFile(group, media, '', (isAddMsg) ? (!!caption ? [addedMsg, caption].join('\n\n') : addedMsg) : '', isQuoted && !!quotedReplyIDs?.group ? quotedReplyIDs[group] : null, true)))
             break;
         case 'sticker':
         case 'ptt':
@@ -152,7 +153,7 @@ const forwardHandler = async (client, message) => {
             forwarderObj.groups.forEach(async group => {
                 const msg = await client.forwardMessages(group, message.id)
                 promiseMsgIDArray.push(msg[0])
-                client.reply(group, (isAddMsg) ? addedMsg : '', isQuoted && !!quotedReplyIDs[group] ? quotedReplyIDs[group] : msg[0])
+                client.reply(group, (isAddMsg) ? addedMsg : '', isQuoted && !!quotedReplyIDs?.group ? quotedReplyIDs[group] : msg[0])
             })
             break;
     }
@@ -169,7 +170,8 @@ const forwardHandler = async (client, message) => {
         if (!!groupObj) {
             // if messages in DB are over the limit, delete the difference.
             if (groupObj.maxMsgs && myForwarder.getGroupMessagesLength(group) > groupObj.maxMsgs)
-                myForwarder.removeMessages(group, myForwarder.getGroupMessagesLength(group) - groupObj.maxMsgs)
+                // remove the amount of messages that passed the limit + 20% more.
+                myForwarder.removeMessages(group, myForwarder.getGroupMessagesLength(group) * 1.2 - groupObj.maxMsgs)
 
             const msgObject = {}
             msgObject[from] = id;
@@ -196,10 +198,9 @@ const msgHandler = async (client, message) => {
     const { id, from, sender, isGroupMsg, chat, caption, quotedMsg, mentionedJidList } = message;
     let { body } = message;
     let groupBlackList = blackList.getGroup(from);
+
     // if we don't send anything mark the chat as seen so we don't get it again on the next startup.
-    client.sendSeen(from);
-
-
+    await client.sendSeen(from)
 
     // Return if sender is null or if it's body is undefined or is not a command, or the caption is not a command or (if the chatID
     // isn't in the allowed group AND it's not 'Me'). [if body doesn't start with prefix, we can make body = caption to see if it starts with prefix]
@@ -208,7 +209,6 @@ const msgHandler = async (client, message) => {
         || (!body)
         || (!body.startsWith(prefix) && (!caption || !(body = caption).startsWith(prefix)))
         || (!getGroup('Allowed').includes(from) && getGroup('Me') !== from)) return;
-
     if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
     // Add user to spam set if it's not the bot owner.
     if (sender.id !== botMaster)
