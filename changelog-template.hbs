@@ -37,11 +37,12 @@ href}}[`#{{id}}`]({{href}}){{/if}}{{/each}}
 {{/each}}
 {{/if}}
 
-{{#commit-list commits heading='### Commits' exclude='(Release v)|(small fix: )|(small change: )|(Bump )'}}
+{{#commit-list commits heading='### Commits' exclude='(Release v)|(small fix: )|(small change: )|(Bump )|(Dependency
+)'}}
 - {{#if breaking}}**Breaking change:** {{/if}}{{subject}} {{#if href}}[`{{shorthash}}`]({{href}}){{/if}}
 {{/commit-list}}
 
-{{#commit-list commits heading='### Dependencies' message='(Bump )'}}
+{{#commit-list commits heading='### Dependencies' message='(Bump )|(Dependency )'}}
 - {{#if breaking}}**Breaking change:** {{/if}}{{subject}} {{#if href}}[`{{shorthash}}`]({{href}}){{/if}}
 {{/commit-list}}
 
