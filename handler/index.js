@@ -135,14 +135,14 @@ const forwardHandler = async (client, message) => {
     switch (type) {
         case 'chat':
             forwarderObj.groups.forEach(group => {
-                isQuoted && !!quotedReplyIDs?.group ? promiseMsgIDArray.push(client.reply(group, (isAddMsg) ? [addedMsg, message.body].join('\n\n') : message.body, quotedReplyIDs[group])) :
+                !!quotedReplyIDs && !!quotedReplyIDs[group] ? promiseMsgIDArray.push(client.reply(group, (isAddMsg) ? [addedMsg, message.body].join('\n\n') : message.body, quotedReplyIDs[group])) :
                     promiseMsgIDArray.push(client.sendText(group, (isAddMsg) ? [addedMsg, message.body].join('\n\n') : message.body))
             })
             break;
         case 'image':
         case 'video':
             let media = await client.decryptMedia(message)
-            forwarderObj.groups.forEach(group => promiseMsgIDArray.push(client.sendFile(group, media, '', (isAddMsg) ? (!!caption ? [addedMsg, caption].join('\n\n') : addedMsg) : '', isQuoted && !!quotedReplyIDs?.group ? quotedReplyIDs[group] : null, true)))
+            forwarderObj.groups.forEach(group => promiseMsgIDArray.push(client.sendFile(group, media, '', (isAddMsg) ? (!!caption ? [addedMsg, caption].join('\n\n') : addedMsg) : '', !!quotedReplyIDs && !!quotedReplyIDs[group] ? quotedReplyIDs[group] : null, true)))
             break;
         case 'sticker':
         case 'ptt':
@@ -153,7 +153,7 @@ const forwardHandler = async (client, message) => {
             forwarderObj.groups.forEach(async group => {
                 const msg = await client.forwardMessages(group, message.id)
                 promiseMsgIDArray.push(msg[0])
-                client.reply(group, (isAddMsg) ? addedMsg : '', isQuoted && !!quotedReplyIDs?.group ? quotedReplyIDs[group] : msg[0])
+                client.reply(group, (isAddMsg) ? addedMsg : '', !!quotedReplyIDs && !!quotedReplyIDs[group] ? quotedReplyIDs[group] : msg[0])
             })
             break;
     }
