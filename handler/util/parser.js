@@ -8,7 +8,7 @@ function isValidURL(url) {
     return pattern.test(url);
 }
 
-const parse = (args) => {
+const parse = (args, getURL = true) => {
 
     const options = {};
     const joinedText = [];
@@ -29,7 +29,7 @@ const parse = (args) => {
 
             options[key] = value;
         }
-        else if (isValidURL(arg))
+        else if (getURL && isValidURL(arg))
             url = arg;
         else
             joinedText.push(arg)
