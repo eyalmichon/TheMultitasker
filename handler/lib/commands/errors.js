@@ -43,7 +43,8 @@ const errors = {
     WRONG_TYPE_RECO: addType(`📛 Error, only accepting audio messages.`),
     CONV_VIDEO_TOO_LARGE: addType(`📛 Error, the video you're trying to convert is too large...`),
     CONV_NOT_VIDEO: addType(`📛 Error, only videos are allowed.`),
-    EMOJI_GEN_ERROR: addType(`📛 Error, wrong number.`)
+    EMOJI_GEN_ERROR: addType(`📛 Error, wrong number.`),
+    EMPTY_TEXT: addType(`📛 Error, no text found.`)
 }
 
 module.exports = { errors }

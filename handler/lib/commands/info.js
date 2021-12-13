@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras } = require("..");
+const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras, qrcode } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Info {
@@ -56,6 +56,8 @@ class Info {
 
         commands.emojigenerator = this.addInfo(this.emojiGenerator)
         commands.randemoji = this.alias(this.emojiGenerator)
+
+        commands.qr = this.addInfo(this.qr)
     }
 
     compile = {
@@ -328,6 +330,23 @@ class Info {
                 return errors.EMOJI_GEN_ERROR;
         },
         help: () => help.Info.emojiGenerator
+    }
+    qr = {
+        func: (args) => {
+            const options = parser.parse(args, false);
+            const file = options.file || 'png'
+            options.data = options.joinedText;
+            if (!options.data) return errors.EMPTY_TEXT;
+
+            return qrcode.qr(options)
+                .then(imgLink => returnType.fileFromURL(imgLink, `the_multitasker.${file}`, options.data))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN;
+                })
+
+        },
+        help: () => help.Info.qr
     }
 }
 
