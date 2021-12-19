@@ -84,9 +84,12 @@ const tts = (text, from = voices.english) => new Promise((resolve, reject) => {
     }
     fetchToFile(link, 'mp3', options)
         .then(res => {
-            if (res.status)
+            if (res.filePath)
                 resolve(res.filePath)
-
+            else {
+                console.error(res);
+                reject('NULL_PATH')
+            }
         })
         .catch(err => {
             console.error(err);
