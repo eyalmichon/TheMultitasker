@@ -215,6 +215,7 @@ class Info {
                 .then(path => returnType.sendPtt(path))
                 .catch(err => {
                     console.log(err)
+                    if (err === 'NULL_PATH') return errors.TEXT_TOO_LONG
                     return errors.UNKNOWN;
                 })
         },
