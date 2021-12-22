@@ -25,10 +25,8 @@ class Senders {
     getGroup(group) { return this.senders[group]; }
 
     // check if we got a correct number, this is the best we can do I guess...
-    // Might want to delete or replace prefix.
     isCorrectNumber(num) {
-        return num.startsWith('972') && (num.endsWith('@c.us') || num.endsWith('@g.us')) && (num.length === 17 || num.length === 28);
-
+        return (num.endsWith('@c.us') || num.endsWith('@g.us')) && (num.length > 17 && num.length < 28);
     }
 
     // Removes a given item from the array.
