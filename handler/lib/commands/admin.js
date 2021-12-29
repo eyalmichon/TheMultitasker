@@ -29,12 +29,15 @@ class Admin {
     }
 
     kick = {
-        func: (client, message) => {
-            if (message.quotedMsg !== null)
+        func: (client, message, botMaster) => {
+            // *bot master is immune to kick command*
+            // Kick the quoted person 
+            if (!!message.quotedMsg && message.quotedMsg.sender.id !== botMaster)
                 client.removeParticipant(message.from, message.quotedMsg.sender.id);
-
+            // Go over the mentioned members and kick them all.
             message.mentionedJidList.forEach(member => {
-                client.removeParticipant(message.from, member);
+                if (member !== botMaster)
+                    client.removeParticipant(message.from, member);
             })
             return { info: true };
         },
