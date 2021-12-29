@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras, qrcode } = require("..");
+const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras, qrcode, carInfo } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Info {
@@ -58,6 +58,8 @@ class Info {
         commands.randemoji = this.alias(this.emojiGenerator)
 
         commands.qr = this.addInfo(this.qr)
+
+        commands.carinfo = this.addInfo(this.carInfo)
     }
 
     compile = {
@@ -348,6 +350,23 @@ class Info {
 
         },
         help: () => help.Info.qr
+    }
+    carInfo = {
+        func: (args) => {
+            return carInfo.infoByCarNumber(args[0])
+                .then(info => returnType.reply(info))
+                .catch(err => {
+                    console.error(err);
+                    if (err === 'WRONG_LENGTH')
+                        return errors.WRONG_CAR_NUMBER_LENGTH
+                    else if (err === 'NOT_FOUND')
+                        return errors.NOT_FOUND_CAR_NUMBER_INFO
+                    else
+                        return errors.UNKNOWN;
+                })
+
+        },
+        help: () => help.Info.carInfo
     }
 }
 

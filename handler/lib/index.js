@@ -17,5 +17,6 @@ exports.nikud = require('./nikud');
 exports.reverso = require('./reverso');
 exports.doesntExist = require('./doesntExist');
 exports.qrcode = require('./qrcode');
+exports.carInfo = require('./carInfo');
 exports.sticker = require('./sticker');
 exports.extras = require('./extras');

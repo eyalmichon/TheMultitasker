@@ -44,7 +44,9 @@ const errors = {
     CONV_VIDEO_TOO_LARGE: addType(`📛 Error, the video you're trying to convert is too large...`),
     CONV_NOT_VIDEO: addType(`📛 Error, only videos are allowed.`),
     EMOJI_GEN_ERROR: addType(`📛 Error, wrong number.`),
-    EMPTY_TEXT: addType(`📛 Error, no text found.`)
+    EMPTY_TEXT: addType(`📛 Error, no text found.`),
+    WRONG_CAR_NUMBER_LENGTH: addType(`📛 Error, car number length entered is invalid.`),
+    NOT_FOUND_CAR_NUMBER_INFO: addType(`📛 Error, car number isn't in the database.`)
 }
 
 module.exports = { errors }
