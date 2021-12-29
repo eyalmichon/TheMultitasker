@@ -107,8 +107,8 @@ const forwardHandler = async (client, message) => {
     }
     // if messages in DB are over the limit, delete the difference.
     if (forwarderObj.maxMsgs && myForwarder.getGroupMessagesLength(from) > forwarderObj.maxMsgs)
-        // remove the amount of messages that passed the limit + 20% more.
-        myForwarder.removeMessages(from, myForwarder.getGroupMessagesLength(from) * 1.2 - forwarderObj.maxMsgs)
+        // remove 20% of maxMsgs from the DB.
+        myForwarder.removeMessages(from, forwarderObj.maxMsgs * 0.2)
     // boolean to check if messages is a quoted message.
     const isQuoted = !!quotedMsg;
     // get all group messages.
@@ -170,8 +170,8 @@ const forwardHandler = async (client, message) => {
         if (!!groupObj) {
             // if messages in DB are over the limit, delete the difference.
             if (groupObj.maxMsgs && myForwarder.getGroupMessagesLength(group) > groupObj.maxMsgs)
-                // remove the amount of messages that passed the limit + 20% more.
-                myForwarder.removeMessages(group, myForwarder.getGroupMessagesLength(group) * 1.2 - groupObj.maxMsgs)
+                // remove 20% of maxMsgs from the DB.
+                myForwarder.removeMessages(group, groupObj.maxMsgs * 0.2)
 
             const msgObject = {}
             msgObject[from] = id;
@@ -312,7 +312,7 @@ const msgHandler = async (client, message) => {
                     result = await commands.execute(command, client, message, groupMembers, botNumber);
                     break;
                 case 'kick':
-                    result = await commands.execute(command, client, message);
+                    result = await commands.execute(command, client, message, botMaster);
                     break;
                 default:
                     break;
