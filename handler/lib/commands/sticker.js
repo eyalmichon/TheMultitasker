@@ -45,9 +45,9 @@ class Sticker {
                 let rphone = options.rphone || options.rp
                 let rname = options.rname || options.rn
 
-                const replyOptions = { phone: typeof phone === 'string' ? phone?.replace(/_/g, ' ') : replyMsg.sender.formattedName, name: !!name ? (typeof name === 'string' ? name?.replace(/_/g, ' ') : replyMsg.sender.pushname) : null, type: replyMsg.type }
+                const replyOptions = { phone: typeof phone === 'string' ? phone?.replace(/_/g, ' ') : replyMsg.sender.formattedName, name: !!name ? (typeof name === 'string' ? name?.replace(/_/g, ' ') : replyMsg.sender.pushname) : !!phone ? null : replyMsg.sender.pushname, type: replyMsg.type }
                 const repliedOptions = {
-                    phone: typeof rphone === 'string' ? rphone?.replace(/_/g, ' ') : repliedMsg.sender.formattedName, name: !!rname ? (typeof rname === 'string' ? rname?.replace(/_/g, ' ') : repliedMsg.sender.pushname) : null, type: repliedMsg.type
+                    phone: typeof rphone === 'string' ? rphone?.replace(/_/g, ' ') : repliedMsg.sender.formattedName, name: !!rname ? (typeof rname === 'string' ? rname?.replace(/_/g, ' ') : repliedMsg.sender.pushname) : !!rphone ? null : repliedMsg.sender.pushname, type: repliedMsg.type
                 }
 
                 switch (repliedMsg.type) {
@@ -112,8 +112,8 @@ class Sticker {
                 return returnType.imgSticker(replyBuffer, !crop)
             }
 
+            name = !!name ? typeof name === 'string' ? name?.replace(/_/g, ' ') : message.sender.pushname : !!phone ? null : message.sender.pushname;
             phone = typeof phone === 'string' ? phone?.replace(/_/g, ' ') : message.sender.formattedName;
-            if (!!name) name = typeof name === 'string' ? name?.replace(/_/g, ' ') : message.sender.pushname;
 
             // if the user tries to make a sticker from a message that has a link in it, change the type to url.
             if (!!options.url) message.type = 'url'
