@@ -40,24 +40,13 @@ class Sticker {
             if (reply && isQuoted) {
                 const replyMsg = !!message.quotedMsg ? message : ogMsg
                 const repliedMsg = !!message.quotedMsg ? message.quotedMsg : message
-                // check if needs to be changed.
-                if (!phone) {
-                    phone = replyMsg.sender.formattedName
-                    if (!name)
-                        name = replyMsg.sender.pushname
-                }
 
                 // the phone and name for the replied message.
                 let rphone = options.rphone || options.rp
                 let rname = options.rname || options.rn
-                if (!rphone) {
-                    rphone = repliedMsg.sender.formattedName
-                    if (!rname)
-                        rname = repliedMsg.sender.pushname
-                }
 
-                const replyOptions = { phone: phone?.replace(/_/g, ' '), name: name?.replace(/_/g, ' '), type: replyMsg.type }
-                const repliedOptions = { phone: rphone?.replace(/_/g, ' '), name: rname?.replace(/_/g, ' '), type: repliedMsg.type }
+                const replyOptions = { phone: typeof phone === 'string' ? phone?.replace(/_/g, ' ') : replyMsg.sender.formattedName, name: typeof name === 'string' ? name?.replace(/_/g, ' ') : replyMsg.sender.pushname, type: replyMsg.type }
+                const repliedOptions = { phone: typeof rphone === 'string' ? rphone?.replace(/_/g, ' ') : repliedMsg.sender.formattedName, name: typeof rname === 'string' ? rname?.replace(/_/g, ' ') : repliedMsg.sender.pushname, type: repliedMsg.type }
 
                 switch (repliedMsg.type) {
                     case 'chat':
@@ -121,14 +110,8 @@ class Sticker {
                 return returnType.imgSticker(replyBuffer, !crop)
             }
 
-
-            if (!phone) {
-                phone = message.sender.formattedName
-                if (!name)
-                    name = message.sender.pushname
-            }
-            phone = phone?.replace(/_/g, ' ');
-            name = name?.replace(/_/g, ' ');
+            phone = typeof phone === 'string' ? phone?.replace(/_/g, ' ') : message.sender.formattedName;
+            name = typeof name === 'string' ? name?.replace(/_/g, ' ') : message.sender.pushname;
 
             // if the user tries to make a sticker from a message that has a link in it, change the type to url.
             if (!!options.url) message.type = 'url'
