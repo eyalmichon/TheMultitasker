@@ -82,7 +82,7 @@ class Info {
 
     wolfram = {
         func: (args) => {
-            const options = parser.parse(args);
+            const options = parser.parse(args, false);
             let full = !!options.f || !!options.full;
             let question = options.joinedText;
 
