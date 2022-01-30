@@ -93,8 +93,12 @@ const forwardHandler = async (client, message) => {
     const { id, from, sender, caption, quotedMsg, type, mentionedJidList } = message;
     // try to get the forwarder from the forwardDB.
     const forwarderObj = myForwarder.getForwarder(from);
-    // if the message doesn't have a sender or the group is not a forwarder, return.
-    if (!sender || !forwarderObj) return;
+    // get all group messages.
+    const forwarderMsgs = myForwarder.getGroupMessages(from);
+    // if the message doesn't have a sender or the group is not a forwarder, or already sent, return.
+    if (!sender || !forwarderObj || !!forwarderMsgs[id]) return;
+    // create object for id.
+    forwarderMsgs[id] = {};
     // if mentioned, replace mentions with the names of the people mentioned in bold.
     if (!!mentionedJidList.length) {
         const mentionObjPromises = []
@@ -111,8 +115,6 @@ const forwardHandler = async (client, message) => {
         myForwarder.removeMessages(from, forwarderObj.maxMsgs * 0.2)
     // boolean to check if messages is a quoted message.
     const isQuoted = !!quotedMsg;
-    // get all group messages.
-    const forwarderMsgs = myForwarder.getGroupMessages(from);
     // if quoted, get all IDs for the relevant quoted message.
     const quotedReplyIDs = isQuoted ? forwarderMsgs[quotedMsg.id] : null
 
