@@ -109,6 +109,7 @@ const help = {
         setLanguageForwarder: `${b('Usage:')} ${prefix}setlanguageforwarder [lang] inside the forwarder OR in the bot's chat: ${prefix}setlanguageforwarder [forwarder groupID] [lang] (where lang is a language that is in the localizations.json file)\n${b('Aliases:')}\n[setlanguageforwarder, slf]`,
         setMaxMsgsForwarder: `${b('Usage:')} ${prefix}setmaxmsgsforwarder [n] inside the forwarder OR in the bot's chat: ${prefix}setmaxmsgsforwarder [forwarder groupID] [n] (where n is a number that you want to set for the max amount of saved messages)\n${b('Aliases:')}\n[setmaxmsgsforwarder, smmf]`,
         setPrefixForwarder: `${b('Usage:')} ${prefix}setprefixforwarder [flag] inside the forwarder OR in the bot's chat: ${prefix}setprefixforwarder [forwarder groupID] [flag]\n${b('Options:')}\nPrefix message ON/OFF: -p/-prefix\nName in message ON/OFF: -n/-name\n${b('Aliases:')}\n[setprefixforwarder, spf]`,
+        removeMsg: `${b('Usage:')} reply with ${prefix}remove to remove a message sent by the bot\n${b('Aliases:')}\n[remove, rmv]`,
     },
     Admin: {
         everyone: `${b('Usage:')} ${prefix}everyone\nTags everyone in the group.\n${b('Aliases:')}\n[everyone, tagall]`,

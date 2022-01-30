@@ -299,6 +299,10 @@ const msgHandler = async (client, message) => {
                 case 'tag':
                     result = await commands.execute(command, client, mentionedJidList, from, args[0]);
                     break;
+                case 'remove':
+                case 'rmv':
+                    result = await commands.execute(command, client, message, botNumber);
+                    break;
                 default:
                     result = await commands.execute(command, message);
                     break;

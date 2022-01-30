@@ -58,6 +58,9 @@ class Owner {
         commands.setprefixforwarder = this.addInfo(this.setPrefixForwarder)
         commands.spf = this.alias(this.setPrefixForwarder)
 
+        commands.remove = this.addInfo(this.removeMsg)
+        commands.rmv = this.alias(this.removeMsg)
+
         commands.m = this.addInfo(this.m);
 
         commands.up = this.addInfo(this.uploadImg)
@@ -401,6 +404,15 @@ class Owner {
         help: () => help.Owner.tag
     }
 
+    removeMsg = {
+        func: (client, message, botNumber) => {
+            if (message.quotedMsg.sender.id === botNumber) {
+                client.deleteMessage(message.from, message.quotedMsg.id, false);
+            }
+            return { info: true };
+        },
+        help: () => help.Owner.removeMsg
+    }
     //debugging
     m = {
         func: (message) => {
