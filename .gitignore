@@ -16,7 +16,6 @@ groups.json
 prefix.json
 forwardDB.json
 messagesDB.json
-
 # Runtime data
 pids
 *.pid
@@ -97,4 +96,8 @@ dist
 # managed
 **.data.json
 **.node-persist**
+# end managed
+
+# managed
+**_IGNORE_**
 # end managed

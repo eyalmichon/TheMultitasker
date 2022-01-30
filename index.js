@@ -18,6 +18,9 @@ async function handleUnread(client) {
     await Promise.all(promises)
         .catch(err => {
             console.error(err);
+            setTimeout(() => {
+                return client.kill()
+            }, 4000);
         })
 }
 
@@ -26,6 +29,7 @@ async function handleUnread(client) {
 const start = async (client = new Client()) => {
     console.log(`The Multitasker [Version ${version}]`)
 
+    // Mutex lock for handleUnread.
     const lock = mutexify()
 
     // refresh the client every hour.
@@ -33,45 +37,50 @@ const start = async (client = new Client()) => {
         client.refresh();
     }, 3600000)
 
-    try {
-        // Activate all commands that run in background if they were active before restart.
-        restartHandler(client, ['redalerts'])
+    // Activate all commands that run in background if they were active before restart.
+    restartHandler(client, ['redalerts'])
+    // If diconnected, go over missed messages.
+    client.onStateChanged(async (state) => {
+        console.log('[Client State]', state)
+        const release = await lock()
+        if (state === 'CONNECTED') await handleUnread(client);
+        release();
         // Force it to keep the current session
-        client.onStateChanged(async (state) => {
-            console.log('[Client State]', state)
-            const release = await lock()
-            if (state === 'CONNECTED') await handleUnread(client);
-            release();
-            if (state === 'CONFLICT' || state === 'DISCONNECTED') client.forceRefocus();
-        })
+        if (state === 'CONFLICT' || state === 'DISCONNECTED') client.forceRefocus();
+    }).catch(err => {
+        console.error(err)
+        setTimeout(() => {
+            return client.kill()
+        }, 4000);
+    })
 
-        await handleUnread(client);
+    await handleUnread(client);
 
-        client.onMessage(message => {
-            // Message handler.
-            msgHandler(client, message);
-            // Forwarding handler.
-            forwardHandler(client, message);
+    client.onMessage(message => {
+        // Message handler.
+        msgHandler(client, message);
+        // Forwarding handler.
+        forwardHandler(client, message);
 
-        }).catch(err => {
-            console.error(err);
-        })
-
-        client.onAnyMessage(message => {
-            // Auto remove users.
-            autoRemoveHandler(client, message);
-            // Welcome message.
-            welcomeMsgHandler(client, message);
-        }).catch(err => {
-            console.error(err);
-        })
-
-    } catch (err) {
+    }).catch(err => {
         console.error(err);
         setTimeout(() => {
             return client.kill()
-        }, 5000);
-    }
+        }, 4000);
+    })
+
+    client.onAnyMessage(message => {
+        // Auto remove users.
+        autoRemoveHandler(client, message);
+        // Welcome message.
+        welcomeMsgHandler(client, message);
+    }).catch(err => {
+        console.error(err);
+        setTimeout(() => {
+            return client.kill()
+        }, 4000);
+    })
+
 }
 
 const options = {
