@@ -19,8 +19,8 @@ class Sticker {
     }
 
     sticker = {
-        func: async (args, message) => {
-            const options = parser.parse(args)
+        func: async (message) => {
+            const options = parser.parse(message.args)
             const isQuoted = !!message.quotedMsg;
             const ogMsg = message;
             // if there is a quoted message, use it to make the sticker.

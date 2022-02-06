@@ -15,10 +15,10 @@ class Admin {
         commands.kick = this.addInfo(this.kick)
     }
     everyone = {
-        func: (client, message, groupMembers, botNumber) => {
-            let mentionlist = [];
-            groupMembers
-                .filter(member => member !== message.sender.id && member !== botNumber)
+        func: (message, client) => {
+            const mentionlist = [];
+            message.groupMembers
+                .filter(member => member !== message.sender.id && member !== message.botNumber)
                 .forEach(member => {
                     mentionlist.push(`@${member.replace('@c.us', '')}`)
                 });
@@ -29,14 +29,14 @@ class Admin {
     }
 
     kick = {
-        func: (client, message, botMaster) => {
+        func: (message, client) => {
             // *bot master is immune to kick command*
             // Kick the quoted person 
-            if (!!message.quotedMsg && message.quotedMsg.sender.id !== botMaster)
+            if (!!message.quotedMsg && message.quotedMsg.sender.id !== message.botMaster)
                 client.removeParticipant(message.from, message.quotedMsg.sender.id);
             // Go over the mentioned members and kick them all.
             message.mentionedJidList.forEach(member => {
-                if (member !== botMaster)
+                if (member !== message.botMaster)
                     client.removeParticipant(message.from, member);
             })
             return { info: true };

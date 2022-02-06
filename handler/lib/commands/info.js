@@ -63,9 +63,9 @@ class Info {
     }
 
     compile = {
-        func: (args) => {
-            let compiler = args.shift();
-            let code = args.join(' ');
+        func: (message) => {
+            let compiler = message.args.shift();
+            let code = message.args.join(' ');
             return compile.compile(compiler, code)
                 .then(result => returnType.reply(result))
         },
@@ -73,16 +73,16 @@ class Info {
     }
 
     covid = {
-        func: (args) => {
-            return covid.infected(args[0])
+        func: (message) => {
+            return covid.infected(message.args[0])
                 .then(infectedInfo => returnType.reply(infectedInfo))
         },
         help: () => help.Info.covid
     }
 
     wolfram = {
-        func: (args) => {
-            const options = parser.parse(args, false);
+        func: (message) => {
+            const options = parser.parse(message.args, false);
             let full = !!options.f || !!options.full;
             let question = options.joinedText;
 
@@ -100,8 +100,8 @@ class Info {
     }
 
     urban = {
-        func: async (args) => {
-            const options = parser.parse(args);
+        func: async (message) => {
+            const options = parser.parse(message.args);
             let result
             let text = [];
             let wotd = !!options.wotd;
@@ -135,8 +135,8 @@ class Info {
     }
 
     translate = {
-        func: (args) => {
-            const options = parser.parse(args);
+        func: (message) => {
+            const options = parser.parse(message.args);
 
             const to = options.l || options.lang;
 
@@ -152,8 +152,8 @@ class Info {
     }
 
     recognizeMusic = {
-        func: async (args, message) => {
-            const options = parser.parse(args);
+        func: async (message) => {
+            const options = parser.parse(message.args);
 
             const full = !!options.f || !!options.full;
             if (message.quotedMsg) message = message.quotedMsg;
@@ -172,8 +172,8 @@ class Info {
     }
 
     nikud = {
-        func: async (args, message) => {
-            const options = parser.parse(args);
+        func: async (message) => {
+            const options = parser.parse(message.args);
             if (message.quotedMsg) message = message.quotedMsg;
 
             if (message.type !== 'chat') return errors.ONLY_TEXT
@@ -189,8 +189,8 @@ class Info {
     }
 
     grammar = {
-        func: (args, message) => {
-            const options = parser.parse(args);
+        func: (message) => {
+            const options = parser.parse(message.args);
             const lang = options.l || options.lang;
             if (message.quotedMsg) message = message.quotedMsg;
 
@@ -206,8 +206,8 @@ class Info {
         help: () => help.Info.grammar
     }
     tts = {
-        func: (args, message) => {
-            const options = parser.parse(args);
+        func: (message) => {
+            const options = parser.parse(message.args);
             const lang = options.l || options.lang;
             if (message.quotedMsg) message = message.quotedMsg;
 
@@ -224,8 +224,8 @@ class Info {
         help: () => help.Info.tts
     }
     context = {
-        func: (args, message) => {
-            const options = parser.parse(args);
+        func: (message) => {
+            const options = parser.parse(message.args);
             const from = options.fl || options.froml || options.fromlang;
             const to = options.tl || options.tol || options.tolang;
             if (message.quotedMsg) message = message.quotedMsg;
@@ -249,8 +249,8 @@ class Info {
         help: () => help.Info.context
     }
     synonym = {
-        func: (args, message) => {
-            const options = parser.parse(args);
+        func: (message) => {
+            const options = parser.parse(message.args);
             const lang = options.l || options.lang;
             if (message.quotedMsg) message = message.quotedMsg;
 
@@ -266,8 +266,8 @@ class Info {
         help: () => help.Info.synonym
     }
     conjugate = {
-        func: (args, message) => {
-            const options = parser.parse(args);
+        func: (message) => {
+            const options = parser.parse(message.args);
             const lang = options.l || options.lang;
             const hq = !!options.hq || !!options.hd;
             if (message.quotedMsg) message = message.quotedMsg;
@@ -287,10 +287,10 @@ class Info {
         help: () => help.Info.conjugate
     }
     thisDoesntExist = {
-        func: (args) => {
+        func: (message) => {
             const types = ['person', 'cat', 'horse', 'rental', 'waifu', 'question',
                 'chemical', 'word', 'city', 'simpsons', 'art', 'video', 'ideas', 'lyrics']
-            const options = parser.parse(args);
+            const options = parser.parse(message.args);
             const hq = !!options.hq || !!options.hd;
             let type = null;
             types.forEach(t => {
@@ -324,8 +324,8 @@ class Info {
     }
 
     emojiGenerator = {
-        func: (args) => {
-            const n = parseInt(args[0])
+        func: (message) => {
+            const n = parseInt(message.args[0])
             if (!!n && n < 1000)
                 return extras.randomEmoji(n)
                     .then(emojis => returnType.reply(emojis))
@@ -335,8 +335,8 @@ class Info {
         help: () => help.Info.emojiGenerator
     }
     qr = {
-        func: (args) => {
-            const options = parser.parse(args, false);
+        func: (message) => {
+            const options = parser.parse(message.args, false);
             const file = options.file || 'png'
             options.data = options.joinedText;
             if (!options.data) return errors.EMPTY_TEXT;
@@ -352,8 +352,8 @@ class Info {
         help: () => help.Info.qr
     }
     carInfo = {
-        func: (args) => {
-            return carInfo.infoByCarNumber(args[0])
+        func: (message) => {
+            return carInfo.infoByCarNumber(message.args[0])
                 .then(info => returnType.reply(info))
                 .catch(err => {
                     console.error(err);

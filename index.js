@@ -1,6 +1,6 @@
 const { version } = require('./package.json')
 const { create, Client } = require('@open-wa/wa-automate');
-const { msgHandler, restartHandler, autoRemoveHandler, forwardHandler, welcomeMsgHandler } = require('./handler');
+const { msgHandler, restartHandler, autoRemoveHandler, forwardHandler, welcomeMsgHandler, setHostNumber } = require('./handler');
 const mutexify = require('mutexify/promise')
 
 /**
@@ -37,8 +37,12 @@ const start = async (client = new Client()) => {
         client.refresh();
     }, 3600000)
 
+    // Set the host number globally.
+    await setHostNumber(client);
+
     // Activate all commands that run in background if they were active before restart.
     restartHandler(client, ['redalerts'])
+
     // If diconnected, go over missed messages.
     client.onStateChanged(async (state) => {
         console.log('[Client State]', state)

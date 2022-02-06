@@ -24,8 +24,8 @@ class Media {
     }
 
     removeBG = {
-        func: (args, message) => {
-            const options = parser.parse(args);
+        func: (message) => {
+            const options = parser.parse(message.args);
             const quoted = !!message.quotedMsg;
             const ogMsg = message;
             let stroke = !!options.s || !!options.stroke;
@@ -61,8 +61,8 @@ class Media {
         help: () => help.Media.removebg
     }
     toImage = {
-        func: (args, message) => {
-            const options = parser.parse(args);
+        func: (message) => {
+            const options = parser.parse(message.args);
             const quoted = !!message.quotedMsg;
             const ogMsg = message;
             let rmbg = !!options.r || !!options.rb;
@@ -106,7 +106,7 @@ class Media {
 
 
     videoTomp3 = {
-        func: (args, message) => {
+        func: (message) => {
 
             // if there is a quoted message, use it to make the sticker.
             if (message.quotedMsg) message = message.quotedMsg;

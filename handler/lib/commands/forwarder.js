@@ -54,20 +54,20 @@ class Forwarder {
     }
 
     egg = {
-        func: async (client, getGroup) => {
+        func: async (message, client) => {
             // get all messages from given group.
             // In order for this to WORK you'll need to have the senders file with the group ID.
-            let ids = await this.getIDsFromDB(client, 'egg', getGroup("ProjectEgg"))
+            let ids = await this.getIDsFromDB(client, 'egg', message.getGroup("ProjectEgg"))
             let id = this.getRandomID(ids)
             return returnType.forwardMessage(id)
         },
         help: () => help.Forwarder.egg
     }
     fart = {
-        func: async (client, getGroup) => {
+        func: async (message, client) => {
             // get all messages from given group.
             // In order for this to WORK you'll need to have the senders file with the group ID.
-            let ids = await this.getIDsFromDB(client, 'fart', getGroup("Fartictionary"))
+            let ids = await this.getIDsFromDB(client, 'fart', message.getGroup("Fartictionary"))
             let id = this.getRandomID(ids)
             return returnType.forwardMessage(id)
         },

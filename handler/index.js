@@ -22,8 +22,15 @@ const botMaster = getGroup('Me');
 const spamSet = new spam.Spam();
 // a spam set to filter out the spammers for social fetching services.
 const socialSpam = new spam.Spam();
+// Global host number.
+var hostNumber = 0;
 // Clean tmp folder in case there are leftovers.
 converter.cleanTmp();
+
+// Set the host number globally.
+async function setHostNumber(client) {
+    hostNumber = await client.getHostNumber() + '@c.us';
+}
 
 /**
  * Delete a message after a certain time.
@@ -199,11 +206,11 @@ const forwardHandler = async (client, message) => {
 const msgHandler = async (client, message) => {
     const { id, from, sender, isGroupMsg, chat, caption, quotedMsg, mentionedJidList } = message;
     let { body } = message;
-    let groupBlackList = blackList.getGroup(from);
 
     // if we don't send anything mark the chat as seen so we don't get it again on the next startup.
     await client.sendSeen(from)
 
+    let groupBlackList = blackList.getGroup(from);
     // Return if sender is null or if it's body is undefined or is not a command, or the caption is not a command or (if the chatID
     // isn't in the allowed group AND it's not 'Me'). [if body doesn't start with prefix, we can make body = caption to see if it starts with prefix]
     if (!sender
@@ -211,36 +218,27 @@ const msgHandler = async (client, message) => {
         || (!body)
         || (!body.startsWith(prefix) && (!caption || !(body = caption).startsWith(prefix)))
         || (!getGroup('Allowed').includes(from) && getGroup('Me') !== from)) return;
+
     if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
     // Add user to spam set if it's not the bot owner.
     if (sender.id !== botMaster)
         spamSet.addUser(sender.id);
     // split the body content into args.
-    const args = body.trim().split(/ +/);
+    message.args = body.trim().split(/ +/);
     // get the command from the body sent.
-    const command = args.shift().slice(1).toLowerCase();
+    const command = message.args.shift().slice(1).toLowerCase();
     // add all content in quoted message to the args if it's not null.
     if (quotedMsg && quotedMsg.type === 'chat')
-        args.push(...(quotedMsg.body.trim().replace(/\n+/g, ' ').split(/ +/)))
-    // Bot's number.
-    const botNumber = await client.getHostNumber() + '@c.us';
-    // if is a group message get the groups ID.
-    const groupId = isGroupMsg ? chat.groupMetadata.id : '';
-    // if is a group message get the group admins
-    const groupAdmins = isGroupMsg ? await client.getGroupAdmins(groupId) : '';
-    // check if the sender is a group admin.
-    const isGroupAdmin = groupAdmins.includes(sender.id) || false;
-    // if is a group message get the group members
-    const groupMembers = isGroupMsg ? await client.getGroupMembersId(groupId) : '';
+        message.args.push(...(quotedMsg.body.trim().replace(/\n+/g, ' ').split(/ +/)))
 
     let result = {};
     let waitMsg = null;
     switch (commands.type(command)) {
         case 'Help':
             // for a command help.
-            if (args[0]) {
-                if (commands.type(args[0].toLowerCase()))
-                    result = { type: 'reply', info: await commands.help(args[0].toLowerCase()) };
+            if (message.args[0]) {
+                if (commands.type(message.args[0].toLowerCase()))
+                    result = { type: 'reply', info: await commands.help(message.args[0].toLowerCase()) };
                 else
                     result = errors.WRONG_CMD;
             }
@@ -251,78 +249,29 @@ const msgHandler = async (client, message) => {
             break;
         // Owner commands, needs different args.
         case 'Owner':
+            // if is a group message get the group members
+            message.groupMembers = isGroupMsg ? await client.getGroupMembersId(from) : '';
+            message.getGroup = getGroup;
+            message.mySenders = mySenders;
+            message.blackList = blackList;
+            message.botMaster = botMaster;
+            message.myForwarder = myForwarder;
+            message.botNumber = hostNumber;
             if (sender.id !== botMaster) { result = errors.OWNER; break };
-            switch (command) {
-                case 'redalerts':
-                    result = await commands.execute(command, client, getGroup, args[0]);
-                    break;
-                case 'addsender':
-                case 'rmsender':
-                case 'rmvsender':
-                    result = await commands.execute(command, mySenders, args[0], args[1], args[2]);
-                    break;
-                case 'blacklist':
-                case 'black':
-                case 'unblacklist':
-                case 'unblack':
-                    result = await commands.execute(command, blackList, message, botMaster);
-                    break;
-                case 'addprefix':
-                case 'rmprefix':
-                    result = await commands.execute(command, blackList, from, args);
-                    break;
-                case 'addforwarder':
-                case 'rmforwarder':
-                case 'addgroupforwarder':
-                case 'addgf':
-                case 'rmgroupforwarder':
-                case 'rmgf':
-                case 'setlanguageforwarder':
-                case 'slf':
-                case 'setmaxmsgsforwarder':
-                case 'smmf':
-                case 'setprefixforwarder':
-                case 'spf':
-                    result = await commands.execute(command, myForwarder, from, args);
-                    break;
-                case 'kickall':
-                    result = await commands.execute(command, client, groupMembers, groupId, botMaster, botNumber);
-                    break;
-                case 'membersof':
-                    result = await commands.execute(command, client, mySenders, args[0], botMaster);
-                    break;
-                case 'id':
-                case 'jid':
-                case 'chatids':
-                    result = await commands.execute(command, client, args);
-                    break;
-                case 'tag':
-                    result = await commands.execute(command, client, mentionedJidList, from, args[0]);
-                    break;
-                case 'remove':
-                case 'rmv':
-                    result = await commands.execute(command, client, message, botNumber);
-                    break;
-                default:
-                    result = await commands.execute(command, message);
-                    break;
-            }
+            result = await commands.execute(command, message, client);
             break;
         // Admin Commands.
         case 'Admin':
+            // if is a group message get the group admins
+            const groupAdmins = isGroupMsg ? await client.getGroupAdmins(from) : '';
+            // check if the sender is a group admin.
+            const isGroupAdmin = groupAdmins.includes(sender.id) || sender.id === botMaster || false;
+            // if is a group message get the group members
+            message.groupMembers = isGroupMsg ? await client.getGroupMembersId(from) : '';
+            message.botNumber = hostNumber;
             if (!isGroupMsg) { result = errors.GROUP; break };
             if (!isGroupAdmin) { result = errors.ADMIN; break }
-            switch (command) {
-                case 'everyone':
-                case 'tagall':
-                    result = await commands.execute(command, client, message, groupMembers, botNumber);
-                    break;
-                case 'kick':
-                    result = await commands.execute(command, client, message, botMaster);
-                    break;
-                default:
-                    break;
-            }
+            result = await commands.execute(command, message, client);
             break;
         // Social Commands.
         case 'Social':
@@ -332,12 +281,12 @@ const msgHandler = async (client, message) => {
                 socialSpam.addUser(sender.id, 20000);
 
             waitMsg = client.reply(from, i('I\'m on it! 🔨'), id);
-            result = await commands.execute(command, args);
-
+            result = await commands.execute(command, message.args);
             break;
         // Social Commands.
         case 'Forwarder':
-            result = await commands.execute(command, client, getGroup);
+            message.getGroup = getGroup;
+            result = await commands.execute(command, message, client);
             break;
         // Info Commands.
         case 'Info':
@@ -347,7 +296,7 @@ const msgHandler = async (client, message) => {
                 socialSpam.addUser(sender.id, 10000);
 
             waitMsg = client.reply(from, i('🧙‍♂️ This may take some time...'), id);
-            result = await commands.execute(command, args, message);
+            result = await commands.execute(command, message);
 
             break;
         // Sticker Commands.
@@ -364,14 +313,12 @@ const msgHandler = async (client, message) => {
                 }
             }
             waitMsg = client.reply(from, i('🧙‍♂️ Please wait a moment while I do some magic...'), id);
-            result = await commands.execute(command, args, message);
-
+            result = await commands.execute(command, message);
             break;
         // Media Commands.
         case 'Media':
             waitMsg = client.reply(from, i('🧙‍♂️ Just sit back, enjoy the view, and i\'ll be right back...'), id);
-            result = await commands.execute(command, args, message);
-
+            result = await commands.execute(command, message);
             break;
         default:
             result = errors.WRONG_CMD
@@ -444,4 +391,4 @@ const msgHandler = async (client, message) => {
 
 }
 
-module.exports = { msgHandler, restartHandler, autoRemoveHandler, forwardHandler, welcomeMsgHandler }
+module.exports = { msgHandler, restartHandler, autoRemoveHandler, forwardHandler, welcomeMsgHandler, setHostNumber }
