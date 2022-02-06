@@ -110,6 +110,8 @@ const help = {
         setMaxMsgsForwarder: `${b('Usage:')} ${prefix}setmaxmsgsforwarder [n] inside the forwarder OR in the bot's chat: ${prefix}setmaxmsgsforwarder [forwarder groupID] [n] (where n is a number that you want to set for the max amount of saved messages)\n${b('Aliases:')}\n[setmaxmsgsforwarder, smmf]`,
         setPrefixForwarder: `${b('Usage:')} ${prefix}setprefixforwarder [flag] inside the forwarder OR in the bot's chat: ${prefix}setprefixforwarder [forwarder groupID] [flag]\n${b('Options:')}\nPrefix message ON/OFF: -p/-prefix\nName in message ON/OFF: -n/-name\n${b('Aliases:')}\n[setprefixforwarder, spf]`,
         removeMsg: `${b('Usage:')} reply with ${prefix}remove to remove a message sent by the bot\n${b('Aliases:')}\n[remove, rmv]`,
+        countMessagesByText: `${b('Usage:')} ${prefix}countmsgs [text]\nCounts the amount of messages sent in the group with the text you specified.\n${b('Options:')}\n-u/-user for and tag the users to search the messages for.\n${b('Aliases:')}\n[countmsgs]`,
+        spamMessage: `${b('Usage:')} ${prefix}spam [text]\nSpam the text you specified in the group with the amount of times you specified.\n${b('Options:')}\n-n for the amount to spam.\n${b('Aliases:')}\n[spammsg]`,
     },
     Admin: {
         everyone: `${b('Usage:')} ${prefix}everyone\nTags everyone in the group.\n${b('Aliases:')}\n[everyone, tagall]`,

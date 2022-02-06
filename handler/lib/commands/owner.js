@@ -61,6 +61,10 @@ class Owner {
         commands.remove = this.addInfo(this.removeMsg)
         commands.rmv = this.alias(this.removeMsg)
 
+        commands.countmsgs = this.addInfo(this.countMessagesByText)
+
+        commands.spammsg = this.addInfo(this.spamMessage)
+
         commands.m = this.addInfo(this.m);
 
         commands.up = this.addInfo(this.uploadImg)
@@ -68,15 +72,15 @@ class Owner {
     }
 
     redAlerts = {
-        func: (client, getGroup, option) => {
+        func: (message, client) => {
             let text = '';
-            switch (option) {
+            switch (message.args[0]) {
                 case 'on':
                     if (redAlerts.getState())
                         text = `🚨 Red Alerts ${b('already')} activated!`;
                     else {
                         redAlerts.changeState(true);
-                        redAlerts.alerts(client, getGroup);
+                        redAlerts.alerts(client, message.getGroup);
                         text = `🚨 Red Alerts has been ${b('activated!')}`;
                     }
                     break;
@@ -97,9 +101,10 @@ class Owner {
     }
 
     addSender = {
-        func: (senders, group, id, lang) => {
+        func: (message) => {
+            const group = message.args[0], id = message.args[1], lang = message.args[2];
             let text = '';
-            if (senders.addSender(group, id, lang))
+            if (message.senders.addSender(group, id, lang))
                 text = `📧 Sender has been ${b('added')} to senders`;
             else
                 text = `📛 Group name or number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
@@ -109,9 +114,10 @@ class Owner {
     }
 
     removeSender = {
-        func: (senders, group, id) => {
+        func: (message) => {
+            const group = message.args[0], id = message.args[1];
             let text = '';
-            if (senders.removeSender(group, id))
+            if (message.senders.removeSender(group, id))
                 text = `📧 Sender has been ${b('removed')} from senders`;
             else
                 text = `📛 Group name or number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
@@ -121,13 +127,13 @@ class Owner {
     }
 
     addForwarder = {
-        func: (forwarders, group, args) => {
+        func: (message) => {
             // get the language from args[0] if args[1] is empty
-            let lang = args[1] || args[0];
+            let lang = message.args[1] || message.args[0];
             // if args[1] is empty, get group ID from 'group'
-            let groupID = !!args[1] ? args[0] : group;
+            let groupID = !!message.args[1] ? message.args[0] : message.from;
             let text = '';
-            if (forwarders.addForwarder(groupID, lang))
+            if (message.myForwarder.addForwarder(groupID, lang))
                 text = `📧 Forwarder has been ${b('added')} to forwardDB`;
             else
                 text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
@@ -136,11 +142,11 @@ class Owner {
         help: () => ''
     }
     removeForwarder = {
-        func: (forwarders, group, args) => {
+        func: (message) => {
             // if args[0] is empty, get group ID from 'group'
-            let groupID = !!args[0] ? args[0] : group;
+            let groupID = !!message.args[0] ? message.args[0] : message.from;
             let text = '';
-            if (forwarders.removeForwarder(groupID))
+            if (message.myForwarder.removeForwarder(groupID))
                 text = `📧 Forwarder has been ${b('removed')} from forwardDB`;
             else
                 text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
@@ -149,13 +155,13 @@ class Owner {
         help: () => ''
     }
     addGroupToForwarder = {
-        func: (forwarders, group, args) => {
+        func: (message) => {
             // get the group from args[0] if args[1] is empty
-            let groupID = args[1] || args[0];
+            let groupID = message.args[1] || message.args[0];
             // if args[1] is empty, get group ID from 'group'
-            let forwarder = !!args[1] ? args[0] : group;
+            let forwarder = !!message.args[1] ? message.args[0] : message.from;
             let text = '';
-            if (forwarders.addGroup(forwarder, groupID))
+            if (message.myForwarder.addGroup(forwarder, groupID))
                 text = `📧 Group has been ${b('added')} to ${forwarder} in forwardDB`;
             else
                 text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
@@ -164,13 +170,13 @@ class Owner {
         help: () => ''
     }
     removeGroupFromForwarder = {
-        func: (forwarders, group, args) => {
+        func: (message) => {
             // get the group from args[0] if args[1] is empty
-            let groupID = args[1] || args[0];
+            let groupID = message.args[1] || message.args[0];
             // if args[1] is empty, get group ID from 'group'
-            let forwarder = !!args[1] ? args[0] : group;
+            let forwarder = !!message.args[1] ? message.args[0] : message.from;
             let text = '';
-            if (forwarders.removeGroup(forwarder, groupID))
+            if (message.myForwarder.removeGroup(forwarder, groupID))
                 text = `📧 Group has been ${b('removed')} from ${forwarder} in forwardDB`;
             else
                 text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
@@ -179,13 +185,13 @@ class Owner {
         help: () => ''
     }
     setLanguageForwarder = {
-        func: (forwarders, group, args) => {
+        func: (message) => {
             // get the language from args[0] if args[1] is empty
-            let lang = args[1] || args[0];
+            let lang = message.args[1] || message.args[0];
             // if args[1] is empty, get group ID from 'group'
-            let forwarder = !!args[1] ? args[0] : group;
+            let forwarder = !!message.args[1] ? message.args[0] : message.from;
             let text = '';
-            if (forwarders.setLanguage(forwarder, lang))
+            if (message.myForwarder.setLanguage(forwarder, lang))
                 text = `📧 Group language has been ${b('set')} to ${lang} for ${forwarder} in forwardDB`;
             else
                 text = `📛 Language given "${lang}" was ${b('incorrect!')} [Are you the master of the bot?!?]`;
@@ -194,13 +200,13 @@ class Owner {
         help: () => ''
     }
     setMaxMsgsForwarder = {
-        func: (forwarders, group, args) => {
+        func: (message) => {
             // get the language from args[0] if args[1] is empty
-            let n = args[1] || args[0];
+            let n = message.args[1] || message.args[0];
             // if args[1] is empty, get group ID from 'group'
-            let forwarder = !!args[1] ? args[0] : group;
+            let forwarder = !!message.args[1] ? message.args[0] : message.from;
             let text = '';
-            if (forwarders.setMaxMsgs(forwarder, n))
+            if (message.myForwarder.setMaxMsgs(forwarder, n))
                 text = `📧 Group maxMsgs has been ${b('set')} to ${n} for ${forwarder} in forwardDB`;
             else
                 text = `📛 maxMsgs number given "${n}" or Forwarder "${forwarder} were ${b('incorrect!')} [Are you the master of the bot?!?]`;
@@ -209,17 +215,17 @@ class Owner {
         help: () => help.Owner.setMaxMsgsForwarder
     }
     setPrefixForwarder = {
-        func: (forwarders, group, args) => {
-            const options = parser.parse(args);
+        func: (message) => {
+            const options = parser.parse(message.args);
 
             // if args[0] is empty, get group ID from 'group'
-            let forwarder = options.joinedText || group;
+            let forwarder = options.joinedText || message.from;
 
             let result = '';
             if (options.prefix || options.p)
-                result = forwarders.setPrefixMsgBool(forwarder)
+                result = message.myForwarder.setPrefixMsgBool(forwarder)
             else if (options.name || options.n)
-                result = forwarders.setNameBool(forwarder)
+                result = message.myForwarder.setNameBool(forwarder)
 
             let text = '';
             if (result)
@@ -232,13 +238,13 @@ class Owner {
     }
 
     addUserToBlackList = {
-        func: (blackList, message, botMaster) => {
+        func: (message) => {
             let groupID = message.from;
             let user = !!message.quotedMsg ? message.quotedMsg.sender.id : message.mentionedJidList[0]
-            if (!user || user === botMaster || !message.isGroupMsg) return returnType.reply('⛔ Error, wrong usage.')
+            if (!user || user === message.botMaster || !message.isGroupMsg) return returnType.reply('⛔ Error, wrong usage.')
 
             let text = '';
-            switch (blackList.addUserToList(groupID, user)) {
+            switch (message.blackList.addUserToList(groupID, user)) {
                 case 'USER_EXISTS':
                     text = `User already exists in the black list for this group.`;
                     break;
@@ -256,13 +262,13 @@ class Owner {
         help: () => help.Owner.addUserToBlackList
     }
     removeUserFromBlackList = {
-        func: (blackList, message) => {
+        func: (message) => {
             let groupID = message.from;
             let user = !!message.quotedMsg ? message.quotedMsg.sender.id : message.mentionedJidList[0]
             if (!user || !message.isGroupMsg) return returnType.reply('⛔ Error, wrong usage.')
 
             let text = '';
-            switch (blackList.removeUserFromList(groupID, user)) {
+            switch (message.blackList.removeUserFromList(groupID, user)) {
                 case 'NO_USERS':
                     text = `⛔ Error, there are no users in this group's black list.`;
                     break;
@@ -280,13 +286,13 @@ class Owner {
         help: () => help.Owner.removeUserFromBlackList
     }
     addPrefixBlackList = {
-        func: (blackList, group, args) => {
+        func: (message) => {
             // get the prefix from args[0] if args[1] is empty
-            let num = args[1] || args[0];
+            let num = message.args[1] || message.args[0];
             // if args[1] is empty, get group ID from 'group'
-            let groupID = !!args[1] ? args[0] : group;
+            let groupID = !!message.args[1] ? message.args[0] : message.from;
             let text = '';
-            switch (blackList.addPrefix(groupID, num)) {
+            switch (message.blackList.addPrefix(groupID, num)) {
                 case 'PREFIX_EXISTS':
                     text = `Prefix already exists.`;
                     break;
@@ -304,13 +310,13 @@ class Owner {
         help: () => help.Owner.addPrefixBlackList
     }
     removePrefixBlackList = {
-        func: (blackList, group, args) => {
+        func: (message) => {
             // get the prefix from args[0] if args[1] is empty
-            let num = args[1] || args[0];
+            let num = message.args[1] || message.args[0];
             // if args[1] is empty, get group ID from 'group'
-            let groupID = !!args[1] ? args[0] : group;
+            let groupID = !!message.args[1] ? message.args[0] : message.from;
             let text = '';
-            switch (blackList.removePrefix(groupID, num)) {
+            switch (message.blackList.removePrefix(groupID, num)) {
                 case 'PREFIX_NOT_FOUND':
                     text = `I didn't find ${num} in the blacklist.`;
                     break;
@@ -329,11 +335,11 @@ class Owner {
     }
 
     kickAll = {
-        func: (client, groupMembers, groupId, botMaster, botNumber) => {
-            if (groupMembers) {
+        func: (message, client) => {
+            if (message.groupMembers) {
 
-                groupMembers.filter(member => member !== botMaster && member !== botNumber).forEach(member => {
-                    client.removeParticipant(groupId, member);
+                message.groupMembers.filter(member => member !== message.botMaster && member !== message.botNumber).forEach(member => {
+                    client.removeParticipant(message.groupId, member);
                 })
                 return { info: true };
             }
@@ -344,8 +350,9 @@ class Owner {
     }
 
     membersOf = {
-        func: async (client, senders, ID) => {
-            if (!ID || !senders.isCorrectNumber(ID))
+        func: async (message, client) => {
+            const ID = message.args[0];
+            if (!ID || !message.mySenders.isCorrectNumber(ID))
                 return errors.WRONG_ID;
             // gets all the phone numbers from a given group.
             let membersNum = await client.getGroupMembersId(ID);
@@ -367,9 +374,9 @@ class Owner {
     }
 
     chatIDs = {
-        func: (client, args) => {
+        func: (message, client) => {
 
-            const options = parser.parse(args);
+            const options = parser.parse(message.args);
             let all = !!options.a || !!options.all;
 
             return client.getAllChatIds()
@@ -389,15 +396,15 @@ class Owner {
     }
 
     tag = {
-        func: (client, mentionedJidList, from, n) => {
+        func: (message, client) => {
             let tagList = [];
-
-            mentionedJidList.forEach(mentioned => {
+            const n = message.args[0] || 1;
+            message.mentionedJidList.forEach(mentioned => {
                 tagList.push(`@${mentioned.replace('@c.us', '')}`)
             });
             let tagText = tagList.join(' ');
             for (let i = 0; i < n; i++) {
-                client.sendTextWithMentions(from, tagText);
+                client.sendTextWithMentions(message.from, tagText);
             }
             return { info: true };
         },
@@ -405,14 +412,63 @@ class Owner {
     }
 
     removeMsg = {
-        func: (client, message, botNumber) => {
-            if (message.quotedMsg.sender.id === botNumber) {
+        func: (message, client) => {
+            if (message.quotedMsg.sender.id === message.botNumber) {
                 client.deleteMessage(message.from, message.quotedMsg.id, false);
             }
             return { info: true };
         },
         help: () => help.Owner.removeMsg
     }
+
+    countMessagesByText = {
+        func: (message, client) => {
+            const options = parser.parse(message.args);
+            let user = options.u || options.user;
+            let text = options.joinedText;
+            if (!text)
+                return errors.NO_TEXT;
+            return client.loadAndGetAllMessagesInChat(message.from, false)
+                .then(messages => {
+                    let count = 0;
+
+                    if (user) {
+                        mentionedJidList.forEach(mentioned => { text = text.replace(mentioned, '') });
+                        messages.forEach(message => {
+                            message.mentionedJidList.forEach(mentioned => {
+                                if (message.type === 'chat' && message.body.includes(text) && mentioned === message.sender.id)
+                                    count++;
+                            })
+                        })
+                    }
+                    else
+                        messages.forEach(message => {
+                            if (message.type === 'chat' && message.body.includes(text))
+                                count++;
+                        })
+
+                    return returnType.reply(`${count} messages found.`);
+                })
+        },
+        help: () => help.Owner.countMessagesByText
+    }
+
+    spamMessage = {
+        func: (message, client) => {
+            const options = parser.parse(message.args);
+            let n = options.n || 1;
+            let text = options.joinedText;
+            if (text)
+                for (let i = 0; i < n; i++)
+                    client.sendText(message.from, text);
+            else if (message.quotedMsg)
+                for (let i = 0; i < n; i++)
+                    client.forwardMessages(message.from, message.quotedMsg.id);
+            return { info: true };
+        },
+        help: () => help.Owner.spamMessage
+    }
+
     //debugging
     m = {
         func: (message) => {
