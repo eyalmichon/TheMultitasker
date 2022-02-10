@@ -158,7 +158,7 @@ class Sticker {
                         let base64 = buffer.toString('base64');
                         let startTime = parseInt(options.start) || 0
                         let endTime = parseInt(options.end) || 5;
-                        let fps = parseInt(options.fps || options.f || 10);
+                        let fps = parseInt(options.fps || options.f) || 10;
                         if (fps < 1 && 60 < fps) fps = 10;
                         return returnType.videoSticker(base64, getTime(startTime), getTime(endTime), fps, crop);
                     })
