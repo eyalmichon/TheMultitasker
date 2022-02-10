@@ -104,7 +104,7 @@ class Owner {
         func: (message) => {
             const group = message.args[0], id = message.args[1], lang = message.args[2];
             let text = '';
-            if (message.senders.addSender(group, id, lang))
+            if (message.mySenders.addSender(group, id, lang))
                 text = `📧 Sender has been ${b('added')} to senders`;
             else
                 text = `📛 Group name or number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
@@ -117,7 +117,7 @@ class Owner {
         func: (message) => {
             const group = message.args[0], id = message.args[1];
             let text = '';
-            if (message.senders.removeSender(group, id))
+            if (message.mySenders.removeSender(group, id))
                 text = `📧 Sender has been ${b('removed')} from senders`;
             else
                 text = `📛 Group name or number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
