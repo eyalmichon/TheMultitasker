@@ -345,7 +345,7 @@ const msgHandler = async (client, message) => {
                 })
             break;
         case 'videoSticker':
-            await client.sendMp4AsSticker(from, result.info.base64, { crop: result.info.crop }, { author: 'The Multitasker Bot', pack: 'Stickers' })
+            await client.sendMp4AsSticker(from, result.info.base64, { crop: result.info.crop, startTime: result.info.startTime, endTime: result.info.endTime, fps: result.info.fps }, { author: 'The Multitasker Bot', pack: 'Stickers' })
                 .catch(err => {
                     console.error(`${err.name} ${err.message}`);
                     if (err.code === 'ERR_FR_MAX_BODY_LENGTH_EXCEEDED') client.reply(from, errors.STICKER_TOO_LARGE.info, id);

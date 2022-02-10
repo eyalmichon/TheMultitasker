@@ -3,6 +3,7 @@ const { errors } = require('./errors');
 const { decryptMedia } = require("@open-wa/wa-automate");
 const { parser, imageProcessing, fetcher, sticker } = require("..");
 const { fetchFileType } = require("../../util/fetcher");
+const { getTime } = require("../../util/utilities");
 
 class Sticker {
 
@@ -155,7 +156,11 @@ class Sticker {
                 case 'video':
                     return decryptMedia(message).then(buffer => {
                         let base64 = buffer.toString('base64');
-                        return returnType.videoSticker(base64, crop);
+                        let startTime = parseInt(options.start) || 0
+                        let endTime = parseInt(options.end) || 5;
+                        let fps = parseInt(options.fps || options.f || 10);
+                        if (fps < 1 && 60 < fps) fps = 10;
+                        return returnType.videoSticker(base64, getTime(startTime), getTime(endTime), fps, crop);
                     })
                 case 'url':
                     // Don't allow sending stickers that are more than 10MB large. (10485760 bytes)
@@ -175,6 +180,12 @@ class Sticker {
                     return sticker.ptt(time, phone, name, length, profilePic)
                         .then(base64 => returnType.imgSticker(base64, !crop))
                 case 'document':
+                    if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(message.filename.split('.').pop().toLowerCase())) {
+                        return decryptMedia(message).then(buffer => {
+                            let base64 = buffer.toString('base64');
+                            return returnType.imgSticker(base64, !crop);
+                        })
+                    }
                 default:
                     return errors.BAD_CMD;
             }

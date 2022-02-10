@@ -72,7 +72,7 @@ const returnType = {
      * @param {String} crop boolean for cropping or not.
      * @returns Object information for sending a sticker from an video.
      */
-    videoSticker: (base64, crop) => { return { type: 'videoSticker', info: { base64, crop } } },
+    videoSticker: (base64, startTime = '00:00:00.0', endTime = '00:00:05.0', fps = 10, crop) => { return { type: 'videoSticker', info: { base64, crop, startTime, endTime, fps } } },
     /**
      * Object information for sending a sticker from a URL.
      * @param {String} url the image's/gif's link.
