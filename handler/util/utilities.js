@@ -19,6 +19,22 @@ const removeFromArray = (array, element) => {
 }
 
 /**
+ * function for getting time as seconds and outputs in format hh:mm:ss.00 padding with 0 if needed.
+ * @param {Number} time The time in seconds.
+ * @returns 
+ */
+const getTime = (time) => {
+    let seconds = Math.floor(time);
+    let minutes = Math.floor(seconds / 60);
+    let hours = Math.floor(minutes / 60);
+    seconds = seconds % 60;
+    minutes = minutes % 60;
+    hours = hours % 60;
+
+    return (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds) + '.00';
+}
+
+/**
  * This method works by splitting the string into an array using the spread operator, 
  * and then uses the every() method to test whether all elements (characters) in the 
  * array are included in the string of digits '0123456789'.
@@ -311,5 +327,6 @@ module.exports = {
     removeFromArray,
     isInt,
     randomUserAgent,
+    getTime,
     base64Logo
 }
