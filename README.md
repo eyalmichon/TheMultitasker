@@ -31,10 +31,15 @@ Command pattern used for easy management of adding more commands.
   - Blacklist 📛 for country codes and participants
   - Expand groups with build-in [Group Expander](https://github.com/eyalmichon/group-expander).
   - Set ON/OFF: get a welcome message when someone joines the group.
+  - Count messages containing a sentence (or multiple sentences) in a group.
+  - Spam any type of message to a group.
 
 - ### Admin Commands 💼:
   - Tag everyone in the group.
   - Kick 🦶 a participant from group.
+  - Add a user to the group.
+  - Promote/Demote users.
+  - Get group invite link.
   
 - ### Social Commands 🌐:
   - Get a random 🎲 meme/post from a set of subreddits you choose or a specifc one.

@@ -9,6 +9,7 @@ const errors = {
     ADMIN: addType(`📛 Error, this command can only be used by group admins!`),
     GROUP: addType(`📛 Error, this command can only be used within a group!`),
     WRONG_ID: addType(`📛 Error, ID entered was incorrect!`),
+    INVALID_JID: addType(`📛 Error, JID entered was invalid!`),
     SUB_ERROR: addType(`📛 Error, this subreddit doesn't exist.`),
     NO_MEDIA: addType(`📛 Error, this subreddit doesn't contain any media.`),
     PORN_ERROR: addType(`📛 Error, this is a porn subreddit. 🔞`),

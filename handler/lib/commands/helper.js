@@ -116,6 +116,10 @@ const help = {
     Admin: {
         everyone: `${b('Usage:')} ${prefix}everyone\nTags everyone in the group.\n${b('Aliases:')}\n[everyone, tagall]`,
         kick: `${b('Usage:')} ${prefix}kick [@someone] or reply to a message sent by the user with ${prefix}kick\nKicks 🦶 a participant from the group.`,
+        addParticipant: `${b('Usage:')} ${prefix}adduser [number@c.us] or reply to a message that has the number@c.us with ${prefix}adduser\nAdd a participant to the group.`,
+        promote: `${b('Usage:')} ${prefix}promote [@someone] or reply to a message sent by the user with ${prefix}promote\nPromotes 👨‍💼 a participant in the group.`,
+        demote: `${b('Usage:')} ${prefix}demote [@someone] or reply to a message sent by the user with ${prefix}demote\nDemotes 👨‍💼 a participant in the group.`,
+        groupInviteLink: `${b('Usage:')} ${prefix}invitelink\nGets the invite link of the group.`,
     },
     Social: {
         meme: `${b('Usage:')} ${prefix}meme and you\'ll get random meme from the following subreddits:\n SUBS_LIST.\n\nOr ${prefix}meme [subreddit] to get a random image from that subreddit.`,
