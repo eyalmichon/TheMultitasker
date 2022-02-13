@@ -41,7 +41,7 @@ class BlackList {
     }
     removeUserFromList(groupID, user) {
         if (this.groups[groupID]) {
-            this.groups = removeFromArray(this.groups[groupID], user)
+            this.groups[groupID] = removeFromArray(this.groups[groupID], user)
             try {
                 fs.writeFileSync(groupsPath, JSON.stringify(this.groups))
             }
