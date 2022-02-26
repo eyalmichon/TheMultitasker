@@ -50,6 +50,7 @@ Command pattern used for easy management of adding more commands.
     - Facebook
     - YouTube
     - [and more...](http://ytdl-org.github.io/youtube-dl/supportedsites.html)
+  - Download music from Deezer. (need premium account)
 
 - ### Info Commands ℹ:
   - Compile 👨‍💻 and get output from many languages like Python 🐍, C, Java, etc....
@@ -93,7 +94,7 @@ Command pattern used for easy management of adding more commands.
 ## Dependencies
 - [node.js](https://nodejs.org/en/download/) >= v14.16.0
 - [npm]() >= v7.15.1
-- [python](https://www.python.org/) >= v2.7
+- [python](https://www.python.org/) >= v3.6 | [Deemix](https://pypi.org/project/deemix/) for downloading music from Deezer.
 - [wa-automate](https://github.com/open-wa/wa-automate-nodejs) >= v4.17.1
 - [puppeteer](https://github.com/puppeteer/puppeteer#readme) >= v10.2.0
 - on Windows [Microsoft Visual C++ 2010 Service Pack 1 Redistributable Package (x86)](https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe)
