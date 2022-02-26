@@ -217,7 +217,7 @@ const msgHandler = async (client, message) => {
         || (!!groupBlackList && groupBlackList.includes(sender.id))
         || (!body)
         || (!body.startsWith(prefix) && (!caption || !(body = caption).startsWith(prefix)))
-        || (!getGroup('Allowed').includes(from) && getGroup('Me') !== from)) return;
+        || (!getGroup('Allowed').includes(from) && sender.id !== botMaster)) return;
 
     if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
     // Add user to spam set if it's not the bot owner.
@@ -372,6 +372,11 @@ const msgHandler = async (client, message) => {
         case 'sendFile':
             await client.sendFile(from, result.info.path, result.info.fileName, result.info.title, id, true)
                 .then(() => result.removeFile ? converter.unlinkOutput(result.info.path) : '');
+            break;
+        case 'sendFiles':
+            result.info.filePaths
+                .forEach((filePath, i) => client.sendFile(from, filePath, result.info.fileNames[i], result.info.titles[i] ? result.info.titles[i] : '', id, true)
+                    .then(() => result.removeFiles ? converter.unlinkOutput(filePath) : ''));
             break;
         case 'sendPtt':
             await client.sendPtt(from, result.info.path, id)
