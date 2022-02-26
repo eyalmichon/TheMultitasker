@@ -47,7 +47,10 @@ const errors = {
     EMOJI_GEN_ERROR: addType(`📛 Error, wrong number.`),
     EMPTY_TEXT: addType(`📛 Error, no text found.`),
     WRONG_CAR_NUMBER_LENGTH: addType(`📛 Error, car number length entered is invalid.`),
-    NOT_FOUND_CAR_NUMBER_INFO: addType(`📛 Error, car number isn't in the database.`)
+    NOT_FOUND_CAR_NUMBER_INFO: addType(`📛 Error, car number isn't in the database.`),
+    NO_SONGS: addType(`📛 Error, no songs given.`),
+    TOO_MANY_SONGS: addType(`📛 Error, too many songs given.`),
+    NO_SONGS_FOUND: addType(`📛 Error, no songs found.`),
 }
 
 module.exports = { errors }

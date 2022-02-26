@@ -16,6 +16,7 @@ groups.json
 prefix.json
 forwardDB.json
 messagesDB.json
+.arl
 # Runtime data
 pids
 *.pid

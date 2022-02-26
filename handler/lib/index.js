@@ -19,4 +19,5 @@ exports.doesntExist = require('./doesntExist');
 exports.qrcode = require('./qrcode');
 exports.carInfo = require('./carInfo');
 exports.sticker = require('./sticker');
+exports.songs = require('./songs');
 exports.extras = require('./extras');

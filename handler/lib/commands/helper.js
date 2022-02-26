@@ -47,6 +47,15 @@ const returnType = {
      */
     sendFile: (path, fileName, title = '', removeFile = true) => { return { type: 'sendFile', info: { path, fileName, title }, removeFile } },
     /**
+     * Object information for sending local files.
+     * @param {*} filePaths the paths of the files you want to send.
+     * @param {*} fileNames the file names of the files you want to send.
+     * @param {*} titles the captions of the files you want to send.
+     * @param {*} removeFiles boolean if to remove the files after sending them.
+     * @returns Object information for sending local files.
+     */
+    sendFiles: (filePaths, fileNames, titles = [], removeFiles = true) => { return { type: 'sendFiles', info: { filePaths, fileNames, titles }, removeFiles } },
+    /**
      * Object information for sending a local music file as push to talk.
      * @param {String} path DataURL data:image/xxx;base64,xxx or the RELATIVE (should start with ./ or ../) path of the file you want to send.
      * @param {Boolean} removeFile boolean if to remove a file after sending it.
@@ -130,6 +139,7 @@ const help = {
         facebook: `${b('Usage:')} reply with ${prefix}facebook to a facebook video link or send ${prefix}facebook [video link] or send !facebook for a random video from facebook.\n${b('Aliases:')}\n[facebook, fb]`,
         youtube: `${b('Usage:')} reply with ${prefix}youtube to a youtube video link or send ${prefix}youtube [video link].\n${b('Options:')}\n${m(`• audio only: -a`)}\n${b('Aliases:')}\n[youtube, yt]`,
         video: `${b('Usage:')} reply with ${prefix}video to a video link or send ${prefix}video [video link].\n${b('Aliases:')}\n[video, v]`,
+        downloadSongs: `${b('Usage:')} ${prefix}songs [song names]\nDownloads the songs with the specified names.\n(for longer song names use quotes, for example: "paradise city")\n${b('Options:')}\n[defaults to 320kbps]\n${m(`• flac: -flac`)}\n${m(`• 320kbps: -320/-mp3`)}\n${m(`• 128kbps: -128`)}\n${b('Aliases:')}\n[songs]`,
     },
     Forwarder: {
         egg: `${b('Usage:')} ${prefix}egg and you\'ll get an 🥚\nHAPPY EGGING!`,

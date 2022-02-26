@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { meme, downloader, parser } = require("..");
+const { meme, downloader, parser, songs } = require("..");
 
 class Social {
     // Add type, function and help using spread syntax.
@@ -34,6 +34,8 @@ class Social {
 
         commands.video = this.addInfo(this.video)
         commands.v = this.alias(this.video)
+
+        commands.songs = this.addInfo(this.downloadSongs)
 
     }
 
@@ -234,6 +236,21 @@ class Social {
                 })
         },
         help: () => help.Social.video
+    }
+    downloadSongs = {
+        func: (args) => {
+            const songNames = parser.parseStrings(args);
+            if (!songNames) return errors.NO_SONGS
+            if (songNames.length > 20) return errors.TOO_MANY_SONGS
+            return songs.downloadSongs(songNames)
+                .then(songs => returnType.sendFiles(songs.filePaths, songs.fileNames))
+                .catch(err => {
+                    console.error(err);
+                    if (err === 'NO_SONGS_FOUND') return errors.NO_SONGS_FOUND
+                    return errors.UNKNOWN
+                })
+        },
+        help: () => help.Social.downloadSongs
     }
 }
 
