@@ -337,9 +337,8 @@ class Owner {
     kickAll = {
         func: (message, client) => {
             if (message.groupMembers) {
-
                 message.groupMembers.filter(member => member !== message.botMaster && member !== message.botNumber).forEach(member => {
-                    client.removeParticipant(message.groupId, member);
+                    client.removeParticipant(message.from, member);
                 })
                 return { info: true };
             }
