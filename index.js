@@ -34,7 +34,7 @@ const start = async (client = new Client()) => {
 
     // refresh the client every hour.
     setInterval(() => {
-        client.refresh();
+        client.kill();
     }, 3600000)
 
     // Set the host number globally.
