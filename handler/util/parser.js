@@ -39,8 +39,31 @@ const parse = (args, getURL = true) => {
     options.joinedText = joinedText.join(' ');
     return options
 }
+/**
+ * Get all strings between quatation marks into an array and return the array, everything with -flag or without quotes is added to the array.
+ * @param {*} args the arguments to parse.
+ * @returns {Array} the array of strings and flags.
+ */
+const parseStrings = (args) => {
+    let ogString = args.join(' ').replace(/[‘’]/g, '\'').replace(/[“”״]/g, '\"');
+    let strings = [];
 
+    const regex = /"([^"]*)"/;
+    let match;
+    while ((match = regex.exec(ogString)) !== null) {
+        strings.push(match[1]);
+        ogString = ogString.replace(match[0], '');
+    }
+    // split the string with ' ' and add to the array.
+    ogString.split(' ').forEach(str => {
+        if (str !== '')
+            strings.push(str);
+    })
+
+    return strings;
+}
 
 module.exports = {
-    parse
+    parse,
+    parseStrings
 }
