@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
-const fs = require('fs')
-const path = require('path')
+const fs = require('fs');
+const path = require('path');
 
 const msgBase = fs.readFileSync(path.join(__dirname, '../util/sticker/msgBase.html'), 'utf8');
 const mainCss = path.join(__dirname, '../util/sticker/bootstrap_main.css')
@@ -425,7 +425,13 @@ class="_2suca l7jjieqr fewfhwl7"><svg style="display: inline" width="16" height=
         fill="currentColor"></path>
 </svg></span><span class="_25ont">Forwarded</span></div>`
 
-const getSticker = (msgBase) => new Promise((resolve, reject) => {
+/**
+ * Create a sticker from the html given.
+ * @param {*} msgBase The html to create the sticker from.
+ * @param {*} sleep The amount of time to wait for processing the page.
+ * @returns {Buffer} The sticker.
+ */
+const getSticker = (msgBase, sleep = 0) => new Promise((resolve, reject) => {
     return puppeteer.launch({ headless: true }).then(async browser => {
         const page = await browser.newPage();
         await page.setContent(msgBase)
@@ -438,6 +444,9 @@ const getSticker = (msgBase) => new Promise((resolve, reject) => {
         const tailDims = await tail.boundingBox();
         const width = Math.floor(msgDims.width + tailDims.width);
         const height = msgDims.height;
+        // sleep for a bit to let the page render
+        if (sleep) await new Promise(resolve => setTimeout(resolve, sleep));
+
         const buffer = await page.screenshot({
             clip: { x: 0, y: 0, width, height },
             omitBackground: true
@@ -555,7 +564,7 @@ const sticker = (time, phone, name, buffer) => new Promise((resolve, reject) => 
     else
         msgBaseCpy = msgBaseCpy.replace(`<span dir="auto" class="emoji-texttt _1u3M2 _ccCW _3xSVM i0jNr">NON_CONTACT_NAME_REPLY</span>`, '')
 
-    return getSticker(msgBaseCpy)
+    return getSticker(msgBaseCpy, 100)
         .then(buffer => resolve(buffer))
         .catch(err => reject(err))
 
