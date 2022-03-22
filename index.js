@@ -89,6 +89,7 @@ const start = async (client = new Client()) => {
 
 const options = {
     sessionId: 'TheMultitasker',
+    multiDevice: true,
     qrTimeout: 0,
     authTimeout: 0,
     headless: true,
