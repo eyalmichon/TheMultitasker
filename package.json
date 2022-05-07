@@ -19,7 +19,7 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@iamtraction/google-translate": "^1.1.2",
-    "@open-wa/wa-automate": "^4.31.7",
+    "@open-wa/wa-automate": "^4.35.13",
     "abort-controller": "^3.0.0",
     "changelog-parser": "^2.8.0",
     "cheerio": "^1.0.0-rc.10",
@@ -30,11 +30,11 @@
     "fs": "0.0.1-security",
     "mathram": "^1.0.5",
     "mutexify": "^1.4.0",
-    "puppeteer": "^13.1.2",
-    "sharp": "^0.30.1",
+    "puppeteer": "^13.7.0",
+    "sharp": "^0.30.4",
     "tiktok-scraper": "^1.4.36",
-    "user-agents": "^1.0.851",
-    "youtube-dl-exec": "^2.0.2",
-    "ytdl-core": "^4.10.1"
+    "user-agents": "^1.0.1009",
+    "youtube-dl-exec": "^2.0.11",
+    "ytdl-core": "^4.11.0"
   }
 }
