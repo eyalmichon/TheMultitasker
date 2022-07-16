@@ -51,6 +51,7 @@ const errors = {
     NO_SONGS: addType(`📛 Error, no songs given.`),
     TOO_MANY_SONGS: addType(`📛 Error, too many songs given.`),
     NO_SONGS_FOUND: addType(`📛 Error, no songs found.`),
+    NO_QUOTED_MESSAGE: addType(`📛 Error, no quoted message found.`),
 }
 
 module.exports = { errors }

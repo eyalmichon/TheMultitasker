@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { imageProcessing, parser, converter } = require("..");
+const { imageProcessing, parser, converter, fetcher } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Media {
@@ -21,6 +21,9 @@ class Media {
         commands.videotomp3 = this.addInfo(this.videoTomp3)
         commands.v2mp3 = this.alias(this.videoTomp3)
         commands.v2m = this.alias(this.videoTomp3)
+
+        commands.addbackground = this.addInfo(this.addBackground)
+        commands.bg = this.alias(this.addBackground)
     }
 
     removeBG = {
@@ -133,6 +136,46 @@ class Media {
         help: () => help.Media.videotomp3
     }
 
+    addBackground = {
+        func: async (message) => {
+            const options = parser.parse(message.args);
+            const toSticker = !!options.s || !!options.sticker;
+            const fromURL = !!options.url;
+            if (!message.quotedMsg && !fromURL)
+                return errors.NO_QUOTED_MESSAGE
+            if (!['image', 'sticker'].includes(message.type) || (!fromURL && !['image', 'sticker'].includes(message.quotedMsg.type)))
+                return errors.NOT_IMG
+
+            let imgBuffer = await decryptMedia(message.quotedMsg);
+            if (message.quotedMsg.type === 'sticker')
+                imgBuffer = await imageProcessing.sharp(imgBuffer).toFormat('png').toBuffer()
+
+            if (fromURL) {
+                const size = await fetcher.checkSize(options.url)
+                if (size === 'CONTENT_TOO_LARGE') return errors.CONTENT_TOO_LARGE
+                var bgBuffer = await fetcher.fetchBuffer(options.url);
+            }
+            else {
+                var bgBuffer = await decryptMedia(message);
+                if (message.type === 'sticker')
+                    bgBuffer = await imageProcessing.sharp(bgBuffer).toFormat('png').toBuffer()
+            }
+            return imageProcessing.addBackground(imgBuffer, bgBuffer)
+                .then(buffer => {
+                    if (toSticker)
+                        return returnType.imgSticker(buffer)
+                    else
+                        return returnType.sendFile(`data:image/png;base64,${buffer.toString('base64')}`, 'bg.png', '', false)
+                })
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN
+                })
+
+
+        },
+        help: () => help.Media.addBackground
+    }
 }
 
 
