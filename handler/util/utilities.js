@@ -43,6 +43,16 @@ const getTime = (time) => {
  */
 const isInt = string => !!parseInt(string) && [...string].every(c => '0123456789'.includes(c));
 
+/**
+ * Function for checking if a number is between two numbers.
+ * @param {Number} value The value to check.
+ * @param {Number} min The minimum value.
+ * @param {Number} max The maximum value.
+ * @returns true if value is between min and max, false otherwise.
+ * @example isBetween(5, 1, 10) // true
+ */
+const isBetween = (value, min, max) => isInt(value) && min <= value && value <= max;
+
 const base64Logo = `iVBORw0KGgoAAAANSUhEUgAAAh8AAAM3CAYAAACd1TI+AAAACXBIWXMAAAsSAAALEgHS3X78AAAgAElEQVR4nO3dP28bx7rH8eVB
 etu3YmednBdgBSe9FTAE2EW3SForTVJGqZyGiAw2cXWUMmkit3ERuSNAE5H6BJFewHGkjtW19Qp4Mcqzzpg7u9w/s7vz5/sBhJxD
 2Za4XO7++MwzM4P1ep0AgKtG48nexq+2I18mu0mS3DU8XtWVfJlkvrdczM8Mfw5ADsIHgM6MxhM9OOihQv/fKkDc8fxVOdf+90WS
@@ -326,6 +336,7 @@ SZL8P0FTkGQfe4/+AAAAAElFTkSuQmCC`
 module.exports = {
     removeFromArray,
     isInt,
+    isBetween,
     randomUserAgent,
     getTime,
     base64Logo
