@@ -17,6 +17,9 @@ class Sticker {
         commands.sticker = this.addInfo(this.sticker);
         commands.s = this.alias(this.sticker);
 
+        commands.textsticker = this.addInfo(this.textSticker);
+        commands.ts = this.alias(this.textSticker);
+
     }
 
     sticker = {
@@ -191,6 +194,19 @@ class Sticker {
             }
         },
         help: () => help.Sticker.sticker
+    }
+
+    textSticker = {
+        func: (message) => {
+            const options = parser.parse(message.args);
+            return imageProcessing.imageFromText(options.joinedText, options)
+                .then(buffer => returnType.imgSticker(buffer))
+                .catch((err) => {
+                    console.error(err);
+                    return errors.UNKNOWN
+                })
+        },
+        help: () => help.Sticker.textSticker
     }
 }
 

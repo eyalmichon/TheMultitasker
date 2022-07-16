@@ -5,8 +5,10 @@ const sharp = require('sharp');
 const { createCanvas, loadImage, registerFont } = require('canvas')
 const Color = require('color');
 const { removebg } = require('./secrets.json');
-const { isInt } = require('./utilities');
+const { isInt, isBetween } = require('./utilities');
 registerFont('./handler/util/fonts/SecularOne-Regular.ttf', { family: 'Secular' })
+// FOR DEBUGGING
+// registerFont('./fonts/SecularOne-Regular.ttf', { family: 'Secular' })
 const MAX_WORDS = 500;
 
 
@@ -115,9 +117,12 @@ function toBinaryImage(ctx, threshold = 5) {
  * @param {*} words array of words to check wraping for.
  * @param {*} fontSize the font size currently used.
  * @param {*} maxWidth the max width allowed.
- * @returns 
+ * @param {*} maxHeight the max height allowed.
+ * @param {*} maxRows the max rows allowed.
+ * @returns {Object} {lines, fontSize}
  */
-function wrapLines(ctx, words, fontSize, maxWidth, maxRows) {
+function wrapLines(ctx, words, fontSize, maxWidth, maxHeight, maxRows) {
+
     ctx.font = `${fontSize}px Secular`
     let lines = [],
         space = ctx.measureText(' ').width,
@@ -153,9 +158,11 @@ function wrapLines(ctx, words, fontSize, maxWidth, maxRows) {
         if (ctx.measureText(line).width > maxWidth)
             noFit = true
     })
+    if (lines.length * fontSize > maxHeight)
+        noFit = true
     // if the line doesn't fit inside the box of maxWidth or we have more than maxRows lines, 
     // call the function recursively with a smaller fontSize.
-    if (noFit || lines.length > maxRows) {
+    if ((noFit || lines.length > maxRows)) {
         if (fontSize > 150)
             fontSize -= 10
         else if (fontSize > 100)
@@ -164,8 +171,7 @@ function wrapLines(ctx, words, fontSize, maxWidth, maxRows) {
             fontSize -= 1
         else
             fontSize -= 0.5
-
-        return wrapLines(ctx, words, fontSize, maxWidth, maxRows)
+        return wrapLines(ctx, words, fontSize, maxWidth, maxHeight, maxRows)
     }
     return { lines: lines, fontSize: fontSize };
 }
@@ -317,12 +323,12 @@ const addText = (buffer, options = {}) => new Promise((resolve, reject) => {
     catch { fillColor = 'white' }
 
     // size of font.
-    if (!isInt(options.fsize) || options.fsize < 1 || 1000 < options.fsize)
+    if (isBetween(options.fsize, 1, 1000))
         options.fsize = false;
 
     // number of max rows for text. (max set to 6 but feel free to change it.)
-    if (!isInt(options.rows) || options.rows < 1 || 6 < options.rows)
-        options.rows = 3;
+    if (isBetween(options.rows, 1, 6))
+        options.rows = 2;
 
     const canvas = createCanvas()
     const ctx = canvas.getContext('2d')
@@ -343,7 +349,7 @@ const addText = (buffer, options = {}) => new Promise((resolve, reject) => {
             const baseFontSize = !!options.fsize ? options.fsize : Math.min(Math.floor(height / 5), Math.floor(width / 5));
 
             // top text.
-            var { lines, fontSize } = wrapLines(ctx, getWords(topText), baseFontSize, width, options.rows)
+            var { lines, fontSize } = wrapLines(ctx, getWords(topText), baseFontSize, width, height, options.rows)
             ctx.lineWidth = Math.floor(fontSize / 10) + 5;
             ctx.textBaseline = 'top';
             lines.forEach((line, i) => {
@@ -352,7 +358,7 @@ const addText = (buffer, options = {}) => new Promise((resolve, reject) => {
             })
 
             // bottom text.
-            var { lines, fontSize } = wrapLines(ctx, getWords(bottomText), baseFontSize, width, options.rows)
+            var { lines, fontSize } = wrapLines(ctx, getWords(bottomText), baseFontSize, width, height, options.rows)
             ctx.lineWidth = Math.floor(fontSize / 10) + 5;
             ctx.textBaseline = 'bottom';
             // if there is more than one line, write in a loop in reverse.
@@ -367,8 +373,7 @@ const addText = (buffer, options = {}) => new Promise((resolve, reject) => {
                 ctx.fillText(lines[0], width / 2, height)
             }
 
-            const outBuffer = canvas.toBuffer('image/png')
-            resolve(outBuffer);
+            resolve(canvas.toBuffer('image/png'));
         })
         .catch(err => {
             console.error(err);
@@ -377,11 +382,147 @@ const addText = (buffer, options = {}) => new Promise((resolve, reject) => {
 
 })
 
+/**
+ * Give a buffer image a background.
+ * 
+ * @param {*} imgBuffer the buffer image.
+ * @param {*} bgBuffer the buffer background image.
+ * @returns image with background.
+ */
+const addBackground = (imgBuffer, bgBuffer) => new Promise((resolve, reject) => {
+
+    const canvas = createCanvas()
+    const ctx = canvas.getContext('2d')
+
+    // Load background image.
+    return loadImage(bgBuffer)
+        .then(bg => {
+            canvas.width = bg.width
+            canvas.height = bg.height
+            // draw background.
+            ctx.drawImage(bg, 0, 0)
+
+            // Load image.
+            return loadImage(imgBuffer)
+        })
+        .then(img => {
+            const ratio = Math.min(canvas.width / img.width, canvas.height / img.height)
+            const width = Math.floor(img.width * ratio)
+            const height = Math.floor(img.height * ratio)
+            const x = Math.floor((canvas.width - width) / 2)
+            const y = Math.floor((canvas.height - height) / 2)
+
+            // draw image.
+            ctx.drawImage(img, x, y, width, height)
+
+            resolve(canvas.toBuffer('image/png'));
+        })
+        .catch(err => {
+            console.error(err);
+            reject(err);
+        })
+
+})
+
+/**
+ * Create a text image from a string.
+ * The text will be wrapped to fit 500px width and height transparent canvas.
+ * @param {*} text the text to create.
+ * @param {*} options {bgcolor: "[color name or #hex]", s: "true/false", scolor: "[color name or #hex]", ssize: "[1-100]" fcolor: "[color name or #hex]", fsize: "[1-1000]", rows: "[1-15]"}
+ * Options:
+ *     bgcolor: the background color.
+ *     s: stroke on/off (default: true, if bgColor is set, stroke is off and neeeds to be set to true manually).
+ *     scolor: the color of the stroke (not mandatory, default is none).
+ *     ssize: the size of the stroke (not mandatory, default is calculated based on font size).
+ *     fcolor: the color of the text fill.
+ *     fsize: the size of the font (fix size and skip wrapping).
+ *     rows: the max number of rows for the text (not mandatory).
+ */
+const imageFromText = (text, options = {}) => new Promise((resolve, reject) => {
+    // should there be a background?
+    // background color.
+    let bgColor = !!options.bgcolor ? options.bgcolor : false
+    // chcek if color is valid.
+    try { Color(bgColor) }
+    catch { bgColor = false }
+
+    // set stroke true/false based on if not set and if bgColor is set.
+    options.s = options.s === undefined ? !bgColor : !!options.s;
+    // color for stroke.
+    let strokeColor = options.s || !!options.scolor ?
+        !!options.scolor ? options.scolor : 'white'
+        : 'transparent';
+    try { Color(strokeColor) }
+    catch { strokeColor = 'white' }
+
+    // Text color.
+    let textColor = !!options.fcolor ? options.fcolor : 'black';
+    try { Color(textColor) }
+    catch { textColor = 'black'; }
+
+    // size of font.
+    options.fsize = (!!options.fsize && isBetween(options.fsize, 1, 1000)) ? options.fsize : false;
+    // size of stroke.
+    options.ssize = (!!options.ssize && isBetween(options.ssize, 1, 100)) ? options.ssize : false;
+    // number of max rows for text. (max set to 15 but feel free to change it.)
+    let rows = (!!options.rows && isBetween(options.rows, 1, 15)) ? options.rows : 3;
+
+    const canvas = createCanvas()
+    const ctx = canvas.getContext('2d')
+
+    // draw a 500x500 transparent canvas.
+    const width = canvas.width = 500
+    const height = canvas.height = 500
+
+    // fill with background color if needed.
+    if (!!bgColor) {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    // Get the words from the text.
+    text = getWords(text)
+
+    // calculate base font size to start with.
+    const baseFontSize = !!options.fsize ? options.fsize : height / 2
+
+    // Wrap the text to fit the width.
+    let { lines, fontSize } = wrapLines(ctx, text, baseFontSize, width, height, rows)
+
+    ctx.fillStyle = textColor;
+    ctx.lineJoin = "round";
+    ctx.miterLimit = 2;
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle';
+
+    // Add stroke if needed.
+    if (strokeColor) {
+        ctx.strokeStyle = strokeColor;
+        // set stroke width proportional to font size.
+        ctx.lineWidth = options.ssize ?
+            options.ssize : Math.floor(fontSize / 10) < 5 ? 5 : Math.floor(fontSize / 10);
+    }
+    // Starting position of text.
+    const startingY = (height / 2) - (fontSize * (lines.length - 1)) / 2;
+
+    // write text.
+    lines.forEach((line, i) => {
+        if (strokeColor) ctx.strokeText(line, width / 2, startingY + (fontSize * i))
+        ctx.fillText(line, width / 2, startingY + (fontSize * i))
+    })
+
+    console.log(`Created image from text: "${lines.join(' ')}" with font size: ${fontSize}, background color: ${bgColor}, stroke color: ${strokeColor}, text color: ${textColor}, rows: ${lines.length}`)
+
+    resolve(canvas.toBuffer('image/png'));
+
+})
 
 
 module.exports = {
     removeBG,
     addStroke,
     addText,
+    addBackground,
+    imageFromText,
     sharp
 }
