@@ -11,7 +11,6 @@ registerFont('./handler/util/fonts/SecularOne-Regular.ttf', { family: 'Secular' 
 // registerFont('./fonts/SecularOne-Regular.ttf', { family: 'Secular' })
 const MAX_WORDS = 500;
 
-
 /**
  * helper function for stroke.
  * Using https://github.com/parmanoir/Meijster-distance
@@ -196,8 +195,6 @@ const removeBG = (buffer, options = {}) => new Promise((resolve, reject) => {
     let form = new FormData();
     form.append('image_file', buffer)
     form.append('size', 'auto')
-    if (!!options.bgurl) form.append('bg_image_url', options.bgurl)
-    if (!!options.bg) form.append('bg_image_file', options.bg)
 
     let i = Math.floor(Math.random() * removebg.length)
     let randomKey = removebg[i]
@@ -323,11 +320,11 @@ const addText = (buffer, options = {}) => new Promise((resolve, reject) => {
     catch { fillColor = 'white' }
 
     // size of font.
-    if (isBetween(options.fsize, 1, 1000))
+    if (!isBetween(options.fsize, 1, 1000))
         options.fsize = false;
 
     // number of max rows for text. (max set to 6 but feel free to change it.)
-    if (isBetween(options.rows, 1, 6))
+    if (!isBetween(options.rows, 1, 6))
         options.rows = 2;
 
     const canvas = createCanvas()
@@ -447,7 +444,7 @@ const imageFromText = (text, options = {}) => new Promise((resolve, reject) => {
     catch { bgColor = false }
 
     // set stroke true/false based on if not set and if bgColor is set.
-    options.s = options.s === undefined ? !bgColor : !!options.s;
+    options.s = options.s === undefined ? !bgColor : options.s === true;
     // color for stroke.
     let strokeColor = options.s || !!options.scolor ?
         !!options.scolor ? options.scolor : 'white'

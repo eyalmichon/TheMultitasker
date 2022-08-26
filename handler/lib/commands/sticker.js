@@ -2,7 +2,6 @@ const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
 const { decryptMedia } = require("@open-wa/wa-automate");
 const { parser, imageProcessing, fetcher, sticker } = require("..");
-const { fetchFileType } = require("../../util/fetcher");
 const { getTime } = require("../../util/utilities");
 
 class Sticker {
@@ -65,7 +64,7 @@ class Sticker {
                     case 'video':
                         repliedOptions.buffer = await decryptMedia(repliedMsg)
                         if (!!repliedMsg.caption) repliedOptions.text = repliedMsg.caption
-                        if (['gif', null].includes(fetchFileType(repliedOptions.buffer))) repliedOptions.type = 'GIF'
+                        if (['gif', null].includes(fetcher.fetchFileType(repliedOptions.buffer))) repliedOptions.type = 'GIF'
                         if (repliedMsg.type === 'video')
                             repliedOptions.buffer = Buffer.from(repliedMsg.mediaData.preview._b64, 'base64')
                         break;
@@ -97,7 +96,7 @@ class Sticker {
                         replyOptions.width = replyMsg.width;
                         replyOptions.height = replyMsg.height;
                         if (!!replyMsg.caption) replyOptions.text = replyMsg.caption
-                        if (['gif', null].includes(fetchFileType(replyOptions.buffer))) replyOptions.type = 'GIF'
+                        if (['gif', null].includes(fetcher.fetchFileType(replyOptions.buffer))) replyOptions.type = 'GIF'
                         replyOptions.time = options.l || options.length || (`${('0' + Math.floor(replyMsg.duration / 60)).slice(-2)}:${('0' + replyMsg.duration % 60).slice(-2)}`)
                         replyOptions.buffer = Buffer.from(replyMsg.mediaData.preview._b64, 'base64')
                         break;
@@ -135,19 +134,22 @@ class Sticker {
                                     await sticker.sticker(time, phone, name, buffer) :
                                     await sticker.image(options.joinedText || message.caption, time, phone, name, { buffer, width: message.width, height: message.height })
 
-                            if (rmbg) {
-                                if (!!options.bg || !!options.bgurl) {
-                                    if (isQuoted)
-                                        options.bg = await decryptMedia(ogMsg);
-                                    buffer = await imageProcessing.removeBG(buffer, options);
-                                }
-                                else
-                                    buffer = await imageProcessing.removeBG(buffer);
-                            }
+                            if (rmbg)
+                                buffer = await imageProcessing.removeBG(buffer);
+
                             if (stroke)
                                 buffer = await imageProcessing.addStroke(buffer, options)
                             if (text)
                                 buffer = await imageProcessing.addText(buffer, options)
+                            if (bg && (isQuoted || (options.url && fetcher.isValidURL(options.url)))) {
+                                if (isQuoted)
+                                    options.bg = await decryptMedia(ogMsg);
+                                else {
+                                    options.bg = await fetcher.fetchImageBuffer(options.url).catch(() => null)
+
+                                }
+                                if (options.bg) buffer = await imageProcessing.addBackground(buffer, options.bg)
+                            }
 
                             return returnType.imgSticker(buffer, !crop);
                         })
@@ -198,6 +200,7 @@ class Sticker {
 
     textSticker = {
         func: (message) => {
+            if (message.type !== 'chat' || (!!message.quotedMsg && message.quotedMsg !== 'chat')) return errors.ONLY_TEXT
             const options = parser.parse(message.args);
             return imageProcessing.imageFromText(options.joinedText, options)
                 .then(buffer => returnType.imgSticker(buffer))
