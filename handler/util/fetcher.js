@@ -15,6 +15,15 @@ const getRandomFileName = () => {
     return random_number;
 }
 
+/**
+    * Checks if the given URL is valid.
+    * @param url The URL we are checking for validity.
+    * @returns true if valid, otherwise false.
+    */
+function isValidURL(url) {
+    var pattern = /^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i
+    return pattern.test(url);
+}
 
 /**
  *Fetch Json from Url
@@ -198,6 +207,25 @@ const fetchFileType = (buffer) => {
     catch { return null }
 }
 
+
+const fetchImageBuffer = (url) => new Promise(async (resolve, reject) => {
+    if (isValidURL(url)) {
+        const size = await checkSize(options.url)
+        if (size === 'CONTENT_TOO_LARGE') reject(errors.CONTENT_TOO_LARGE)
+        return fetchBuffer(url)
+            .then(buffer => resolve(buffer))
+            .catch(err => {
+                console.error(err)
+                reject(err)
+            })
+    }
+    else {
+        return reject('INVALID_URL')
+    }
+})
+
+
+
 module.exports = {
     fetchJson,
     fetchText,
@@ -206,9 +234,11 @@ module.exports = {
     fetchWithTimeout,
     checkSize,
     fetchToFile,
+    fetchImageBuffer,
     getRandomFileName,
     uploadImage,
     uploadFile,
     fetchFileType,
+    isValidURL,
     MAX_SIZE_ALLOWED
 }
