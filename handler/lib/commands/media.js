@@ -69,6 +69,7 @@ class Media {
             const quoted = !!message.quotedMsg;
             const ogMsg = message;
             let rmbg = !!options.r || !!options.rb;
+            let bg = !!options.bg;
             let stroke = !!options.s || !!options.stroke;
             let text = !!options.t || !!options.text;
             let file = !!options.f || !!options.file;
@@ -81,25 +82,29 @@ class Media {
                 if (message.type === 'sticker')
                     buffer = await imageProcessing.sharp(buffer).toFormat('png').toBuffer()
 
-                if (rmbg) {
-                    if (!!options.bg || !!options.bgurl) {
-                        if (quoted)
-                            options.bg = await decryptMedia(ogMsg);
-                        buffer = await imageProcessing.removeBG(buffer, options);
-                    }
-                    else
-                        buffer = await imageProcessing.removeBG(buffer, options);
-                }
+                if (rmbg)
+                    buffer = await imageProcessing.removeBG(buffer, options);
+
                 if (stroke)
                     buffer = await imageProcessing.addStroke(buffer, options)
                 if (text)
                     buffer = await imageProcessing.addText(buffer, options)
+                if (bg && (isQuoted || (options.url && fetcher.isValidURL(options.url)))) {
+                    if (isQuoted)
+                        options.bg = await decryptMedia(ogMsg);
+                    else {
+                        options.bg = await fetcher.fetchImageBuffer(options.url).catch(() => null)
+
+                    }
+                    if (options.bg) buffer = await imageProcessing.addBackground(buffer, options.bg)
+                }
 
                 let base64 = buffer.toString('base64');
                 if (file) return returnType.sendFile(`data:document/png;base64,${base64}`, `the_multitasker.png`, '', false)
                 else return returnType.sendFile(`data:image/png;base64,${base64}`, `the_multitasker.png`, '', false)
             })
                 .catch((err) => {
+                    console.error(err)
                     return errors.UNKNOWN
                 })
         },
@@ -150,16 +155,15 @@ class Media {
             if (message.quotedMsg.type === 'sticker')
                 imgBuffer = await imageProcessing.sharp(imgBuffer).toFormat('png').toBuffer()
 
-            if (fromURL) {
-                const size = await fetcher.checkSize(options.url)
-                if (size === 'CONTENT_TOO_LARGE') return errors.CONTENT_TOO_LARGE
-                var bgBuffer = await fetcher.fetchBuffer(options.url);
+            if (fromURL && fetcher.isValidURL(options.url)) {
+                var bgBuffer = await fetcher.fetchImageBuffer(options.url).catch(() => null);
             }
             else {
                 var bgBuffer = await decryptMedia(message);
                 if (message.type === 'sticker')
                     bgBuffer = await imageProcessing.sharp(bgBuffer).toFormat('png').toBuffer()
             }
+            if (!bgBuffer) return errors.UNKNOWN
             return imageProcessing.addBackground(imgBuffer, bgBuffer)
                 .then(buffer => {
                     if (toSticker)

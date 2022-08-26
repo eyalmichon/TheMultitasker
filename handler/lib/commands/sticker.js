@@ -33,6 +33,7 @@ class Sticker {
             let rmbg = !!options.r || !!options.rb;
             let stroke = !!options.s || !!options.stroke;
             let text = !!options.t || !!options.text;
+            let bg = !!options.bg;
 
             let reply = !!options.rep || !!options.reply
             let msg = !!options.m || !!options.message
