@@ -66,7 +66,7 @@ class Media {
     toImage = {
         func: (message) => {
             const options = parser.parse(message.args);
-            const quoted = !!message.quotedMsg;
+            const isQuoted = !!message.quotedMsg;
             const ogMsg = message;
             let rmbg = !!options.r || !!options.rb;
             let bg = !!options.bg;
@@ -74,7 +74,7 @@ class Media {
             let text = !!options.t || !!options.text;
             let file = !!options.f || !!options.file;
             // if there is a quoted message, use it to make the sticker.
-            if (quoted) message = message.quotedMsg;
+            if (isQuoted) message = message.quotedMsg;
 
             if (message.type !== 'image' && message.type !== 'sticker' && ogMsg.type !== 'image') return errors.NOT_IMG
 
