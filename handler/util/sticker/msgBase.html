@@ -181,7 +181,7 @@
     const rtl_re = /[\u0591-\u07FF]/;
     let inner_text = document.getElementById('inner_text').textContent;
     let dir = rtl_re.test(inner_text) ? 'rtl' : 'ltr'
-    document.getElementById('text_align').setAttribute('dir', dir)
+    document.getElementById('text_align')?.setAttribute('dir', dir)
     document.getElementById('icon').style.margin = dir === 'rtl' ? '0px 0px 0px 3px' : '0px 3px 0px 0px'
 </script>
 
