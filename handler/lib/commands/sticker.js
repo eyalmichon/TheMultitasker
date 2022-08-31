@@ -201,7 +201,7 @@ class Sticker {
 
     textSticker = {
         func: (message) => {
-            if (message.type !== 'chat' || (!!message.quotedMsg && message.quotedMsg !== 'chat')) return errors.ONLY_TEXT
+            if (message.type !== 'chat' || (!!message.quotedMsg && message.quotedMsg.type !== 'chat')) return errors.ONLY_TEXT
             const options = parser.parse(message.args);
             return imageProcessing.imageFromText(options.joinedText, options)
                 .then(buffer => returnType.imgSticker(buffer))
