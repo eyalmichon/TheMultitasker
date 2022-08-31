@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras, qrcode, carInfo } = require("..");
+const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras, qrcode, carInfo, currency } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Info {
@@ -367,6 +367,19 @@ class Info {
 
         },
         help: () => help.Info.carInfo
+    }
+    curreny = {
+        func: (message) => {
+            const options = parser.parse(message.args)
+            const from = options.from || 'usd';
+            const to = options.to || 'ils';
+            const amount = options.joinedText || 1;
+
+            return currency.checkCurrency(from, to, amount)
+                .then(result => returnType.reply(result))
+                .catch(err => returnType.reply(err))
+        },
+        help: () => help.Info.currency + currency.getCurrenciesString()
     }
 }
 

@@ -66,6 +66,7 @@ Command pattern used for easy management of adding more commands.
   - Conjugate words/sentences.
   - get this doesn't exist content from [this](https://thisxdoesnotexist.com/) collection
   - Get info on cars 🚗 and motorcycles 🏍 in Israel.
+  - Currency checking. 💱💵
 
 - ### Forwarder Commands ⏩:
   - Forward messages randomly from a chosen group. (group IDs need to be set manually)
