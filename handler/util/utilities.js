@@ -44,6 +44,15 @@ const getTime = (time) => {
 const isInt = string => !!parseInt(string) && [...string].every(c => '0123456789'.includes(c));
 
 /**
+ * This method works by splitting the string into an array using the spread operator, 
+ * and then uses the every() method to test whether all elements (characters) in the 
+ * array are included in the string of digits '0123456789.'.
+ * @param {String} string the string to check if is float.
+ * @returns true if the string is an float.
+ */
+const isFloat = string => !!parseFloat(string) && [...string].every(c => '0123456789.'.includes(c)) && ((string.split('.').length - 1) === 1);
+
+/**
  * Function for checking if a number is between two numbers.
  * @param {Number} value The value to check.
  * @param {Number} min The minimum value.
@@ -336,6 +345,7 @@ SZL8P0FTkGQfe4/+AAAAAElFTkSuQmCC`
 module.exports = {
     removeFromArray,
     isInt,
+    isFloat,
     isBetween,
     randomUserAgent,
     getTime,
