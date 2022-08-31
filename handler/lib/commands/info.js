@@ -60,6 +60,8 @@ class Info {
         commands.qr = this.addInfo(this.qr)
 
         commands.carinfo = this.addInfo(this.carInfo)
+
+        commands.currency = this.addInfo(this.curreny)
     }
 
     compile = {
