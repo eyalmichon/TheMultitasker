@@ -5,8 +5,8 @@ const fileType = require('file-type');
 const AbortController = require('abort-controller');
 const secrets = require('../util/secrets.json');
 
-// 1.5 GB
-const MAX_SIZE_ALLOWED = 1610612736;
+// 500 MB
+const MAX_SIZE_ALLOWED = 524288000;
 
 const getRandomFileName = () => {
     var timestamp = new Date().toISOString().replace(/[-:.Z]/g, "");
