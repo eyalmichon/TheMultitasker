@@ -375,7 +375,7 @@ class Info {
             const options = parser.parse(message.args)
             const from = options.from || 'usd';
             const to = options.to || 'ils';
-            const amount = options.joinedText || 1;
+            const amount = options.joinedText || '1';
 
             return currency.checkCurrency(from, to, amount)
                 .then(result => returnType.reply(result))
