@@ -283,7 +283,7 @@ const getCurrenciesString = () => {
 const checkCurrency = (from, to, amount = '1') => new Promise((resolve, reject) => {
     if (from in currencies && to in currencies && (isInt(amount) || isFloat(amount)))
         return fetcher.fetchJson(`https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${from}.json`)
-            .then(json => resolve(`${amount} ${from} is ${json[from][to] * amount}`))
+            .then(json => resolve(`${amount} ${currencies[from]} is ${json[from][to] * amount} ${currencies[to]}`))
     else {
 
         if (!(from in currencies))
