@@ -119,7 +119,7 @@ class Admin {
         func: (message) => {
             let groupID = message.from;
             let user = !!message.quotedMsg ? message.quotedMsg.sender.id : message.mentionedJidList[0]
-            if (!user || user === message.botMaster || !message.isGroupMsg) return returnType.reply('⛔ Error, wrong usage.')
+            if (!user || user === message.botMaster || user === message.botNumber || !message.isGroupMsg) return returnType.reply('⛔ Error, wrong usage.')
 
             let text = '';
             switch (message.muteList.addUserToList(groupID, user)) {

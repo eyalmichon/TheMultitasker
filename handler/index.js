@@ -306,6 +306,7 @@ const msgHandler = async (client, message) => {
             // if is a group message get the group members
             message.groupMembers = isGroupMsg ? await client.getGroupMembersId(from) : '';
             message.botNumber = hostNumber;
+            message.botMaster = botMaster;
             message.muteList = muteList;
             result = await commands.execute(command, message, client);
             break;
