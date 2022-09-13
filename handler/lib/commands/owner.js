@@ -65,7 +65,7 @@ class Owner {
 
         commands.spammsg = this.addInfo(this.spamMessage)
 
-        commands.m = this.addInfo(this.m);
+        // commands.m = this.addInfo(this.m);
 
         commands.up = this.addInfo(this.uploadImg)
 
@@ -412,9 +412,8 @@ class Owner {
 
     removeMsg = {
         func: (message, client) => {
-            if (message.quotedMsg.sender.id === message.botNumber) {
-                client.deleteMessage(message.from, message.quotedMsg.id, false);
-            }
+            client.deleteMessage(message.from, message.quotedMsg.id, false);
+            client.deleteMessage(message.from, message.id, false);
             return { info: true };
         },
         help: () => help.Owner.removeMsg
