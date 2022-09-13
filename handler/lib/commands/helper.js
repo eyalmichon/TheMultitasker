@@ -129,6 +129,8 @@ const help = {
         promote: `${b('Usage:')} ${prefix}promote [@someone] or reply to a message sent by the user with ${prefix}promote\nPromotes 👨‍💼 a participant in the group.`,
         demote: `${b('Usage:')} ${prefix}demote [@someone] or reply to a message sent by the user with ${prefix}demote\nDemotes 👨‍💼 a participant in the group.`,
         groupInviteLink: `${b('Usage:')} ${prefix}invitelink\nGets the invite link of the group.`,
+        addUserToMuteList: `${b('Usage:')} ${prefix}mutelist [tag] or reply to someone with the command.\n${b('Aliases:')}\n[mutelist, mute]`,
+        removeUserFromMuteList: `${b('Usage:')} ${prefix}unmutelist [tag] or reply to someone with the command.\n${b('Aliases:')}\n[unmutelist, unmute]`,
     },
     Social: {
         meme: `${b('Usage:')} ${prefix}meme and you\'ll get random meme from the following subreddits:\n SUBS_LIST.\n\nOr ${prefix}meme [subreddit] to get a random image from that subreddit.`,

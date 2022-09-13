@@ -1,5 +1,6 @@
 const { Commands, prefix, errors } = require('./lib/commands');
 const { BlackList } = require('./util/blacklist');
+const { MuteList } = require('./util/mutelist');
 const { b, m, i } = require('./util/style');
 const localizations = require('./util/localizations.json')
 const { senders, spam, converter, redAlerts } = require('./lib');
@@ -7,6 +8,7 @@ const { Forwarder } = require('./util/forwarder');
 
 const commands = new Commands();
 const blackList = new BlackList();
+const muteList = new MuteList
 const myForwarder = new Forwarder()
 
 
@@ -24,12 +26,22 @@ const spamSet = new spam.Spam();
 const socialSpam = new spam.Spam();
 // Global host number.
 var hostNumber = 0;
+// Global bot admin list.
+var botAdminList = []
 // Clean tmp folder in case there are leftovers.
 converter.cleanTmp();
 
 // Set the host number globally.
-async function setHostNumber(client) {
+async function setupBot(client) {
     hostNumber = await client.getHostNumber() + '@c.us';
+
+    // get all groups where bot is admin.
+    const groups = await client.getAllGroups()
+    const groupIDs = groups.map(group => group.groupMetadata.id)
+    const botAdminListPromises = []
+    groupIDs.forEach(groupID => botAdminListPromises.push(client.getGroupAdmins(groupID).then(admins => admins.includes(hostNumber) ? groupID : false)))
+    botAdminList = await Promise.all(botAdminListPromises)
+    botAdminList = botAdminList.filter(id => id !== false)
 }
 
 /**
@@ -210,7 +222,21 @@ const msgHandler = async (client, message) => {
     // if we don't send anything mark the chat as seen so we don't get it again on the next startup.
     await client.sendSeen(from)
 
-    let groupBlackList = blackList.getGroup(from);
+    // check if the bot is an admin in the group.
+    const isBotGroupAdmin = botAdminList.includes(from)
+    if (isBotGroupAdmin) {
+        const groupMuteList = muteList.getGroup(from)
+        // if user is in mute, delete his message.
+        if (!!groupMuteList && groupMuteList.includes(sender.id)) {
+            console.log(`deleting message from: ${sender.id} in group ${from}`)
+            await client.deleteMessage(from, id, false);
+            return
+        }
+    }
+
+    // get the group's black list.
+    const groupBlackList = blackList.getGroup(from);
+
     // Return if sender is null or if it's body is undefined or is not a command, or the caption is not a command or (if the chatID
     // isn't in the allowed group AND it's not 'Me'). [if body doesn't start with prefix, we can make body = caption to see if it starts with prefix]
     if (!sender
@@ -219,10 +245,13 @@ const msgHandler = async (client, message) => {
         || (!body.startsWith(prefix) && (!caption || !(body = caption).startsWith(prefix)))
         || (!getGroup('Allowed').includes(from) && sender.id !== botMaster)) return;
 
+
+    // if user in spam set, send an error message.
     if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
     // Add user to spam set if it's not the bot owner.
     if (sender.id !== botMaster)
         spamSet.addUser(sender.id);
+
     // split the body content into args.
     message.args = body.trim().split(/ +/);
     // get the command from the body sent.
@@ -235,20 +264,25 @@ const msgHandler = async (client, message) => {
     let waitMsg = null;
     switch (commands.type(command)) {
         case 'Help':
+            const isOwner = sender.id === botMaster
             // for a command help.
             if (message.args[0]) {
-                if (commands.type(message.args[0].toLowerCase()))
-                    result = { type: 'reply', info: await commands.help(message.args[0].toLowerCase()) };
+                const helpCmd = message.args[0].toLowerCase()
+                // check if the command exists.
+                if (commands.type(helpCmd))
+                    result = { type: 'reply', info: await commands.help(helpCmd) };
                 else
                     result = errors.WRONG_CMD;
             }
-            // for help.
+            // for main help.
             else {
-                result = await commands.execute(command);
+                result = await commands.execute(command, isOwner);
             }
             break;
         // Owner commands, needs different args.
         case 'Owner':
+            // check if its the bot master.
+            if (sender.id !== botMaster) { result = errors.OWNER; break };
             // if is a group message get the group members
             message.groupMembers = isGroupMsg ? await client.getGroupMembersId(from) : '';
             message.getGroup = getGroup;
@@ -257,7 +291,6 @@ const msgHandler = async (client, message) => {
             message.botMaster = botMaster;
             message.myForwarder = myForwarder;
             message.botNumber = hostNumber;
-            if (sender.id !== botMaster) { result = errors.OWNER; break };
             result = await commands.execute(command, message, client);
             break;
         // Admin Commands.
@@ -266,11 +299,14 @@ const msgHandler = async (client, message) => {
             const groupAdmins = isGroupMsg ? await client.getGroupAdmins(from) : '';
             // check if the sender is a group admin.
             const isGroupAdmin = groupAdmins.includes(sender.id) || sender.id === botMaster || false;
+            // check if admin.
+            if (!isGroupAdmin) { result = errors.ADMIN; break }
+            // check if a message from group.
+            if (!isGroupMsg) { result = errors.GROUP; break }
             // if is a group message get the group members
             message.groupMembers = isGroupMsg ? await client.getGroupMembersId(from) : '';
             message.botNumber = hostNumber;
-            if (!isGroupMsg) { result = errors.GROUP; break };
-            if (!isGroupAdmin) { result = errors.ADMIN; break }
+            message.muteList = muteList;
             result = await commands.execute(command, message, client);
             break;
         // Social Commands.
@@ -396,4 +432,4 @@ const msgHandler = async (client, message) => {
 
 }
 
-module.exports = { msgHandler, restartHandler, autoRemoveHandler, forwardHandler, welcomeMsgHandler, setHostNumber }
+module.exports = { msgHandler, restartHandler, autoRemoveHandler, forwardHandler, welcomeMsgHandler, setupBot }

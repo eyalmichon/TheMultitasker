@@ -22,6 +22,12 @@ class Admin {
         commands.demote = this.addInfo(this.demote)
 
         commands.invitelink = this.addInfo(this.groupInviteLink)
+
+        commands.mutelist = this.addInfo(this.addUserToMuteList)
+        commands.mute = this.alias(this.addUserToMuteList)
+
+        commands.unmutelist = this.addInfo(this.removeUserFromMuteList)
+        commands.unmute = this.alias(this.removeUserFromMuteList)
     }
     everyone = {
         func: (message, client) => {
@@ -109,6 +115,54 @@ class Admin {
         help: () => help.Admin.groupInviteLink
     }
 
+    addUserToMuteList = {
+        func: (message) => {
+            let groupID = message.from;
+            let user = !!message.quotedMsg ? message.quotedMsg.sender.id : message.mentionedJidList[0]
+            if (!user || user === message.botMaster || !message.isGroupMsg) return returnType.reply('⛔ Error, wrong usage.')
+
+            let text = '';
+            switch (message.muteList.addUserToList(groupID, user)) {
+                case 'USER_EXISTS':
+                    text = `User already exists in the mute list for this group.`;
+                    break;
+                case true:
+                    text = `User has been added successfully!`;
+                    break;
+                case false:
+                    text = `⛔ Error, check logs.`;
+                    break;
+                default:
+                    text = `⛔ Unknown Error`;
+            }
+            return returnType.reply(text);
+        },
+        help: () => help.Admin.addUserToMuteList
+    }
+    removeUserFromMuteList = {
+        func: (message) => {
+            let groupID = message.from;
+            let user = !!message.quotedMsg ? message.quotedMsg.sender.id : message.mentionedJidList[0]
+            if (!user || !message.isGroupMsg) return returnType.reply('⛔ Error, wrong usage.')
+
+            let text = '';
+            switch (message.muteList.removeUserFromList(groupID, user)) {
+                case 'NO_USERS':
+                    text = `⛔ Error, there are no users in this group's mute list.`;
+                    break;
+                case true:
+                    text = `User has been removed successfully!`;
+                    break;
+                case false:
+                    text = `⛔ Error, check logs.`;
+                    break;
+                default:
+                    text = `⛔ Unknown Error`;
+            }
+            return returnType.reply(text);
+        },
+        help: () => help.Admin.removeUserFromMuteList
+    }
 
 }
 module.exports = { Admin }
