@@ -9,7 +9,9 @@ class Social {
     // Add alias and call addInfo.
     alias(cmd) { return { ...this.addInfo(cmd), alias: true } }
 
-    constructor(commands) {
+    constructor(commands, defaultTimer) {
+        this.defaultTimer = defaultTimer;
+
         commands.meme = this.addInfo(this.meme)
 
         commands.reddit = this.addInfo(this.reddit)
@@ -65,7 +67,8 @@ class Social {
                     else return errors.UNKNOWN
                 })
         },
-        help: () => help.Social.meme.replace('SUBS_LIST', meme.subreddits.join(', '))
+        help: () => help.Social.meme.replace('SUBS_LIST', meme.subreddits.join(', ')),
+        timer: () => this.defaultTimer
     }
 
     reddit = {
@@ -101,7 +104,8 @@ class Social {
                     else return errors.UNKNOWN
                 })
         },
-        help: () => help.Social.reddit.replace('SUBS_LIST', meme.subreddits.join(', '))
+        help: () => help.Social.reddit.replace('SUBS_LIST', meme.subreddits.join(', ')),
+        timer: () => this.defaultTimer
 
     }
 
@@ -124,7 +128,8 @@ class Social {
                     else return errors.PRIVATE_SOCIAL
                 })
         },
-        help: () => help.Social.instagram
+        help: () => help.Social.instagram,
+        timer: () => this.defaultTimer
     }
 
     twitter = {
@@ -143,7 +148,8 @@ class Social {
                     else errors.PRIVATE_TWITTER
                 })
         },
-        help: () => help.Social.twitter
+        help: () => help.Social.twitter,
+        timer: () => this.defaultTimer
     }
 
     tiktok = {
@@ -159,7 +165,8 @@ class Social {
                     return errors.PRIVATE_SOCIAL
                 })
         },
-        help: () => help.Social.tiktok
+        help: () => help.Social.tiktok,
+        timer: () => this.defaultTimer
     }
 
     facebook = {
@@ -180,7 +187,8 @@ class Social {
             else
                 return errors.NO_LINK
         },
-        help: () => help.Social.facebook
+        help: () => help.Social.facebook,
+        timer: () => this.defaultTimer
     }
 
     youtube = {
@@ -211,7 +219,8 @@ class Social {
                         else return errors.UNKNOWN_SOCIAL
                     })
         },
-        help: () => help.Social.youtube
+        help: () => help.Social.youtube,
+        timer: () => this.defaultTimer
     }
 
 
@@ -235,7 +244,8 @@ class Social {
                     else return errors.NOT_SUPPORTED
                 })
         },
-        help: () => help.Social.video
+        help: () => help.Social.video,
+        timer: () => this.defaultTimer
     }
     downloadSongs = {
         func: (args) => {
@@ -250,7 +260,8 @@ class Social {
                     return errors.UNKNOWN
                 })
         },
-        help: () => help.Social.downloadSongs
+        help: () => help.Social.downloadSongs,
+        timer: () => this.defaultTimer
     }
 }
 

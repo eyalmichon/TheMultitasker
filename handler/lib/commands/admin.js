@@ -9,7 +9,9 @@ class Admin {
     // Add alias and call addInfo.
     alias(cmd) { return { ...this.addInfo(cmd), alias: true } }
 
-    constructor(commands) {
+    constructor(commands, defaultTimer) {
+        this.defaultTimer = defaultTimer;
+
         commands.everyone = this.addInfo(this.everyone)
         commands.tagall = this.alias(this.everyone)
 
@@ -40,7 +42,8 @@ class Admin {
             client.sendTextWithMentions(message.from, mentionlist.join(' '))
             return { info: true };
         },
-        help: () => help.Admin.everyone
+        help: () => help.Admin.everyone,
+        timer: () => this.defaultTimer
     }
 
     kick = {
@@ -56,7 +59,8 @@ class Admin {
             })
             return { info: true };
         },
-        help: () => help.Admin.kick
+        help: () => help.Admin.kick,
+        timer: () => this.defaultTimer
     }
 
     promote = {
@@ -72,7 +76,8 @@ class Admin {
             })
             return { info: true };
         },
-        help: () => help.Admin.promote
+        help: () => help.Admin.promote,
+        timer: () => this.defaultTimer
     }
 
     demote = {
@@ -88,7 +93,8 @@ class Admin {
             })
             return { info: true };
         },
-        help: () => help.Admin.demote
+        help: () => help.Admin.demote,
+        timer: () => this.defaultTimer
     }
 
     addParticipant = {
@@ -103,7 +109,8 @@ class Admin {
             }
             return { info: true };
         },
-        help: () => help.Admin.addParticipant
+        help: () => help.Admin.addParticipant,
+        timer: () => this.defaultTimer
     }
 
     groupInviteLink = {
@@ -112,7 +119,8 @@ class Admin {
                 return returnType.reply(link);
             })
         },
-        help: () => help.Admin.groupInviteLink
+        help: () => help.Admin.groupInviteLink,
+        timer: () => this.defaultTimer
     }
 
     addUserToMuteList = {
@@ -137,7 +145,8 @@ class Admin {
             }
             return returnType.reply(text);
         },
-        help: () => help.Admin.addUserToMuteList
+        help: () => help.Admin.addUserToMuteList,
+        timer: () => this.defaultTimer
     }
     removeUserFromMuteList = {
         func: (message) => {
@@ -161,7 +170,8 @@ class Admin {
             }
             return returnType.reply(text);
         },
-        help: () => help.Admin.removeUserFromMuteList
+        help: () => help.Admin.removeUserFromMuteList,
+        timer: () => this.defaultTimer
     }
 
 }

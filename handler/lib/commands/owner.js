@@ -11,7 +11,9 @@ class Owner {
     // Add alias and call addInfo.
     alias(cmd) { return { ...this.addInfo(cmd), alias: true } }
 
-    constructor(commands) {
+    constructor(commands, defaultTimer) {
+        this.defaultTimer = defaultTimer;
+
         commands.redalerts = this.addInfo(this.redAlerts);
 
         commands.addsender = this.addInfo(this.addSender);
@@ -97,7 +99,8 @@ class Owner {
             }
             return returnType.reply(text);
         },
-        help: () => help.Owner.redAlerts
+        help: () => help.Owner.redAlerts,
+        timer: () => this.defaultTimer
     }
 
     addSender = {
@@ -110,7 +113,8 @@ class Owner {
                 text = `📛 Group name or number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
-        help: () => help.Owner.addSender
+        help: () => help.Owner.addSender,
+        timer: () => this.defaultTimer
     }
 
     removeSender = {
@@ -123,7 +127,8 @@ class Owner {
                 text = `📛 Group name or number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
-        help: () => help.Owner.removeSender
+        help: () => help.Owner.removeSender,
+        timer: () => this.defaultTimer
     }
 
     addForwarder = {
@@ -139,7 +144,8 @@ class Owner {
                 text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
-        help: () => ''
+        help: () => '',
+        timer: () => this.defaultTimer
     }
     removeForwarder = {
         func: (message) => {
@@ -152,7 +158,8 @@ class Owner {
                 text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
-        help: () => ''
+        help: () => '',
+        timer: () => this.defaultTimer
     }
     addGroupToForwarder = {
         func: (message) => {
@@ -167,7 +174,8 @@ class Owner {
                 text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
-        help: () => ''
+        help: () => '',
+        timer: () => this.defaultTimer
     }
     removeGroupFromForwarder = {
         func: (message) => {
@@ -182,7 +190,8 @@ class Owner {
                 text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
-        help: () => ''
+        help: () => '',
+        timer: () => this.defaultTimer
     }
     setLanguageForwarder = {
         func: (message) => {
@@ -197,7 +206,8 @@ class Owner {
                 text = `📛 Language given "${lang}" was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
-        help: () => ''
+        help: () => '',
+        timer: () => this.defaultTimer
     }
     setMaxMsgsForwarder = {
         func: (message) => {
@@ -212,7 +222,8 @@ class Owner {
                 text = `📛 maxMsgs number given "${n}" or Forwarder "${forwarder} were ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
-        help: () => help.Owner.setMaxMsgsForwarder
+        help: () => help.Owner.setMaxMsgsForwarder,
+        timer: () => this.defaultTimer
     }
     setPrefixForwarder = {
         func: (message) => {
@@ -234,7 +245,8 @@ class Owner {
                 text = `📛 Group number given was ${b('incorrect!')} [Are you the master of the bot?!?]`;
             return returnType.reply(text);
         },
-        help: () => ''
+        help: () => '',
+        timer: () => this.defaultTimer
     }
 
     addUserToBlackList = {
@@ -259,7 +271,8 @@ class Owner {
             }
             return returnType.reply(text);
         },
-        help: () => help.Owner.addUserToBlackList
+        help: () => help.Owner.addUserToBlackList,
+        timer: () => this.defaultTimer
     }
     removeUserFromBlackList = {
         func: (message) => {
@@ -283,7 +296,8 @@ class Owner {
             }
             return returnType.reply(text);
         },
-        help: () => help.Owner.removeUserFromBlackList
+        help: () => help.Owner.removeUserFromBlackList,
+        timer: () => this.defaultTimer
     }
     addPrefixBlackList = {
         func: (message) => {
@@ -307,7 +321,8 @@ class Owner {
             }
             return returnType.reply(text);
         },
-        help: () => help.Owner.addPrefixBlackList
+        help: () => help.Owner.addPrefixBlackList,
+        timer: () => this.defaultTimer
     }
     removePrefixBlackList = {
         func: (message) => {
@@ -331,7 +346,8 @@ class Owner {
             }
             return returnType.reply(text);
         },
-        help: () => help.Owner.removePrefixBlackList
+        help: () => help.Owner.removePrefixBlackList,
+        timer: () => this.defaultTimer
     }
 
     kickAll = {
@@ -345,7 +361,8 @@ class Owner {
             else
                 return errors.GROUP;
         },
-        help: () => help.Owner.kickAll
+        help: () => help.Owner.kickAll,
+        timer: () => this.defaultTimer
     }
 
     membersOf = {
@@ -369,7 +386,8 @@ class Owner {
             // send the list of names to the bot master.
             return returnType.sendMaster(memberNames.join(', '))
         },
-        help: () => help.Owner.membersOf
+        help: () => help.Owner.membersOf,
+        timer: () => this.defaultTimer
     }
 
     chatIDs = {
@@ -391,7 +409,8 @@ class Owner {
                     return returnType.sendMaster(res.filter(item => item !== undefined).join('\n'));
                 })
         },
-        help: () => help.Owner.ID
+        help: () => help.Owner.ID,
+        timer: () => this.defaultTimer
     }
 
     tag = {
@@ -407,7 +426,8 @@ class Owner {
             }
             return { info: true };
         },
-        help: () => help.Owner.tag
+        help: () => help.Owner.tag,
+        timer: () => this.defaultTimer
     }
 
     removeMsg = {
@@ -416,7 +436,8 @@ class Owner {
             client.deleteMessage(message.from, message.id, false);
             return { info: true };
         },
-        help: () => help.Owner.removeMsg
+        help: () => help.Owner.removeMsg,
+        timer: () => this.defaultTimer
     }
 
     countMessagesByText = {
@@ -448,7 +469,8 @@ class Owner {
                     return returnType.reply(`${count} messages found.`);
                 })
         },
-        help: () => help.Owner.countMessagesByText
+        help: () => help.Owner.countMessagesByText,
+        timer: () => this.defaultTimer
     }
 
     spamMessage = {
@@ -464,7 +486,8 @@ class Owner {
                     client.forwardMessages(message.from, message.quotedMsg.id);
             return { info: true };
         },
-        help: () => help.Owner.spamMessage
+        help: () => help.Owner.spamMessage,
+        timer: () => this.defaultTimer
     }
 
     //debugging
@@ -474,7 +497,8 @@ class Owner {
                 console.log(message.quotedMsg.mimetype)
             return { info: true };
         },
-        help: () => help.Owner.m
+        help: () => help.Owner.m,
+        timer: () => this.defaultTimer
     }
 
     uploadImg = {
@@ -487,7 +511,8 @@ class Owner {
                 })
 
         },
-        help: () => ''
+        help: () => '',
+        timer: () => this.defaultTimer
     }
 
 }

@@ -44,7 +44,8 @@ class Forwarder {
     // Add type, function and help using spread syntax.
     addInfo(cmd) { return { type: 'Forwarder', ...cmd } }
 
-    constructor(commands) {
+    constructor(commands, defaultTimer) {
+        this.defaultTimer = defaultTimer;
         this.lock = mutexify()
         this.groupsDB = {};
 
@@ -61,7 +62,8 @@ class Forwarder {
             let id = this.getRandomID(ids)
             return returnType.forwardMessage(id)
         },
-        help: () => help.Forwarder.egg
+        help: () => help.Forwarder.egg,
+        timer: () => this.defaultTimer
     }
     fart = {
         func: async (message, client) => {
@@ -71,7 +73,8 @@ class Forwarder {
             let id = this.getRandomID(ids)
             return returnType.forwardMessage(id)
         },
-        help: () => help.Forwarder.fart
+        help: () => help.Forwarder.fart,
+        timer: () => this.defaultTimer
     }
 
 }

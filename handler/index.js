@@ -22,8 +22,6 @@ const getGroup = (group) => { return mySenders.getGroup(group); }
 const botMaster = getGroup('Me');
 // a spam set to filter out the spammers.
 const spamSet = new spam.Spam();
-// a spam set to filter out the spammers for social fetching services.
-const socialSpam = new spam.Spam();
 // Global host number.
 var hostNumber = 0;
 // Global bot admin list.
@@ -250,7 +248,7 @@ const msgHandler = async (client, message) => {
     if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
     // Add user to spam set if it's not the bot owner.
     if (sender.id !== botMaster)
-        spamSet.addUser(sender.id);
+        spamSet.addUser(sender.id, commands.timer(command));
 
     // split the body content into args.
     message.args = body.trim().split(/ +/);
@@ -262,6 +260,7 @@ const msgHandler = async (client, message) => {
 
     let result = {};
     let waitMsg = null;
+
     switch (commands.type(command)) {
         case 'Help':
             const isOwner = sender.id === botMaster
@@ -312,11 +311,6 @@ const msgHandler = async (client, message) => {
             break;
         // Social Commands.
         case 'Social':
-            if (socialSpam.isSpam(sender.id)) { result = errors.SPAM; break }
-            // add to social spam set for 20 seconds.
-            if (sender.id !== botMaster)
-                socialSpam.addUser(sender.id, 20000);
-
             waitMsg = client.reply(from, i('I\'m on it! 🔨'), id);
             result = await commands.execute(command, message.args);
             break;
@@ -327,11 +321,6 @@ const msgHandler = async (client, message) => {
             break;
         // Info Commands.
         case 'Info':
-            if (socialSpam.isSpam(sender.id)) { result = errors.SPAM; break }
-            // add to social spam set for 10 seconds.
-            if (sender.id !== botMaster)
-                socialSpam.addUser(sender.id, 10000);
-
             waitMsg = client.reply(from, i('🧙‍♂️ This may take some time...'), id);
             result = await commands.execute(command, message);
 

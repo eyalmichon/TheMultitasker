@@ -13,15 +13,15 @@ class Commands {
     // Initialize all commands to the commands object.
     constructor() {
         this.commands = {};
-        new Owner(this.commands);
-        new Admin(this.commands);
-        new Social(this.commands);
-        new Forwarder(this.commands);
-        new Info(this.commands);
-        new Sticker(this.commands);
-        new Media(this.commands);
+        new Owner(this.commands, 0);
+        new Admin(this.commands, 0);
+        new Social(this.commands, 20);
+        new Forwarder(this.commands, 5);
+        new Info(this.commands, 10);
+        new Sticker(this.commands, 5);
+        new Media(this.commands, 5);
         // Keep last.
-        new Help(this.commands);
+        new Help(this.commands, 0);
     }
     /**
      * Get the type of the command.
@@ -47,6 +47,14 @@ class Commands {
      */
     help(cmd) {
         return this.commands[cmd] && this.commands[cmd].help();
+    }
+    /**
+     * Spam timer for a command.
+     * @param {String} cmd
+     * @returns time in ms.
+     */
+    timer(cmd) {
+        return this.commands[cmd] && this.commands[cmd].timer * 1000;
     }
 
 }

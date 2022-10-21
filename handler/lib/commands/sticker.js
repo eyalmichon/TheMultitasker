@@ -12,7 +12,9 @@ class Sticker {
     // Add alias and call addInfo.
     alias(cmd) { return { ...this.addInfo(cmd), alias: true } }
 
-    constructor(commands) {
+    constructor(commands, defaultTimer) {
+        this.defaultTimer = defaultTimer;
+
         commands.sticker = this.addInfo(this.sticker);
         commands.s = this.alias(this.sticker);
 
@@ -196,7 +198,8 @@ class Sticker {
                     return errors.BAD_CMD;
             }
         },
-        help: () => help.Sticker.sticker
+        help: () => help.Sticker.sticker,
+        timer: () => this.defaultTimer
     }
 
     textSticker = {
@@ -210,7 +213,8 @@ class Sticker {
                     return errors.UNKNOWN
                 })
         },
-        help: () => help.Sticker.textSticker
+        help: () => help.Sticker.textSticker,
+        timer: () => this.defaultTimer
     }
 }
 

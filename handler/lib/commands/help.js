@@ -31,7 +31,9 @@ class Help {
         return [text.join('\n\n'), ownerText.join('\n\n')];
     }
 
-    constructor(commands) {
+    constructor(commands, defaultTimer) {
+        this.defaultTimer = defaultTimer;
+
         [this.helpText, this.ownerText] = this.createHelp(commands);
 
         commands.help = this.addInfo(this.help);
@@ -42,7 +44,8 @@ class Help {
             const text = isOwner ? returnType.reply(this.ownerText) : returnType.reply(this.helpText)
             return text;
         },
-        help: async () => help.Help.help + await randomStory()
+        help: async () => help.Help.help + await randomStory(),
+        timer: () => this.defaultTimer
     }
 }
 

@@ -10,7 +10,9 @@ class Media {
     // Add alias and call addInfo.
     alias(cmd) { return { ...this.addInfo(cmd), alias: true } }
 
-    constructor(commands) {
+    constructor(commands, defaultTimer) {
+        this.defaultTimer = defaultTimer;
+
         commands.removebg = this.addInfo(this.removeBG)
         commands.rmbg = this.alias(this.removeBG)
 
@@ -61,7 +63,8 @@ class Media {
                     return errors.UNKNOWN
                 })
         },
-        help: () => help.Media.removebg
+        help: () => help.Media.removebg,
+        timer: () => this.defaultTimer
     }
     toImage = {
         func: (message) => {
@@ -108,7 +111,8 @@ class Media {
                     return errors.UNKNOWN
                 })
         },
-        help: () => help.Media.toimage
+        help: () => help.Media.toimage,
+        timer: () => this.defaultTimer
     }
 
 
@@ -138,7 +142,8 @@ class Media {
                         })
                 })
         },
-        help: () => help.Media.videotomp3
+        help: () => help.Media.videotomp3,
+        timer: () => this.defaultTimer
     }
 
     addBackground = {
@@ -178,7 +183,8 @@ class Media {
 
 
         },
-        help: () => help.Media.addBackground
+        help: () => help.Media.addBackground,
+        timer: () => this.defaultTimer
     }
 }
 
