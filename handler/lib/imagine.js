@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const { fetchJson } = require('../util/fetcher');
 const { isBetween } = require('../util/utilities');
-
+const { imagine: imagineSecrets } = require('../util/secrets.json');
 
 
 var tokenExpired = true;
@@ -20,7 +20,7 @@ const aspect_ratio = {
 }
 
 async function getBearerToken() {
-    let bearerToken = await fetchJson("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAzUV2NNUOlLTL04jwmUw9oLhjteuv6Qr4", {
+    let bearerToken = await fetchJson(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${imagineSecrets.googleApi}`, {
         "headers": {
             "accept": "*/*",
             "accept-language": "en-US,en;q=0.9,he;q=0.8",
@@ -33,9 +33,9 @@ async function getBearerToken() {
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "cross-site",
-            "x-client-data": "CJC2yQEIpbbJAQjBtskBCKmdygEIk6HLAQiAvMwBCMy8zAEIx+DMAQ==",
-            "x-client-version": "Chrome/JsCore/9.11.0/FirebaseCore-web",
-            "x-firebase-gmpid": "1:816167389238:web:8ddd68a6e3e0d762517097"
+            "x-client-data": imagineSecrets['x-client-data'],
+            "x-client-version": imagineSecrets['x-client-version'],
+            "x-firebase-gmpid": imagineSecrets['x-firebase-gmpid']
         },
         "referrerPolicy": "no-referrer",
         "body": "{\"returnSecureToken\":true}",
@@ -99,7 +99,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
         await page.goto('https://google.com/');
 
         const result = await page.evaluate(async (bearerToken, text, options) => {
-            return fetch("https://api.mage.space/api/v2/images/generate", {
+            return fetch(`${imagineSecrets.apiUrl}/generate`, {
                 "headers": {
                     "accept": "application/json",
                     "accept-language": "en-US,en;q=0.9,he;q=0.8",
@@ -114,7 +114,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                     "sec-fetch-mode": "cors",
                     "sec-fetch-site": "same-site"
                 },
-                "referrer": "https://www.mage.space/",
+                "referrer": imagineSecrets.refferer,
                 "referrerPolicy": "strict-origin-when-cross-origin",
                 "body": `{"prompt": "${text}","aspect_ratio": ${options.aspect_ratio},"num_inference_steps": ${options.num_inference_steps},"guidance_scale": ${options.guide_scale} ${options.init_image ? `,"init_image":"data:image/jpeg;base64,${options.init_image}","strength":${options.prompt_strength}` : ""} ${options.negative_prompt ? `,"negative_prompt":"${options.negative_prompt}"` : ""}}`,
                 "method": "POST",
@@ -124,7 +124,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                 .then(json => {
                     if (options.enhance) {
                         console.log(`Enhancing image with id: ${id}`);
-                        return fetch("https://api.mage.space/api/v2/images/enhance", {
+                        return fetch(`${imagineSecrets.apiUrl}/enhance`, {
                             "headers": {
                                 "accept": "application/json",
                                 "accept-language": "en-US,en;q=0.9,he;q=0.8",
@@ -139,7 +139,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                                 "sec-fetch-mode": "cors",
                                 "sec-fetch-site": "same-site"
                             },
-                            "referrer": "https://www.mage.space/",
+                            "referrer": imagineSecrets.refferer,
                             "referrerPolicy": "strict-origin-when-cross-origin",
                             "body": `{"id":"${json.results[0].id}"}`,
                             "method": "POST",
