@@ -41,7 +41,7 @@ const getTime = (time) => {
  * @param {String} string the string to check if is integer.
  * @returns true if the string is an integer.
  */
-const isInt = string => !!parseInt(string) && [...string].every(c => '0123456789'.includes(c));
+const isInt = string => [...string].every(c => '0123456789'.includes(c));
 
 /**
  * This method works by splitting the string into an array using the spread operator, 
@@ -50,7 +50,7 @@ const isInt = string => !!parseInt(string) && [...string].every(c => '0123456789
  * @param {String} string the string to check if is float.
  * @returns true if the string is an float.
  */
-const isFloat = string => !!parseFloat(string) && [...string].every(c => '0123456789.'.includes(c)) && ((string.split('.').length - 1) === 1);
+const isFloat = string => [...string].every(c => '0123456789.'.includes(c)) && ((string.split('.').length - 1) === 1);
 
 /**
  * Function for checking if a number is between two numbers.
@@ -60,7 +60,7 @@ const isFloat = string => !!parseFloat(string) && [...string].every(c => '012345
  * @returns true if value is between min and max, false otherwise.
  * @example isBetween(5, 1, 10) // true
  */
-const isBetween = (value, min, max) => isInt(value) && min <= value && value <= max;
+const isBetween = (value, min, max) => min <= value && value <= max;
 
 const base64Logo = `iVBORw0KGgoAAAANSUhEUgAAAh8AAAM3CAYAAACd1TI+AAAACXBIWXMAAAsSAAALEgHS3X78AAAgAElEQVR4nO3dP28bx7rH8eVB
 etu3YmednBdgBSe9FTAE2EW3SForTVJGqZyGiAw2cXWUMmkit3ERuSNAE5H6BJFewHGkjtW19Qp4Mcqzzpg7u9w/s7vz5/sBhJxD
