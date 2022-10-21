@@ -1,6 +1,12 @@
 const { isValidURL } = require("./fetcher");
 
-
+// describe what this function does.
+/**
+ * @param {string} args the arguments to parse
+ * @param {Boolean} getURL whether to get the URL or not
+ * @returns {Object} the parsed arguments
+ * 
+ */
 const parse = (args, getURL = true) => {
 
     const options = {};
@@ -32,6 +38,7 @@ const parse = (args, getURL = true) => {
     options.joinedText = joinedText.join(' ');
     return options
 }
+
 /**
  * Get all strings between quatation marks into an array and return the array, everything with -flag or without quotes is added to the array.
  * @param {*} args the arguments to parse.
@@ -56,7 +63,26 @@ const parseStrings = (args) => {
     return strings;
 }
 
+/**
+ * Get string between quatation marks after the flag given into an array and return the array, everything with -flag or without quotes is added to the array.
+ * @param {*} args the arguments to parse.
+ * @param {String} flag the flag to look for.
+ * @returns {Array} the array of strings and flags.
+ */
+const parseStringForFlag = (args, flag) => {
+    let ogString = args.join(' ').replace(/[‘’]/g, '\'').replace(/[“”״]/g, '\"');
+    let strings = [];
+    // get 1 string between quatation marks after the given flag.
+    const regex = new RegExp(`-${flag}="(.*?)"`);
+    let match;
+    if ((match = regex.exec(ogString)) !== null) {
+        strings.push(match[1]);
+    }
+    return strings;
+}
+
 module.exports = {
     parse,
-    parseStrings
+    parseStrings,
+    parseStringForFlag
 }
