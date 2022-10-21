@@ -54,7 +54,7 @@ class Commands {
      * @returns time in ms.
      */
     timer(cmd) {
-        return this.commands[cmd] && this.commands[cmd].timer * 1000;
+        return this.commands[cmd] && this.commands[cmd].timer() * 1000;
     }
 
 }
