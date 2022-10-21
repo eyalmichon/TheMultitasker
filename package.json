@@ -1,6 +1,6 @@
 {
   "name": "the_multitasker",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "description": "A WhatsApp bot 🤖 written in JavaScript and Node.js.",
   "main": "index.js",
   "scripts": {
