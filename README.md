@@ -40,6 +40,7 @@ Command pattern used for easy management of adding more commands.
   - Add a user to the group.
   - Promote/Demote users.
   - Get group invite link.
+  - Mute/Unmute group members 🔇
   
 - ### Social Commands 🌐:
   - Get a random 🎲 meme/post from a set of subreddits you choose or a specifc one.
@@ -67,6 +68,7 @@ Command pattern used for easy management of adding more commands.
   - get this doesn't exist content from [this](https://thisxdoesnotexist.com/) collection
   - Get info on cars 🚗 and motorcycles 🏍 in Israel.
   - Currency checking. 💱💵
+  - Imagine, text to image generation. 🖼
 
 - ### Forwarder Commands ⏩:
   - Forward messages randomly from a chosen group. (group IDs need to be set manually)

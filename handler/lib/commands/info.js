@@ -1,6 +1,6 @@
 const { b, m, i, help, returnType } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras, qrcode, carInfo, currency } = require("..");
+const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras, qrcode, carInfo, currency, imagine, fetcher } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Info {
@@ -11,7 +11,9 @@ class Info {
     alias(cmd) { return { ...this.addInfo(cmd), alias: true } }
 
 
-    constructor(commands) {
+    constructor(commands, defaultTimer) {
+        this.defaultTimer = defaultTimer;
+
         commands.compile = this.addInfo(this.compile)
 
         commands.covid = this.addInfo(this.covid)
@@ -62,6 +64,8 @@ class Info {
         commands.carinfo = this.addInfo(this.carInfo)
 
         commands.currency = this.addInfo(this.curreny)
+
+        commands.imagine = this.addInfo(this.imagine)
     }
 
     compile = {
@@ -71,7 +75,8 @@ class Info {
             return compile.compile(compiler, code)
                 .then(result => returnType.reply(result))
         },
-        help: () => help.Info.compile
+        help: () => help.Info.compile,
+        timer: () => this.defaultTimer
     }
 
     covid = {
@@ -79,7 +84,8 @@ class Info {
             return covid.infected(message.args[0])
                 .then(infectedInfo => returnType.reply(infectedInfo))
         },
-        help: () => help.Info.covid
+        help: () => help.Info.covid,
+        timer: () => this.defaultTimer
     }
 
     wolfram = {
@@ -98,7 +104,8 @@ class Info {
                     .then(res => returnType.fileFromURL(res.img, 'the_multitasker.gif', res.text))
                     .catch(() => errors.CANT_ANSWER_WOLF)
         },
-        help: () => help.Info.wolfram
+        help: () => help.Info.wolfram,
+        timer: () => this.defaultTimer
     }
 
     urban = {
@@ -133,7 +140,8 @@ class Info {
             return returnType.reply(text.join('\n\n'));
 
         },
-        help: () => help.Info.urban
+        help: () => help.Info.urban,
+        timer: () => this.defaultTimer
     }
 
     translate = {
@@ -150,7 +158,8 @@ class Info {
                     return errors.UNKNOWN;
                 })
         },
-        help: () => help.Info.translate
+        help: () => help.Info.translate,
+        timer: () => this.defaultTimer
     }
 
     recognizeMusic = {
@@ -170,7 +179,8 @@ class Info {
                     return errors.UNKNOWN;
                 })
         },
-        help: () => help.Info.recognizeMusic
+        help: () => help.Info.recognizeMusic,
+        timer: () => this.defaultTimer
     }
 
     nikud = {
@@ -187,7 +197,8 @@ class Info {
                     return errors.UNKNOWN;
                 })
         },
-        help: () => help.Info.nikud
+        help: () => help.Info.nikud,
+        timer: () => this.defaultTimer
     }
 
     grammar = {
@@ -205,7 +216,8 @@ class Info {
                     return errors.UNKNOWN;
                 })
         },
-        help: () => help.Info.grammar
+        help: () => help.Info.grammar,
+        timer: () => this.defaultTimer
     }
     tts = {
         func: (message) => {
@@ -223,7 +235,8 @@ class Info {
                     return errors.UNKNOWN;
                 })
         },
-        help: () => help.Info.tts
+        help: () => help.Info.tts,
+        timer: () => this.defaultTimer
     }
     context = {
         func: (message) => {
@@ -248,7 +261,8 @@ class Info {
                     return errors.UNKNOWN;
                 })
         },
-        help: () => help.Info.context
+        help: () => help.Info.context,
+        timer: () => this.defaultTimer
     }
     synonym = {
         func: (message) => {
@@ -265,7 +279,8 @@ class Info {
                     return errors.UNKNOWN;
                 })
         },
-        help: () => help.Info.synonym
+        help: () => help.Info.synonym,
+        timer: () => this.defaultTimer
     }
     conjugate = {
         func: (message) => {
@@ -286,7 +301,8 @@ class Info {
                     return errors.UNKNOWN;
                 })
         },
-        help: () => help.Info.conjugate
+        help: () => help.Info.conjugate,
+        timer: () => this.defaultTimer
     }
     thisDoesntExist = {
         func: (message) => {
@@ -322,7 +338,8 @@ class Info {
                     return errors.UNKNOWN;
                 })
         },
-        help: () => help.Info.thisDoesntExist
+        help: () => help.Info.thisDoesntExist,
+        timer: () => this.defaultTimer
     }
 
     emojiGenerator = {
@@ -334,7 +351,8 @@ class Info {
             else
                 return errors.EMOJI_GEN_ERROR;
         },
-        help: () => help.Info.emojiGenerator
+        help: () => help.Info.emojiGenerator,
+        timer: () => this.defaultTimer
     }
     qr = {
         func: (message) => {
@@ -351,7 +369,8 @@ class Info {
                 })
 
         },
-        help: () => help.Info.qr
+        help: () => help.Info.qr,
+        timer: () => this.defaultTimer
     }
     carInfo = {
         func: (message) => {
@@ -368,7 +387,8 @@ class Info {
                 })
 
         },
-        help: () => help.Info.carInfo
+        help: () => help.Info.carInfo,
+        timer: () => this.defaultTimer
     }
     curreny = {
         func: (message) => {
@@ -381,7 +401,59 @@ class Info {
                 .then(result => returnType.reply(result))
                 .catch(err => returnType.reply(err))
         },
-        help: () => help.Info.currency + currency.getCurrenciesString()
+        help: () => help.Info.currency + currency.getCurrenciesString(),
+        timer: () => this.defaultTimer
+    }
+
+    imagine = {
+        func: async (message) => {
+            const options = parser.parse(message.args);
+
+            if (!options.joinedText) return errors.EMPTY_TEXT;
+
+            if (!!options.quality)
+                options.num_inference_steps = options.quality;
+            if (!!options.freedom)
+                options.guide_scale = options.freedom;
+            if (!!options.ratio)
+                options.aspect_ratio = options.ratio;
+            if (message.type === 'image' || (message.quotedMsg && message.quotedMsg.type === 'image'))
+                options.image = true;
+            if (!!options.image) {
+                // if it's a url
+                if (options.url) {
+                    // 15MB limit
+                    await fetcher.checkSize(options.url, 15728640)
+                        .then(async res => {
+                            if (res === 'OK')
+                                options.init_image = await fetcher.fetchBase64(options.url)
+                            else
+                                console.error(`Error in imagine (checkSize): ${res}\n Url: ${options.url}`)
+                        })
+                }
+                // if it's an image.
+                else if (message.type === 'image')
+                    options.init_image = await decryptMedia(message).then(buffer => buffer.toString('base64'));
+                // if it's a quoted image.
+                else if (!!message.quotedMsg)
+                    if (message.quotedMsg.type === 'image') {
+                        options.init_image = await decryptMedia(message.quotedMsg).then(buffer => buffer.toString('base64'))
+                    }
+                if (!!options.strength)
+                    options.prompt_strength = options.strength;
+            }
+            if (!!options.neg)
+                options.negative_prompt = parser.parseStringForFlag(message.args, 'neg');
+
+            return imagine.textToImage(options.joinedText, options)
+                .then(result => returnType.fileFromURL(result.image_url, 'the_multitasker.png', options.joinedText))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.imagine,
+        timer: () => 30
     }
 }
 

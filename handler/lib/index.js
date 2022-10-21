@@ -22,3 +22,4 @@ exports.sticker = require('./sticker');
 exports.songs = require('./songs');
 exports.extras = require('./extras');
 exports.currency = require('./currency');
+exports.imagine = require('./imagine');
