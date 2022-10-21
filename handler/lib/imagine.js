@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const { fetchJson } = require('../util/fetcher');
 const { isBetween } = require('../util/utilities');
-const { imagine: imagineSecrets } = require('../util/secrets.json');
+const { imagineSecrets } = require('../util/secrets.json');
 
 
 var tokenExpired = true;
