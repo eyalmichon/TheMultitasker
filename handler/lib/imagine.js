@@ -98,7 +98,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
         await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36");
         await page.goto('https://google.com/');
 
-        const result = await page.evaluate(async (bearerToken, text, options) => {
+        const result = await page.evaluate(async (bearerToken, text, options, imagineSecrets) => {
             return fetch(`${imagineSecrets.apiUrl}/generate`, {
                 "headers": {
                     "accept": "application/json",
@@ -157,7 +157,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                     console.error(err);
                     return { error: err };
                 });
-        }, bearerToken, text, options)
+        }, bearerToken, text, options, imagineSecrets)
 
         // close browser
         await browser.close();

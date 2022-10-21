@@ -244,11 +244,6 @@ const msgHandler = async (client, message) => {
         || (!getGroup('Allowed').includes(from) && sender.id !== botMaster)) return;
 
 
-    // if user in spam set, send an error message.
-    if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
-    // Add user to spam set if it's not the bot owner.
-    if (sender.id !== botMaster)
-        spamSet.addUser(sender.id, commands.timer(command));
 
     // split the body content into args.
     message.args = body.trim().split(/ +/);
@@ -258,6 +253,11 @@ const msgHandler = async (client, message) => {
     if (quotedMsg && quotedMsg.type === 'chat')
         message.args.push(...(quotedMsg.body.trim().replace(/\n+/g, ' ').split(/ +/)))
 
+    // if user in spam set, send an error message.
+    if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
+    // Add user to spam set if it's not the bot owner.
+    if (sender.id !== botMaster)
+        spamSet.addUser(sender.id, commands.timer(command));
     let result = {};
     let waitMsg = null;
 
