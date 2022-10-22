@@ -254,10 +254,11 @@ const msgHandler = async (client, message) => {
         message.args.push(...(quotedMsg.body.trim().replace(/\n+/g, ' ').split(/ +/)))
 
     // if user in spam set, send an error message.
-    if (spamSet.isSpam(sender.id)) return client.reply(from, errors.SPAM.info, id);
+    if (spamSet.isSpam(sender.id, command)) return client.reply(from, errors.SPAM.info, id);
     // Add user to spam set if it's not the bot owner.
     if (sender.id !== botMaster)
-        spamSet.addUser(sender.id, commands.timer(command));
+        spamSet.addUser(sender.id, command, commands.timer(command));
+
     let result = {};
     let waitMsg = null;
 
