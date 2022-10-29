@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const { fetchJson } = require('../util/fetcher');
-const { isBetween } = require('../util/utilities');
+const { isBetween, randomUserAgent } = require('../util/utilities');
 const { imagineSecrets } = require('../util/secrets.json');
 
 
@@ -19,6 +19,8 @@ const aspect_ratio = {
     5: 0.5625
 }
 
+imagineSecrets.userAgent = randomUserAgent();
+
 async function getBearerToken() {
     let bearerToken = await fetchJson(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${imagineSecrets.googleApi}`, {
         "headers": {
@@ -27,7 +29,7 @@ async function getBearerToken() {
             "cache-control": "no-cache",
             "content-type": "application/json",
             "pragma": "no-cache",
-            "sec-ch-ua": "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"",
+            "sec-ch-ua": imagineSecrets.userAgent,
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "\"Windows\"",
             "sec-fetch-dest": "empty",
@@ -94,8 +96,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
 
     puppeteer.launch({ headless: true }).then(async browser => {
         const page = await browser.newPage();
-
-        await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36");
+        await page.setUserAgent(imagineSecrets.userAgent);
         await page.goto('https://google.com/');
 
         const result = await page.evaluate(async (bearerToken, text, options, imagineSecrets) => {
@@ -107,7 +108,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                     "cache-control": "no-cache",
                     "content-type": "application/json",
                     "pragma": "no-cache",
-                    "sec-ch-ua": "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"",
+                    "sec-ch-ua": imagineSecrets.userAgent,
                     "sec-ch-ua-mobile": "?0",
                     "sec-ch-ua-platform": "\"Windows\"",
                     "sec-fetch-dest": "empty",
@@ -123,7 +124,6 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                 .then(res => res.json())
                 .then(json => {
                     if (options.enhance) {
-                        console.log(`Enhancing image with id: ${id}`);
                         return fetch(`${imagineSecrets.apiUrl}/enhance`, {
                             "headers": {
                                 "accept": "application/json",
@@ -132,7 +132,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                                 "cache-control": "no-cache",
                                 "content-type": "application/json",
                                 "pragma": "no-cache",
-                                "sec-ch-ua": "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"",
+                                "sec-ch-ua": imagineSecrets.userAgent,
                                 "sec-ch-ua-mobile": "?0",
                                 "sec-ch-ua-platform": "\"Windows\"",
                                 "sec-fetch-dest": "empty",
@@ -168,6 +168,9 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
             reject(result.error);
 
         console.log(`Got image with id: ${result.id}`);
+        if (options.enhance)
+            console.log(`Enhanced image with id: ${result.id}`);
+
         resolve(result)
     })
 
