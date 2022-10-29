@@ -453,7 +453,7 @@ class Info {
                 })
         },
         help: () => help.Info.imagine,
-        timer: () => 120
+        timer: () => 60
     }
 }
 
