@@ -78,13 +78,19 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
     // options for num_inference_steps
     if (!isBetween(options.num_inference_steps, 25, 150))
         options.num_inference_steps = 25;
+    options.num_inference_steps = parseInt(options.num_inference_steps);
+
     // options for guide_scale (keep only 1 digit after the dot)
     options.guide_scale = Math.floor(options.guide_scale * 10) / 10;
     if (!isBetween(options.guide_scale, 0, 30))
         options.guide_scale = 7.5;
+    options.guide_scale = parseFloat(options.guide_scale);
+
     // options for aspect_ratio
     if (!aspect_ratio[options.aspect_ratio])
         options.aspect_ratio = aspect_ratio[3];
+    options.aspect_ratio = aspect_ratio[options.aspect_ratio];
+
     // options for init_image
     if (options.init_image) {
         if (!isBetween(options.prompt_strength, 0, 1))
