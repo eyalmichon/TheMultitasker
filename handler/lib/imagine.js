@@ -8,15 +8,15 @@ var tokenExpired = true;
 var bearerToken = null;
 const aspect_ratio = {
     // Cinema 16:9
-    1: 1.7777777777777777,
+    "1": 1.7777777777777777,
     // Landscape 3:2
-    2: 1.5,
+    "2": 1.5,
     // Square 1:1
-    3: 1,
+    "3": 1,
     // Tablet 2:3
-    4: 0.6666666666666666,
+    "4": 0.6666666666666666,
     // Phone 9:16
-    5: 0.5625
+    "5": 0.5625
 }
 
 imagineSecrets.userAgent = randomUserAgent();
@@ -89,7 +89,6 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
     // options for aspect_ratio
     if (!aspect_ratio[options.aspect_ratio])
         options.aspect_ratio = aspect_ratio[3];
-    options.aspect_ratio = aspect_ratio[options.aspect_ratio];
 
     // options for init_image
     if (options.init_image) {

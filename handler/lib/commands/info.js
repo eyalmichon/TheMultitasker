@@ -411,12 +411,18 @@ class Info {
 
             if (!options.joinedText) return errors.EMPTY_TEXT;
 
-            if (!!options.quality)
+            if (!!options.quality) {
                 options.num_inference_steps = options.quality;
-            if (!!options.freedom)
+                delete options.quality;
+            }
+            if (!!options.freedom) {
                 options.guide_scale = options.freedom;
-            if (!!options.ratio)
+                delete options.freedom;
+            }
+            if (!!options.ratio) {
                 options.aspect_ratio = options.ratio;
+                delete options.ratio;
+            }
             if (message.type === 'image' || (message.quotedMsg && message.quotedMsg.type === 'image'))
                 options.image = true;
             if (!!options.image) {
