@@ -254,7 +254,7 @@ const msgHandler = async (client, message) => {
         message.args.push(...(quotedMsg.body.trim().replace(/\n+/g, ' ').split(/ +/)))
 
     // if user in spam set, send an error message and how much time left until he can use the command again.
-    if (spamSet.isSpam(sender.id, command)) return client.reply(from, `${errors.SPAM.info}\nYou can use this command again in ${Math.floor(spamSet.timeLeft(sender.id, command) / 1000)} seconds`, id);
+    if (spamSet.isSpam(sender.id, command)) return client.reply(from, `${errors.SPAM.info}\nYou can use this command again in ${Math.floor(spamSet.timeLeft(sender.id, command) / 1000)} seconds.`, id);
     // Add user to spam set if it's not the bot owner.
     if (sender.id !== botMaster)
         spamSet.addUser(sender.id, command, commands.timer(command));
