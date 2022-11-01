@@ -89,6 +89,8 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
     // options for aspect_ratio
     if (!aspect_ratio[options.aspect_ratio])
         options.aspect_ratio = aspect_ratio[3];
+    else
+        options.aspect_ratio = aspect_ratio[options.aspect_ratio];
 
     // options for init_image
     if (options.init_image) {
