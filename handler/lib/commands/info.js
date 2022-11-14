@@ -66,6 +66,8 @@ class Info {
         commands.currency = this.addInfo(this.curreny)
 
         commands.imagine = this.addInfo(this.imagine)
+
+        commands.poll = this.addInfo(this.poll)
     }
 
     compile = {
@@ -460,6 +462,24 @@ class Info {
         },
         help: () => help.Info.imagine,
         timer: () => 60
+    }
+
+    poll = {
+        func: (message) => {
+            const splittedText = message.args.join(' ').split(',').map(t => t.trim());
+
+            if (splittedText.length < 1) return errors.EMPTY_TEXT;
+
+            const question = splittedText.shift();
+            const options = splittedText;
+            if (!options || options.length < 2) return errors.POLL_ERROR_TOO_LESS;
+            if (options.length > 12) return errors.POLL_ERROR_TOO_MANY;
+
+
+            return returnType.sendPoll(question, options)
+        },
+        help: () => help.Info.poll,
+        timer: () => this.defaultTimer
     }
 }
 

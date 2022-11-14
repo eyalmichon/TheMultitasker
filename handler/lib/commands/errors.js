@@ -52,6 +52,8 @@ const errors = {
     TOO_MANY_SONGS: addType(`📛 Error, too many songs given.`),
     NO_SONGS_FOUND: addType(`📛 Error, no songs found.`),
     NO_QUOTED_MESSAGE: addType(`📛 Error, no quoted message found.`),
+    POLL_ERROR_TOO_LESS: addType(`📛 Error, you need to enter at least 2 options.`),
+    POLL_ERROR_TOO_MANY: addType(`📛 Error, you can only enter up to 12 options.`),
 }
 
 module.exports = { errors }

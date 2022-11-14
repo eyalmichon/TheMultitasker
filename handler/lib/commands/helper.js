@@ -95,6 +95,12 @@ const returnType = {
      * @returns Object information for sending a text to the bot master.
      */
     sendMaster: (text) => { return { type: 'sendMaster', info: text } },
+    /**
+     * Object information for sending a poll.
+     * @param {String} question the question of the poll.
+     * @param {Array} options the options of the poll.
+     */
+    sendPoll: (question, options) => { return { type: 'sendPoll', info: { question, options } } },
 }
 
 const help = {
@@ -167,6 +173,7 @@ const help = {
         carInfo: `${b('Usage:')} ${prefix}carinfo [number] (where number is the car's number of length between 7-8)\n${b('Aliases:')}\n[carinfo]`,
         currency: `${b('Usage:')} ${prefix}currency [amount (default is 1)] -to=[id] -from=[id]\n${b('IDs:')}\n`,
         imagine: `${b('Usage:')} ${prefix}imagine [text] (where text is the text you want to come to life.)\n\n${b('Options:')}\n• Enhance: (-enhance) Whether to enhance the image or not.\nDefault: false.\n\n• Quality: (-quality=[25-150]) Quality refers to the number of artistic steps taken while creating. The more steps, the higher the quality.\nDefault: 25.\n\n• Freedom: (-freedom=[0-30])(float) the level of freedom (or strictness) you allow when creating from your prompt. Higher values force to follow your prompt.\nDefault: 7.5.\n\n• Ratio: (-ratio=[1-5]) The aspect ratio of the image.\n 1: Cinema 16:9\n 2: Landscape 3:2\n 3: Square 1:1\n 4: Tablet 2:3\n 5: Phone 9:16.\nDefault: 3 (square).\n\n• Image: (-image and tag an image or -image and a link of an image) The image to start the creation from.\n\n• Strength: (-strength=[0-1]) The strength of the image. (To use with an image)\n\n• Negative Prompt: (-neg="prompt here") a description of what you do *not* want in the image - will stay away from concepts in the negative prompt.\n\n${b('Aliases:')}\n[imagine]`,
+        poll: `${b('Usage:')} ${prefix}poll [question, option1, options2, etc...]\n${b('Aliases:')}\n[poll]`,
     },
     Sticker: {
         sticker: `${b('Usage:')}\n${m(`reply with ${prefix}sticker or send the image/gif/video with caption ${prefix}sticker.`)}\n${b('OR')}\n ${m('Reply to a URL of an image/gif to create the sticker from that instead.')}\n${b('Options:')}\n${m(`• Cropping: -c\n\n• Remove background: -r\n• Background: -bg\n• Background from URL: -url=[image link]\n\n• Image stroke: -s\n• Image stroke size: -size=[1-10]\n• Image stroke alpha: -alpha=[0-255]\n• Image stroke color: -color[color name or #hex]\n\n• Text on sticker: -t [and type text you want, seperate text to top and bottom using "|" character]\n• Text fill color: -fcolor=[color name or #hex]\n• Text stroke color: -scolor=[color name or #hex]\n• Font size: -fsize=[number 1-1000]\n• Max text rows: -rows=[1-6]\n\n• As Whatsapp message: -m (for images)\n• As Whatsapp reply: -rep\n• Reply Phone number: -p=[name/phone)\n• Reply Name: -n=[name]\n• Replied Phone number: -rp=[name/phone)\n• Replied Name: -rn=[name]\n• Time on voice: -time=[HH:MM:SS]\n\n(for background: send an image (which you want it\'s background removed), then quote the image with the background picture you want)`)}\n${b('Aliases:')}\n${m('[sticker, s]')}`,
