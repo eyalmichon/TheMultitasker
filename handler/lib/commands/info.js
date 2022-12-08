@@ -425,6 +425,10 @@ class Info {
                 options.aspect_ratio = options.ratio;
                 delete options.ratio;
             }
+            if (!!options.v) {
+                options.version = options.v;
+                delete options.v;
+            }
             if (message.type === 'image' || (message.quotedMsg && message.quotedMsg.type === 'image'))
                 options.image = true;
             if (!!options.image) {

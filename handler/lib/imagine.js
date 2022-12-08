@@ -62,6 +62,7 @@ async function getBearerToken() {
  * - init_image: The image to start the creation from.
  * - strength: The strength of the image.
  * - negative_prompt: a description of what you do *not* want in the image - the A.I. will stay away from concepts in the negative prompt.
+ * - version: The version of the A.I. to use. Default: 2.1.
  */
 const textToImage = (text, options = {}) => new Promise(async (resolve, reject) => {
     // check if token expired and get new one if needed.
@@ -74,7 +75,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
     }
 
     // should enhance image
-    options.enhance = !!options.enhance
+    options.enhance = !!options.enhance || !!options.hd
     // options for num_inference_steps
     if (!isBetween(options.num_inference_steps, 25, 150))
         options.num_inference_steps = 25;
@@ -98,6 +99,10 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
             options.prompt_strength = 0.5;
         options.prompt_strength = Math.floor(options.prompt_strength * 100) / 100;
     }
+
+    // options for version
+    if (options.version != '1.5' && options.version != '2.1')
+        options.version = '2.1';
 
     console.log(`Creating image with text: ${text} and options: ${JSON.stringify(options, (key, value) => key === 'init_image' ? value.substring(0, 30) : value)}`);
 
@@ -124,7 +129,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                 },
                 "referrer": imagineSecrets.refferer,
                 "referrerPolicy": "strict-origin-when-cross-origin",
-                "body": `{"prompt": "${text}","aspect_ratio": ${options.aspect_ratio},"num_inference_steps": ${options.num_inference_steps},"guidance_scale": ${options.guide_scale} ${options.init_image ? `,"init_image":"data:image/jpeg;base64,${options.init_image}","strength":${options.prompt_strength}` : ""} ${options.negative_prompt ? `,"negative_prompt":"${options.negative_prompt}"` : ""}}`,
+                "body": `{"prompt": "${text}","aspect_ratio": ${options.aspect_ratio},"num_inference_steps": ${options.num_inference_steps},"guidance_scale": ${options.guide_scale} ${options.init_image ? `,"init_image":"data:image/jpeg;base64,${options.init_image}","strength":${options.prompt_strength}` : ""} ${options.negative_prompt ? `,"negative_prompt":"${options.negative_prompt}"` : ""}, "model": "v${options.version}"}`,
                 "method": "POST",
                 "mode": "cors",
             })
