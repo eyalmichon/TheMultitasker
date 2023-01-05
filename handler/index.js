@@ -359,10 +359,12 @@ const msgHandler = async (client, message) => {
 
     switch (result.type) {
         case 'reply':
-            await client.reply(from, result.info, id);
+            await client.reply(from, result.info, id)
+                .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) });
             break;
         case 'text':
-            await client.sendText(from, result.info);
+            await client.sendText(from, result.info)
+                .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) });
             break;
         case 'imgSticker':
             await client.sendImageAsSticker(from, result.info.base64, { author: 'The Multitasker Bot', keepScale: result.info.keepScale, pack: 'Stickers' })
@@ -390,33 +392,42 @@ const msgHandler = async (client, message) => {
                 })
             break;
         case 'fileFromURL':
-            await client.sendFileFromUrl(from, result.info.url, result.info.fileName, result.info.title, id, result.info.options, true, result.info.ptt);
+            await client.sendFileFromUrl(from, result.info.url, result.info.fileName, result.info.title, id, result.info.options, false, result.info.ptt)
+                .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) });
             break;
         case 'filesFromURL':
             result.info
-                .forEach(link => client.sendFileFromUrl(from, link, '', '', id, null, true))
+                .forEach(link =>
+                    client.sendFileFromUrl(from, link, '', '', id, null)
+                        .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) }));
             break;
         case 'sendFile':
-            await client.sendFile(from, result.info.path, result.info.fileName, result.info.title, id, true)
-                .then(() => result.removeFile ? converter.unlinkOutput(result.info.path) : '');
+            await client.sendFile(from, result.info.path, result.info.fileName, result.info.title, id)
+                .then(() => result.removeFile ? converter.unlinkOutput(result.info.path) : '')
+                .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) });
             break;
         case 'sendFiles':
             result.info.filePaths
-                .forEach((filePath, i) => client.sendFile(from, filePath, result.info.fileNames[i], result.info.titles[i] ? result.info.titles[i] : '', id, true)
-                    .then(() => result.removeFiles ? converter.unlinkOutput(filePath) : ''));
+                .forEach((filePath, i) => client.sendFile(from, filePath, result.info.fileNames[i], result.info.titles[i] ? result.info.titles[i] : '', id, false)
+                    .then(() => result.removeFiles ? converter.unlinkOutput(filePath) : '')
+                    .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) }))
             break;
         case 'sendPtt':
             await client.sendPtt(from, result.info.path, id)
                 .then(() => result.removeFile ? converter.unlinkOutput(result.info.path) : '')
+                .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) });
             break;
         case 'forwardMessage':
-            await client.forwardMessages(from, result.info.msgID);
+            await client.forwardMessages(from, result.info.msgID)
+                .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) });
             break;
         case 'sendMaster':
-            await client.sendText(botMaster, result.info);
+            await client.sendText(botMaster, result.info)
+                .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) });
             break;
         case 'sendPoll':
-            await client.sendPoll(from, result.info.question, result.info.options);
+            await client.sendPoll(from, result.info.question, result.info.options)
+                .catch(err => { client.reply(from, errors.UNKNOWN, id); console.error(err) });
             break;
         default:
             break;
