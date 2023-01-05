@@ -1,77 +1,86 @@
-const request = require('request');
+const { fetchJson } = require('../util/fetcher');
 
 var compilers = {
     'c': 'gcc-head-c',
     'cpp': 'gcc-head',
     'c#': 'dotnetcore-head',
-    'rill': 'rill-head',
-    'erlang': 'erlang-head',
-    'elixir': 'elixir-head',
-    'haskell': 'ghc-head',
-    'd': 'dmd-head',
-    'java': 'openjdk-head',
-    'rust': 'rust-head',
-    'python': 'cpython-head',
-    'python2.7': 'cpython-2.7-head',
-    'ruby': 'ruby-head',
-    'scala': 'scala-2.13.x',
-    'groovy': 'groovy-3.0.7',
-    'nodejs': 'nodejs-head',
-    'nodejs14': 'nodejs-14.0.0',
-    'coffeescript': 'coffeescript-head',
-    'spidermonkey': 'spidermonkey-45.0.2',
-    'swift': 'swift-head',
-    'perl': 'perl-head',
-    'php': 'php-head',
-    'lua': 'lua-5.4.0',
-    'sql': 'sqlite-head',
-    'pascal': 'fpc-head',
+    'erlang': 'erlang-23.3.1',
+    'elixir': 'elixir-1.11.4',
+    'haskell': 'ghc-9.0.1',
+    'd': 'dmd-2.096.0',
+    'java': 'openjdk-jdk-15.0.3+2',
+    'rust': 'rust-1.51.0',
+    'python': 'cpython-3.10.2',
+    'python2.7': 'cpython-2.7.18',
+    'ruby': 'ruby-3.1.0',
+    'scala': 'scala-2.13.5',
+    'groovy': 'groovy-3.0.8',
+    'nodejs': 'nodejs-16.14.0',
+    'nodejs14': 'nodejs-14.16.1',
+    'spidermonkey': 'spidermonkey-88.0.0',
+    'swift': 'swift-5.3.3',
+    'perl': 'perl-5.34.0',
+    'php': 'php-8.0.3',
+    'lua': 'lua-5.4.3',
+    'sql': 'sqlite-3.35.5',
+    'pascal': 'fpc-3.2.0',
     'lisp': 'clisp-2.49',
     'lazyk': 'lazyk',
-    'vim': 'vim-head',
-    'pypy': 'pypy-head',
-    'ocaml': 'ocaml-head',
-    'go': 'go-head',
+    'vim': 'vim-8.2.2811',
+    'pypy': 'pypy-3.7-v7.3.4',
+    'ocaml': 'ocaml-4.12.0',
+    'go': 'go-1.16.3',
     'bash': 'bash',
-    'pony': 'pony-head',
-    'crystal': 'crystal-head',
-    'nim': 'nim-head',
-    'openssl': 'openssl-head',
-    'f#': 'fsharp-head',
-    'r': 'r-head',
-    'typescript': 'typescript-3.9.5',
-    'julia': 'julia-head'
+    'pony': 'pony-0.39.1',
+    'crystal': 'crystal-1.0.0',
+    'nim': 'nim-1.6.10',
+    'openssl': 'openssl-1.1.1k',
+    'r': 'r-4.0.5',
+    'typescript': 'typescript-4.2.4',
+    'julia': 'julia-1.6.1'
 }
 
-const options = {
-    method: 'POST',
-    url: 'https://wandbox.org/api/compile.json',
-    json: true,
-    timeout: 10000,
-    headers: { 'content-type': 'application/json' }
-}
 
-const compile = (lang, code) => new Promise((resolve, reject) => {
-    if (!compilers.hasOwnProperty(lang)) return resolve('📛 Wrong compiler used, please see \'!help compile\' for a list of available compilers.');
-    else if (!code) { return resolve('😶 Why did you send an empty code? 😒') }
-
-    let compiler = compilers[lang];
-    code = code.replace(/[‘’]/g, '\'').replace(/[“”]/g, '\"');
-    options.body = {
-        code: code,
-        compiler: compiler
-    }
-    request(options, (error, response, body) => {
-        if (error) {
-            console.error('Request has failed!\nReason:', error);
-            return resolve('🌐 Server error has occurred!, this has nothing to do with me...');
+const compile = (lang, code) =>
+    new Promise((resolve, reject) => {
+        if (!compilers.hasOwnProperty(lang))
+            return resolve(
+                "📛 Wrong compiler used, please see '!help compile' for a list of available compilers."
+            );
+        else if (!code) {
+            return resolve("😶 Why did you send an empty code? 😒");
         }
-        if (body.compiler_error) { resolve(body.compiler_error) }
-        else if (body.program_error) { resolve(body.program_error) }
-        else if (!body.program_message) { resolve('😶 The output was empty, so here\'s a unicorn 🦄') }
-        else { resolve(body.program_message) }
+
+        let compiler = compilers[lang];
+        code = code.replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
+
+        fetchJson("https://wandbox.org/api/compile.json", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+                code: code,
+                compiler: compiler,
+            }),
+        })
+            .then((body) => {
+                console.log(body);
+                if (body.compiler_error) {
+                    resolve(body.compiler_error);
+                } else if (body.program_error) {
+                    resolve(body.program_error);
+                } else if (!body.program_message) {
+                    resolve("😶 The output was empty, so here's a unicorn 🦄");
+                } else {
+                    resolve(body.program_message);
+                }
+            })
+            .catch((error) => {
+                console.error("Request has failed!\nReason:", error);
+                return resolve(
+                    "🌐 Server error has occurred!, this has nothing to do with me..."
+                );
+            });
     });
-});
 
 
 
