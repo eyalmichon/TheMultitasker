@@ -56,7 +56,7 @@ class Social {
             return await Promise.all(memePost)
                 .then(promise => {
                     let post = promise[0];
-                    return returnType.fileFromURL(post.url, '', post.title);
+                    return returnType.fileFromURL(post.url, `the_multitasker.${post.url.split('.').pop()}`, post.title)
 
                 })
                 .catch(err => {
@@ -89,7 +89,7 @@ class Social {
                         case 'video':
                             return returnType.sendFile(post.path, 'the_multitasker.mp4', post.title);
                         case 'image/gif':
-                            return returnType.fileFromURL(post.url, '', post.title);
+                            return returnType.fileFromURL(post.url, `the_multitasker.${post.url.split('.').pop()}`, post.title);
                         case 'youtube':
                             return this.youtube.func([post.url]);
                         default:
