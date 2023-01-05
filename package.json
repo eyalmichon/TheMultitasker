@@ -19,7 +19,7 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@iamtraction/google-translate": "^1.1.2",
-    "@open-wa/wa-automate": "^4.51.1",
+    "@open-wa/wa-automate": "^4.54.6",
     "abort-controller": "^3.0.0",
     "changelog-parser": "^2.8.1",
     "cheerio": "^1.0.0-rc.11",
@@ -34,7 +34,7 @@
     "sharp": "^0.30.7",
     "tiktok-scraper": "^1.4.36",
     "user-agents": "^1.0.1051",
-    "youtube-dl-exec": "^2.0.12",
+    "youtube-dl-exec": "^2.1.11",
     "ytdl-core": "^4.11.2"
   }
 }
