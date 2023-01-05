@@ -26,6 +26,7 @@
     "color": "^4.2.3",
     "command-line-args": "^5.2.1",
     "fetch": "^1.1.0",
+    "file-type": "^16.5.3",
     "fluent-ffmpeg": "^2.1.2",
     "fs": "0.0.1-security",
     "mathram": "^1.0.5",
