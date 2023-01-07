@@ -19,6 +19,25 @@ const aspect_ratio = {
     "5": 0.5625
 }
 
+const models = {
+    "1.5": "v1.5",
+    "2.1": "v2.1",
+    // "waifu": "waifu",
+    // "anything": "anything-v3.0",
+    // "openjourney": "openjourney",
+    // "redshift": "redshift",
+    // "hassan": "hassan",
+    // "analog": "analog",
+    // "eimis": "eimis",
+    // "nitro": "nitro",
+    // "nitro-disney": "nitro-disney",
+    // "nitro-arcane": "nitro-arcane",
+    // "nitro-archer": "nitro-archer",
+    // "f222": "f222",
+    // "ppp": "ppp",
+    // "pfg": "pfg"
+}
+
 imagineSecrets.userAgent = randomUserAgent();
 
 async function getBearerToken() {
@@ -101,8 +120,8 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
     }
 
     // options for version
-    if (options.version != '1.5' && options.version != '2.1')
-        options.version = '2.1';
+    if (!models[options.version])
+        options.version = 'v2.1';
 
     console.log(`Creating image with text: ${text} and options: ${JSON.stringify(options, (key, value) => key === 'init_image' ? value.substring(0, 30) : value)}`);
 
@@ -129,7 +148,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                 },
                 "referrer": imagineSecrets.refferer,
                 "referrerPolicy": "strict-origin-when-cross-origin",
-                "body": `{"prompt": "${text}","aspect_ratio": ${options.aspect_ratio},"num_inference_steps": ${options.num_inference_steps},"guidance_scale": ${options.guide_scale} ${options.init_image ? `,"init_image":"data:image/jpeg;base64,${options.init_image}","strength":${options.prompt_strength}` : ""} ${options.negative_prompt ? `,"negative_prompt":"${options.negative_prompt}"` : ""}, "model": "v${options.version}"}`,
+                "body": `{"prompt": "${text}","aspect_ratio": ${options.aspect_ratio},"num_inference_steps": ${options.num_inference_steps},"guidance_scale": ${options.guide_scale} ${options.init_image ? `,"init_image":"data:image/jpeg;base64,${options.init_image}","strength":${options.prompt_strength}` : ""} ${options.negative_prompt ? `,"negative_prompt":"${options.negative_prompt}"` : ""}, "model": "${options.version}"}`,
                 "method": "POST",
                 "mode": "cors",
             })
