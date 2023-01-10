@@ -119,8 +119,9 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
         options.prompt_strength = Math.floor(options.prompt_strength * 100) / 100;
     }
 
+    options.version = models[options.version]
     // options for version
-    if (!models[options.version])
+    if (!options.version)
         options.version = 'v2.1';
 
     console.log(`Creating image with text: ${text} and options: ${JSON.stringify(options, (key, value) => key === 'init_image' ? value.substring(0, 30) : value)}`);
