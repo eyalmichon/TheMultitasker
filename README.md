@@ -41,6 +41,7 @@ Command pattern used for easy management of adding more commands.
   - Promote/Demote users.
   - Get group invite link.
   - Mute/Unmute group members 🔇
+  - Get the profile picture of a participant.
   
 - ### Social Commands 🌐:
   - Get a random 🎲 meme/post from a set of subreddits you choose or a specifc one.

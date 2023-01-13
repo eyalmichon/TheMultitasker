@@ -137,6 +137,7 @@ const help = {
         groupInviteLink: `${b('Usage:')} ${prefix}invitelink\nGets the invite link of the group.`,
         addUserToMuteList: `${b('Usage:')} ${prefix}mutelist [tag] or reply to someone with the command.\n${b('Aliases:')}\n[mutelist, mute]`,
         removeUserFromMuteList: `${b('Usage:')} ${prefix}unmutelist [tag] or reply to someone with the command.\n${b('Aliases:')}\n[unmutelist, unmute]`,
+        getProfilePic: `${b('Usage:')} ${prefix}profilepic or reply to a message with ${prefix}profilepic\nGets the profile picture of the user.`,
     },
     Social: {
         meme: `${b('Usage:')} ${prefix}meme and you\'ll get random meme from the following subreddits:\n SUBS_LIST.\n\nOr ${prefix}meme [subreddit] to get a random image from that subreddit.`,

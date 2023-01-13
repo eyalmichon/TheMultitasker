@@ -30,6 +30,8 @@ class Admin {
 
         commands.unmutelist = this.addInfo(this.removeUserFromMuteList)
         commands.unmute = this.alias(this.removeUserFromMuteList)
+
+        commands.profilepic = this.addInfo(this.getProfilePic)
     }
     everyone = {
         func: (message, client) => {
@@ -173,6 +175,17 @@ class Admin {
         help: () => help.Admin.removeUserFromMuteList,
         timer: () => this.defaultTimer
     }
-
+    getProfilePic = {
+        func: async (message, client) => {
+            let msg = message.quotedMsg || message;
+            console.log(`Getting profile pic of ${msg.sender.pushname}`)
+            let base64 = await client.downloadProfilePicFromMessage(msg).catch(err => { return { err: err } });
+            if (base64.err) return returnType.reply(`⛔ Error, ${msg.sender.pushname} is private or doesn't have a profile pic.`)
+            return returnType.sendFile(`data:image/jpeg;base64, ${base64}`, 'profile.jpg', `Here's the profile pic of ${msg.sender.pushname}`, false);
+        },
+        help: () => help.Admin.getProfilePic,
+        timer: () => this.defaultTimer
+    }
 }
+
 module.exports = { Admin }
