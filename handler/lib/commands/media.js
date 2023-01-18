@@ -60,7 +60,7 @@ class Media {
                 return returnType.sendFile(`data:document/png;base64,${base64}`, `the_multitasker.png`, '', false)
             })
                 .catch((err) => {
-                    return errors.UNKNOWN
+                    return errors.UNKNOWN()
                 })
         },
         help: () => help.Media.removebg,
@@ -108,7 +108,7 @@ class Media {
             })
                 .catch((err) => {
                     console.error(err)
-                    return errors.UNKNOWN
+                    return errors.UNKNOWN()
                 })
         },
         help: () => help.Media.toimage,
@@ -138,7 +138,7 @@ class Media {
                         })
                         .catch(err => {
                             console.error(err);
-                            return errors.UNKNOWN
+                            return errors.UNKNOWN()
                         })
                 })
         },
@@ -168,7 +168,7 @@ class Media {
                 if (message.type === 'sticker')
                     bgBuffer = await imageProcessing.sharp(bgBuffer).toFormat('png').toBuffer()
             }
-            if (!bgBuffer) return errors.UNKNOWN
+            if (!bgBuffer) return errors.UNKNOWN()
             return imageProcessing.addBackground(imgBuffer, bgBuffer)
                 .then(buffer => {
                     if (toSticker)
@@ -178,7 +178,7 @@ class Media {
                 })
                 .catch(err => {
                     console.error(err);
-                    return errors.UNKNOWN
+                    return errors.UNKNOWN()
                 })
 
 

@@ -159,7 +159,7 @@ class Info {
                 .catch(err => {
                     console.error(err);
                     if (err === 'WRONG_LANG_CODE') return errors.WRONG_LANG_CODE;
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.translate,
@@ -180,7 +180,7 @@ class Info {
                 .catch(err => {
                     console.error(err);
                     if (err === 'NO_RESULT') return errors.NO_RESULT_RECO;
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.recognizeMusic,
@@ -198,7 +198,7 @@ class Info {
                 .then(text => returnType.reply(text))
                 .catch(err => {
                     console.error(err);
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.nikud,
@@ -217,7 +217,7 @@ class Info {
                 .then(text => returnType.reply(text))
                 .catch(err => {
                     console.error(err);
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.grammar,
@@ -236,7 +236,7 @@ class Info {
                 .catch(err => {
                     console.log(err)
                     if (err === 'NULL_PATH') return errors.TEXT_TOO_LONG
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.tts,
@@ -262,7 +262,7 @@ class Info {
                 })
                 .catch(err => {
                     console.error(err);
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.context,
@@ -280,7 +280,7 @@ class Info {
                 .then(result => returnType.reply(`${b('Synonyms:')} ${result.synonyms.join(', ')}\n\n${b('Antonyms:')} ${result.antonyms.join(', ')}`))
                 .catch(err => {
                     console.log(err)
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.synonym,
@@ -302,7 +302,7 @@ class Info {
                 })
                 .catch(err => {
                     console.error(err);
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.conjugate,
@@ -339,7 +339,7 @@ class Info {
                 })
                 .catch(err => {
                     console.error(err);
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.thisDoesntExist,
@@ -369,7 +369,7 @@ class Info {
                 .then(imgLink => returnType.fileFromURL(imgLink, `the_multitasker.${file}`, options.data))
                 .catch(err => {
                     console.error(err);
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
 
         },
@@ -387,7 +387,7 @@ class Info {
                     else if (err === 'NOT_FOUND')
                         return errors.NOT_FOUND_CAR_NUMBER_INFO
                     else
-                        return errors.UNKNOWN;
+                        return errors.UNKNOWN();
                 })
 
         },
@@ -463,7 +463,7 @@ class Info {
                 .then(result => returnType.fileFromURL(result.image_url, 'the_multitasker.png', options.joinedText))
                 .catch(err => {
                     console.error(err);
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.imagine,
@@ -483,7 +483,7 @@ class Info {
                 .then(result => returnType.fileFromURL(result.image_url, 'the_multitasker.png', 'enhanced image'))
                 .catch(err => {
                     console.error(err);
-                    return errors.UNKNOWN;
+                    return errors.UNKNOWN();
                 })
         },
         help: () => help.Info.enhanceImage,

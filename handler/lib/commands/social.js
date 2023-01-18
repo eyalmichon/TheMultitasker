@@ -64,7 +64,7 @@ class Social {
                     if (err === 'SUB_ERROR') return errors.SUB_ERROR
                     else if (err === 'NO_MEDIA') return errors.NO_MEDIA
                     else if (err === 'PORN_ERROR') return errors.PORN_ERROR
-                    else return errors.UNKNOWN
+                    else return errors.UNKNOWN()
                 })
         },
         help: () => help.Social.meme.replace('SUBS_LIST', meme.subreddits.join(', ')),
@@ -101,7 +101,7 @@ class Social {
                     if (err === 'SUB_ERROR') return errors.SUB_ERROR
                     else if (err === 'NO_MEDIA') return errors.NO_MEDIA
                     else if (err === 'PORN_ERROR') return errors.PORN_ERROR
-                    else return errors.UNKNOWN
+                    else return errors.UNKNOWN()
                 })
         },
         help: () => help.Social.reddit.replace('SUBS_LIST', meme.subreddits.join(', ')),
@@ -124,7 +124,7 @@ class Social {
                 ).catch((err) => {
                     if (err.message === 'Not Found instagram') return errors.INVALID_LINK
                     else if (err.message === 'Parse Error') return errors.INVALID_INSTA
-                    else if (err === 'EMPTY') return errors.UNKNOWN
+                    else if (err === 'EMPTY') return errors.UNKNOWN()
                     else return errors.PRIVATE_SOCIAL
                 })
         },
@@ -249,6 +249,7 @@ class Social {
     }
     downloadSongs = {
         func: (args) => {
+            return errors.UNKNOWN();
             const songNames = parser.parseStrings(args);
             if (!songNames) return errors.NO_SONGS
             if (songNames.length > 20) return errors.TOO_MANY_SONGS
@@ -257,7 +258,7 @@ class Social {
                 .catch(err => {
                     console.error(err);
                     if (err === 'NO_SONGS_FOUND') return errors.NO_SONGS_FOUND
-                    return errors.UNKNOWN
+                    return errors.UNKNOWN()
                 })
         },
         help: () => help.Social.downloadSongs,

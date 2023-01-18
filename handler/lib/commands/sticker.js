@@ -158,7 +158,7 @@ class Sticker {
                         })
                         .catch((err) => {
                             console.error(err);
-                            return errors.UNKNOWN
+                            return errors.UNKNOWN()
                         })
 
                 case 'video':
@@ -210,7 +210,7 @@ class Sticker {
                 .then(buffer => returnType.imgSticker(buffer))
                 .catch((err) => {
                     console.error(err);
-                    return errors.UNKNOWN
+                    return errors.UNKNOWN()
                 })
         },
         help: () => help.Sticker.textSticker,

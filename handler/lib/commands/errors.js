@@ -13,7 +13,7 @@ const errors = {
     SUB_ERROR: addType(`📛 Error, this subreddit doesn't exist.`),
     NO_MEDIA: addType(`📛 Error, this subreddit doesn't contain any media.`),
     PORN_ERROR: addType(`📛 Error, this is a porn subreddit. 🔞`),
-    UNKNOWN: addType(`📛 ${getRandomUnknownErr()}`),
+    UNKNOWN: () => addType(`📛 ${getRandomUnknownErr()}`),
     NO_LINK: addType(`📛 Error, no link found.`),
     BAD_CMD: addType(`📛 Error, this is not the right way to use this command!\nCheck ${prefix}help command for more details.`),
     WRONG_CMD: addType(`📛 Error, are you making up commands?\nUse ${prefix}help for ${b(`real`)} available commands.`),
