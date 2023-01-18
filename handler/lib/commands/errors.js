@@ -13,7 +13,7 @@ const errors = {
     SUB_ERROR: addType(`📛 Error, this subreddit doesn't exist.`),
     NO_MEDIA: addType(`📛 Error, this subreddit doesn't contain any media.`),
     PORN_ERROR: addType(`📛 Error, this is a porn subreddit. 🔞`),
-    UNKNOWN: addType(`📛 An unknown error has occurred.`),
+    UNKNOWN: addType(`📛 ${getRandomUnknownErr()}`),
     NO_LINK: addType(`📛 Error, no link found.`),
     BAD_CMD: addType(`📛 Error, this is not the right way to use this command!\nCheck ${prefix}help command for more details.`),
     WRONG_CMD: addType(`📛 Error, are you making up commands?\nUse ${prefix}help for ${b(`real`)} available commands.`),
@@ -56,4 +56,41 @@ const errors = {
     POLL_ERROR_TOO_MANY: addType(`📛 Error, you can only enter up to 12 options.`),
 }
 
+
+function getRandomUnknownErr() {
+    const err = [
+        "An unknown error has occurred. You can't divide by zero, Einstein!",
+        "An unknown error has occurred. Summoning demons on a computer? Not a good idea!",
+        "An unknown error has occurred. Breaking the space-time continuum? You're not Dr. Who!",
+        "An unknown error has occurred. Giving a computer a sense of humor? That's a joke!",
+        "An unknown error has occurred. Turning the computer into a toaster? You're not Tony Stark!",
+        "An unknown error has occurred. You're not a hacker, are you?",
+        "An unknown error has occurred. Don't try to teleport, you'll end up in a black hole!",
+        "An unknown error has occurred. Stop trying to bend the rules of physics!",
+        "An unknown error has occurred. Don't try to be a hacker, it's not a good look on you!",
+        "An unknown error has occurred. You're not a wizard Harry!",
+        "An unknown error has occurred. Don't try to be a witch, it's not Halloween yet!",
+        "An unknown error has occurred. You're not a superhero, stop trying to save the world!",
+        "An unknown error has occurred. Hacking is not a game, it's a crime!",
+        "An unknown error has occurred. Don't try to be a ghost, you're not haunting this computer!",
+        "An unknown error has occurred. Magic spells won't work on this computer!",
+        "An unknown error has occurred. Don't try to fly, you're not a bird!",
+        "An unknown error has occurred. Turning computers into toasters is not a feature!",
+        "An unknown error has occurred. The Matrix is not real, stop trying to hack into it!",
+        "An unknown error has occurred. Time-travel is not an option on this computer!",
+        "An unknown error has occurred. Computers don't have emotions, stop trying to give them!",
+        "An unknown error has occurred. Don't try to be a mermaid, you're not going to swim in the digital ocean!",
+        "An unknown error has occurred. Saving the world through a computer is impossible!",
+        "An unknown error has occurred. This is not Harry Potter, stop trying to cast spells!",
+        "An unknown error has occurred. Don't try to be a werewolf, you're not becoming a monster!",
+        "An unknown error has occurred. Immortality can't be achieved on a computer!",
+        "An unknown error has occurred. Fire breathing on a computer is not a thing!",
+        "An unknown error has occurred. Don't try to be a zombie, computers can't be undead!",
+        "An unknown error has occurred. Stop trying to control the weather with your computer!",
+        "An unknown error has occurred. Don't try to teleport, your computer is not a transporter!",
+        "An unknown error has occurred. You're not a genie, stop trying to grant wishes!",
+        "An unknown error has occurred. Don't try to be a phoenix, computers can't rise from the ashes!"
+    ]
+    return err[Math.floor(Math.random() * err.length)]
+}
 module.exports = { errors }
