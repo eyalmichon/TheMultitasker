@@ -67,6 +67,8 @@ class Info {
 
         commands.imagine = this.addInfo(this.imagine)
 
+        commands.enhance = this.addInfo(this.enhanceImage)
+
         commands.poll = this.addInfo(this.poll)
     }
 
@@ -465,6 +467,26 @@ class Info {
                 })
         },
         help: () => help.Info.imagine,
+        timer: () => 60
+    }
+
+    enhanceImage = {
+        func: async (message) => {
+            if (message.type !== 'image' && (!message.quotedMsg || message.quotedMsg.type !== 'image'))
+                return errors.NOT_IMG;
+
+            message = message.type === 'image' ? message : message.quotedMsg;
+
+            const base64 = await decryptMedia(message).then(buffer => buffer.toString('base64'));
+
+            return imagine.enhanceImage(base64)
+                .then(result => returnType.fileFromURL(result.image_url, 'the_multitasker.png', 'enhanced image'))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN;
+                })
+        },
+        help: () => help.Info.enhanceImage,
         timer: () => 60
     }
 
