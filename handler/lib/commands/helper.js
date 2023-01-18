@@ -105,86 +105,1465 @@ const returnType = {
 
 const help = {
     Owner: {
-        redAlerts: `${b('Usage:')} ${prefix}redalerts [on/off]\nSends Red Alerts 🚀 as message with (or without) location on GoogleMaps.`,
-        addSender: `${b('Usage:')} ${prefix}addsender [group] [ID]\nAdd a number to the senders json file.`,
-        removeSender: `${b('Usage:')} ${prefix}rmsender [group] [ID]\nRemove a number from the senders json file.\n${b('Aliases:')}\n[rmsender, rmvsender]`,
-        kickAll: `${b('Usage:')} ${prefix}kickall\nKicks 🦶 all participants from the group.`,
-        membersOf: `${b('Usage:')} ${prefix}membersof [group ID]\nGet a list of names from a specific group.`,
-        ID: `${b('Usage:')} ${prefix}id\nGet a list of all group IDs that the bot is part of.\n${b('Aliases:')}\n[id, jid]`,
-        tag: `${b('Usage:')} ${prefix}tag [number of tags] [@people]\nMass spam tag people with any amount of mentions.\n${b('⚠ WARNING! DO NOT ABUSE. ⚠')}`,
-        m: `Get the ${b('mimetype')} of the message.`,
-        addUserToBlackList: `${b('Usage:')} ${prefix}blacklist [tag] or reply to someone with the command.\n${b('Aliases:')}\n[blacklist, black]`,
-        removeUserFromBlackList: `${b('Usage:')} ${prefix}unblacklist [tag] or reply to someone with the command.\n${b('Aliases:')}\n[unblacklist, unblack]`,
-        addPrefixBlackList: `${b('Usage:')} ${prefix}addprefix [country code] inside the group you want to prefix block or !addprefix [group ID] [country code] from bot private chat.\n${b('Aliases:')}\n[addprefix]`,
-        removePrefixBlackList: `${b('Usage:')} ${prefix}rmprefix [country code] inside the group you want to prefix block or !addprefix [group ID] [country code] from bot private chat.\n${b('Aliases:')}\n[rmprefix]`,
-        addForwarder: `${b('Usage:')} ${prefix}addforwarder [lang] OR in the bot's chat: ${prefix}addforwader [groupID] [lang]  (where lang is a language that is in the localizations.json file)`,
-        removeForwarder: `${b('Usage:')} ${prefix}rmforwarder inside the forwarder OR in the bot's chat: ${prefix}rmforwader [groupID] (where groupID is the group you want to add to the forwarder)`,
-        addGroupToForwarder: `${b('Usage:')} ${prefix}addgroupforwarder [groupID] inside the forwarder OR in the bot's chat: ${prefix}addgroupforwarder [forwarder groupID] [groupID] (where groupID is the group you want to add to the forwarder)\n${b('Aliases:')}\n[addgroupforwarder, addgf]`,
-        removeGroupFromForwarder: `${b('Usage:')} ${prefix}rmgroupforwarder [lang] inside the forwarder OR in the bot's chat: ${prefix}rmgroupforwarder [forwarder groupID] [groupID] (where groupID is the group you want to remove from the forwarder)\n${b('Aliases:')}\n[rmgroupforwarder, rmgf]`,
-        setLanguageForwarder: `${b('Usage:')} ${prefix}setlanguageforwarder [lang] inside the forwarder OR in the bot's chat: ${prefix}setlanguageforwarder [forwarder groupID] [lang] (where lang is a language that is in the localizations.json file)\n${b('Aliases:')}\n[setlanguageforwarder, slf]`,
-        setMaxMsgsForwarder: `${b('Usage:')} ${prefix}setmaxmsgsforwarder [n] inside the forwarder OR in the bot's chat: ${prefix}setmaxmsgsforwarder [forwarder groupID] [n] (where n is a number that you want to set for the max amount of saved messages)\n${b('Aliases:')}\n[setmaxmsgsforwarder, smmf]`,
-        setPrefixForwarder: `${b('Usage:')} ${prefix}setprefixforwarder [flag] inside the forwarder OR in the bot's chat: ${prefix}setprefixforwarder [forwarder groupID] [flag]\n${b('Options:')}\nPrefix message ON/OFF: -p/-prefix\nName in message ON/OFF: -n/-name\n${b('Aliases:')}\n[setprefixforwarder, spf]`,
-        removeMsg: `${b('Usage:')} reply with ${prefix}remove to remove a message sent by the bot\n${b('Aliases:')}\n[remove, rmv]`,
-        countMessagesByText: `${b('Usage:')} ${prefix}countmsgs [text]\nCounts the amount of messages sent in the group with the text you specified.\n${b('Options:')}\n-u/-user for and tag the users to search the messages for.\n${b('Aliases:')}\n[countmsgs]`,
-        spamMessage: `${b('Usage:')} ${prefix}spam [text]\nSpam the text you specified in the group with the amount of times you specified.\n${b('Options:')}\n-n for the amount to spam.\n${b('Aliases:')}\n[spammsg]`,
+        redAlerts: generateCommandString({
+            cmdName: 'redalerts',
+            cmdDescription: 'Sends Red Alerts 🚀 as message with (or without) location on GoogleMaps.',
+            cmdUsage: {
+                usage: `redalerts [on/off]`,
+                options: [],
+                aliases: ['redalerts']
+            }
+        }),
+        addSender: generateCommandString({
+            cmdName: 'addsender',
+            cmdDescription: 'Add a number to the senders json file.',
+            cmdUsage: {
+                usage: `addsender [group] [ID]`,
+                options: [],
+                aliases: ['addsender']
+            }
+        }),
+        removeSender: generateCommandString({
+            cmdName: 'rmsender',
+            cmdDescription: 'Remove a number from the senders json file.',
+            cmdUsage: {
+                usage: `rmsender [group] [ID]`,
+                options: [],
+                aliases: ['rmsender', 'rmvsender']
+            }
+        }),
+        kickAll: generateCommandString({
+            cmdName: 'kickall',
+            cmdDescription: 'Kicks 🦶 all participants from the group.',
+            cmdUsage: {
+                usage: `kickall`,
+                options: [],
+                aliases: ['kickall']
+            }
+        }),
+        membersOf: generateCommandString({
+            cmdName: 'membersof',
+            cmdDescription: 'Get a list of names from a specific group.',
+            cmdUsage: {
+                usage: `membersof [group ID]`,
+                options: [],
+                aliases: ['membersof']
+            }
+        }),
+        ID: generateCommandString({
+            cmdName: 'id',
+            cmdDescription: 'Get a list of all group IDs that the bot is part of.',
+            cmdUsage: {
+                usage: `id`,
+                options: [],
+                aliases: ['id', 'jid']
+            }
+        }),
+        tag: generateCommandString({
+            cmdName: 'tag',
+            cmdDescription: 'Mass spam tag people with any amount of mentions.',
+            cmdUsage: {
+                usage: `tag [number of tags] [@people]`,
+                options: [],
+                aliases: ['tag']
+            }
+        }),
+        m: generateCommandString({
+            cmdName: 'm',
+            cmdDescription: 'Get the mimetype of the message.',
+            cmdUsage: {
+                usage: `m`,
+                options: [],
+                aliases: ['m']
+            }
+        }),
+        addUserToBlackList: generateCommandString({
+            cmdName: 'blacklist',
+            cmdDescription: 'Blacklist a user from using the bot.',
+            cmdUsage: {
+                usage: `blacklist [tag] or reply to someone with the command.`,
+                options: [],
+                aliases: ['blacklist', 'black']
+            }
+        }),
+        removeUserFromBlackList: generateCommandString({
+            cmdName: 'unblacklist',
+            cmdDescription: 'Unblacklist a user from using the bot.',
+            cmdUsage: {
+                usage: `unblacklist [tag] or reply to someone with the command.`,
+                options: [],
+                aliases: ['unblacklist', 'unblack']
+            }
+        }),
+        addPrefixBlackList: generateCommandString({
+            cmdName: 'addprefix',
+            cmdDescription: 'Add a phone prefix to the prefix blacklist.',
+            cmdUsage: {
+                usage: `addprefix [country code] inside the group you want to prefix block or !addprefix [group ID] [country code] from bot private chat.`,
+                options: [],
+                aliases: ['addprefix']
+            }
+        }),
+        removePrefixBlackList: generateCommandString({
+            cmdName: 'rmprefix',
+            cmdDescription: 'Remove a phone prefix from the prefix blacklist.',
+            cmdUsage: {
+                usage: `rmprefix [country code] inside the group you want to prefix block or !addprefix [group ID] [country code] from bot private chat.`,
+                options: [],
+                aliases: ['rmprefix']
+            }
+        }),
+        addForwarder: generateCommandString({
+            cmdName: 'addforwarder',
+            cmdDescription: 'Create a group that will act as a forwarder.',
+            cmdUsage: {
+                usage: `addforwarder [lang] OR in the bot's chat: addforwader [groupID] [lang]  (where lang is a language that is in the localizations.json file)`,
+                options: [],
+                aliases: ['addforwarder']
+            }
+        }),
+        removeForwarder: generateCommandString({
+            cmdName: 'rmforwarder',
+            cmdDescription: 'Remove a group from being a forwarder.',
+            cmdUsage: {
+                usage: `rmforwarder inside the forwarder OR in the bot's chat: rmforwader [groupID] (where groupID is the group you want to add to the forwarder)`,
+                options: [],
+                aliases: ['rmforwarder']
+            }
+        }),
+        addGroupToForwarder: generateCommandString({
+            cmdName: 'addgroupforwarder',
+            cmdDescription: 'Add a group to a forwarder.',
+            cmdUsage: {
+                usage: `addgroupforwarder [groupID] inside the forwarder OR in the bot's chat: addgroupforwarder [forwarder groupID] [groupID] (where groupID is the group you want to add to the forwarder)`,
+                options: [],
+                aliases: ['addgroupforwarder', 'addgf']
+            }
+        }),
+        removeGroupFromForwarder: generateCommandString({
+            cmdName: 'rmgroupforwarder',
+            cmdDescription: 'Remove a group from a forwarder.',
+            cmdUsage: {
+                usage: `rmgroupforwarder [groupID] inside the forwarder OR in the bot's chat: rmgroupforwarder [forwarder groupID] [groupID] (where groupID is the group you want to remove from the forwarder)`,
+                options: [],
+                aliases: ['rmgroupforwarder', 'rmgf']
+            }
+        }),
+        setLanguageForwarder: generateCommandString({
+            cmdName: 'setlanguageforwarder',
+            cmdDescription: 'Set the language of a forwarder.',
+            cmdUsage: {
+                usage: `setlanguageforwarder [lang] inside the forwarder OR in the bot's chat: setlanguageforwarder [forwarder groupID] [lang] (where lang is a language that is in the localizations.json file)`,
+                options: [],
+                aliases: ['setlanguageforwarder', 'slf']
+            }
+        }),
+        setMaxMsgsForwarder: generateCommandString({
+            cmdName: 'setmaxmsgsforwarder',
+            cmdDescription: 'Set the max amount of messages that will be saved in a forwarder.',
+            cmdUsage: {
+                usage: `setmaxmsgsforwarder [n] inside the forwarder OR in the bot's chat: setmaxmsgsforwarder [forwarder groupID] [n] (where n is a number that you want to set for the max amount of saved messages)`,
+                options: [],
+                aliases: ['setmaxmsgsforwarder', 'smmf']
+            }
+        }),
+        setPrefixForwarder: generateCommandString({
+            cmdName: 'setprefixforwarder',
+            cmdDescription: 'Set the prefix of a forwarder.',
+            cmdUsage: {
+                usage: `setprefixforwarder [flag] inside the forwarder OR in the bot's chat: setprefixforwarder [forwarder groupID] [flag] (where flag is a flag that you want to set for the prefix)`,
+                options: [
+                    {
+                        name: 'Prefix',
+                        description: 'Prefix message ON/OFF',
+                        usage: '-p/-prefix'
+                    },
+                    {
+                        name: 'Name',
+                        description: 'Name in message ON/OFF',
+                        usage: '-n/-name'
+                    }
+                ],
+                aliases: ['setprefixforwarder', 'spf']
+            }
+        }),
+        removeMsg: generateCommandString({
+            cmdName: 'remove',
+            cmdDescription: 'Remove a message sent by the bot or anyone if the bot has admin.',
+            cmdUsage: {
+                usage: `remove`,
+                options: [],
+                aliases: ['remove', 'rmv']
+            }
+        }),
+        countMessagesByText: generateCommandString({
+            cmdName: 'countmsgs',
+            cmdDescription: 'Counts the amount of messages sent in the group with the text you specified.',
+            cmdUsage: {
+                usage: `countmsgs [text]`,
+                options: [
+                    {
+                        name: 'User',
+                        description: 'Tag the users to search the messages for.',
+                        usage: '-u/-user'
+                    }
+                ],
+                aliases: ['countmsgs']
+            }
+        }),
+        spamMessage: generateCommandString({
+            cmdName: 'spam',
+            cmdDescription: 'Spam the text or forward the message you specified in the group with the amount of times you specified.',
+            cmdUsage: {
+                usage: `spam [text]`,
+                options: [
+                    {
+                        name: 'Amount',
+                        description: 'Amount of times to spam the message.',
+                        usage: '-n=number'
+                    },
+                    {
+                        name: 'To',
+                        description: 'ID of the group to send the message to.',
+                        usage: '-to=groupID'
+                    }
+                ],
+                aliases: ['spammsg']
+            }
+        }),
     },
     Admin: {
-        everyone: `${b('Usage:')} ${prefix}everyone\nTags everyone in the group.\n${b('Aliases:')}\n[everyone, tagall]`,
-        kick: `${b('Usage:')} ${prefix}kick [@someone] or reply to a message sent by the user with ${prefix}kick\nKicks 🦶 a participant from the group.`,
-        addParticipant: `${b('Usage:')} ${prefix}adduser [number@c.us] or reply to a message that has the number@c.us with ${prefix}adduser\nAdd a participant to the group.`,
-        promote: `${b('Usage:')} ${prefix}promote [@someone] or reply to a message sent by the user with ${prefix}promote\nPromotes 👨‍💼 a participant in the group.`,
-        demote: `${b('Usage:')} ${prefix}demote [@someone] or reply to a message sent by the user with ${prefix}demote\nDemotes 👨‍💼 a participant in the group.`,
-        groupInviteLink: `${b('Usage:')} ${prefix}invitelink\nGets the invite link of the group.`,
-        addUserToMuteList: `${b('Usage:')} ${prefix}mutelist [tag] or reply to someone with the command.\n${b('Aliases:')}\n[mutelist, mute]`,
-        removeUserFromMuteList: `${b('Usage:')} ${prefix}unmutelist [tag] or reply to someone with the command.\n${b('Aliases:')}\n[unmutelist, unmute]`,
-        getProfilePic: `${b('Usage:')} ${prefix}profilepic or reply to a message with ${prefix}profilepic\nGets the profile picture of the user.`,
+        everyone: generateCommandString({
+            cmdName: 'everyone',
+            cmdDescription: 'Tags everyone in the group.',
+            cmdUsage: {
+                usage: `everyone`,
+                options: [],
+                aliases: ['everyone', 'tagall']
+            }
+        }),
+        kick: generateCommandString({
+            cmdName: 'kick',
+            cmdDescription: 'Kicks a participant from the group.',
+            cmdUsage: {
+                usage: `kick [@someone] or reply to a message sent by the user with the command.`,
+                options: [],
+                aliases: ['kick']
+            }
+        }),
+        addParticipant: generateCommandString({
+            cmdName: 'adduser',
+            cmdDescription: 'Add a participant to the group.',
+            cmdUsage: {
+                usage: `adduser [number@c.us] or reply to a message that has the number@c.us with the command.`,
+                options: [],
+                aliases: ['adduser']
+            }
+        }),
+        promote: generateCommandString({
+            cmdName: 'promote',
+            cmdDescription: 'Promotes 👨‍💼 a participant in the group.',
+            cmdUsage: {
+                usage: `promote [@someone] or reply to a message sent by the user with the command.`,
+                options: [],
+                aliases: ['promote']
+            }
+        }),
+        demote: generateCommandString({
+            cmdName: 'demote',
+            cmdDescription: 'Demotes 👨‍💼 a participant in the group.',
+            cmdUsage: {
+                usage: `demote [@someone] or reply to a message sent by the user with the command.`,
+                options: [],
+                aliases: ['demote']
+            }
+        }),
+        groupInviteLink: generateCommandString({
+            cmdName: 'invitelink',
+            cmdDescription: 'Gets the invite link of the group.',
+            cmdUsage: {
+                usage: `invitelink`,
+                options: [],
+                aliases: ['invitelink']
+            }
+        }),
+        addUserToMuteList: generateCommandString({
+            cmdName: 'mutelist',
+            cmdDescription: 'Mutes a participant in the group.',
+            cmdUsage: {
+                usage: `mutelist [@someone] or reply to a message sent by the user with the command.`,
+                options: [],
+                aliases: ['mutelist', 'mute']
+            }
+        }),
+        removeUserFromMuteList: generateCommandString({
+            cmdName: 'unmutelist',
+            cmdDescription: 'Unmutes a participant in the group.',
+            cmdUsage: {
+                usage: `unmutelist [@someone] or reply to a message sent by the user with the command.`,
+                options: [],
+                aliases: ['unmutelist', 'unmute']
+            }
+        }),
+        getProfilePic: generateCommandString({
+            cmdName: 'profilepic',
+            cmdDescription: 'Gets the profile picture of the user.',
+            cmdUsage: {
+                usage: `profilepic or reply to a message with profilepic`,
+                options: [],
+                aliases: ['profilepic']
+            }
+        }),
     },
     Social: {
-        meme: `${b('Usage:')} ${prefix}meme and you\'ll get random meme from the following subreddits:\n SUBS_LIST.\n\nOr ${prefix}meme [subreddit] to get a random image from that subreddit.`,
-        reddit: `${b('Usage:')} ${prefix}reddit and you\'ll get random post from the following subreddits:\n SUBS_LIST.\n\nOr ${prefix}reddit [subreddit] to get a random post from that subreddit.\n${b('Aliases:')}\n[reddit, rd]`,
-        instagram: `${b('Usage:')} reply with ${prefix}instagram to an instagram photo/video/story link or send ${prefix}instagram [link].\n${b('Aliases:')}\n[instagram, insta, ig]`,
-        twitter: `${b('Usage:')} reply with ${prefix}twitter to a twitter video link or send ${prefix}twitter [link to tweet with video].\n${b('Aliases:')}\n[twitter, tw]`,
-        tiktok: `${b('Usage:')} reply with ${prefix}tiktok to a tiktok video link or send ${prefix}tiktok [link].\n${b('Aliases:')}\n[tiktok, tik, tk]`,
-        facebook: `${b('Usage:')} reply with ${prefix}facebook to a facebook video link or send ${prefix}facebook [video link] or send !facebook for a random video from facebook.\n${b('Aliases:')}\n[facebook, fb]`,
-        youtube: `${b('Usage:')} reply with ${prefix}youtube to a youtube video link or send ${prefix}youtube [video link].\n${b('Options:')}\n${m(`• audio only: -a`)}\n${b('Aliases:')}\n[youtube, yt]`,
-        video: `${b('Usage:')} reply with ${prefix}video to a video link or send ${prefix}video [video link].\n${b('Aliases:')}\n[video, v]`,
-        downloadSongs: `${b('Usage:')} ${prefix}songs [song names]\nDownloads the songs with the specified names.\n(for longer song names use quotes, for example: "paradise city")\n${b('Options:')}\n[defaults to 320kbps]\n${m(`• flac: -flac`)}\n${m(`• 320kbps: -320/-mp3`)}\n${m(`• 128kbps: -128`)}\n${b('Aliases:')}\n[songs]`,
+        meme: generateCommandString({
+            cmdName: 'meme',
+            cmdDescription: 'Gets a random meme from the subreddits you specified.',
+            cmdUsage: {
+                usage: `meme and you\'ll get random meme from the following subreddits:\n SUBS_LIST.\n\nOr ${prefix}meme [subreddit] to get a random image from that subreddit.`,
+                options: [],
+                aliases: ['meme']
+            }
+        }),
+        reddit: generateCommandString({
+            cmdName: 'reddit',
+            cmdDescription: 'Gets a random post from the subreddits you specified.',
+            cmdUsage: {
+                usage: `reddit and you\'ll get random post from the following subreddits:\n SUBS_LIST.\n\nOr ${prefix}reddit [subreddit] to get a random post from that subreddit.`,
+                options: [],
+                aliases: ['reddit', 'rd']
+            }
+        }),
+        instagram: generateCommandString({
+            cmdName: 'instagram',
+            cmdDescription: 'Gets the photo/video/story from the instagram link you specified.',
+            cmdUsage: {
+                usage: `instagram or reply to a instagram photo/video/story link with instagram.`,
+                options: [],
+                aliases: ['instagram', 'insta', 'ig']
+            }
+        }),
+        twitter: generateCommandString({
+            cmdName: 'twitter',
+            cmdDescription: 'Gets the video from the twitter link you specified.',
+            cmdUsage: {
+                usage: `twitter or reply to a twitter video link with with the command.`,
+                options: [],
+                aliases: ['twitter', 'tw']
+            }
+        }),
+        tiktok: generateCommandString({
+            cmdName: 'tiktok',
+            cmdDescription: 'Gets the video from the tiktok link you specified.',
+            cmdUsage: {
+                usage: `tiktok or reply to a tiktok video link with the command.`,
+                options: [],
+                aliases: ['tiktok', 'tik', 'tk']
+            }
+        }),
+        facebook: generateCommandString({
+            cmdName: 'facebook',
+            cmdDescription: 'Gets the video from the facebook link you specified.',
+            cmdUsage: {
+                usage: `facebook or reply to a facebook video link with the command.`,
+                options: [],
+                aliases: ['facebook', 'fb']
+            }
+        }),
+        youtube: generateCommandString({
+            cmdName: 'youtube',
+            cmdDescription: 'Gets the video from the youtube link you specified.',
+            cmdUsage: {
+                usage: `youtube or reply to a youtube video link with the command.`,
+                options: [
+                    {
+                        name: 'Audio only',
+                        description: 'Gets the audio only from the youtube video.',
+                        usage: '-a'
+                    }
+                ],
+                aliases: ['youtube', 'yt']
+            }
+        }),
+        video: generateCommandString({
+            cmdName: 'video',
+            cmdDescription: 'Gets the video from the link you specified.',
+            cmdUsage: {
+                usage: `video or reply to a video link with the command.`,
+                options: [],
+                aliases: ['video', 'v']
+            }
+        }),
+        downloadSongs: generateCommandString({
+            cmdName: 'songs',
+            cmdDescription: 'Downloads the songs with the specified names.',
+            cmdUsage: {
+                usage: `songs [song names] (for longer song names use quotes, for example: "paradise city")`,
+                options: [
+                    {
+                        name: 'flac',
+                        description: 'Downloads the songs in flac format.',
+                        usage: '-flac'
+                    },
+                    {
+                        name: '320kbps',
+                        description: 'Downloads the songs in 320kbps format.',
+                        usage: '-320/-mp3'
+                    },
+                    {
+                        name: '128kbps',
+                        description: 'Downloads the songs in 128kbps format.',
+                        usage: '-128'
+                    }
+                ],
+                aliases: ['songs']
+            }
+        }),
     },
     Forwarder: {
-        egg: `${b('Usage:')} ${prefix}egg and you\'ll get an 🥚\nHAPPY EGGING!`,
-        fart: `${b('Usage:')} ${prefix}fart and you\'ll get a 💨\nCan you smell it?!\nAt least try to!`,
-
+        egg: generateCommandString({
+            cmdName: 'egg',
+            cmdDescription: 'Gets an egg.',
+            cmdUsage: {
+                usage: `egg and you\'ll get an 🥚\nHAPPY EGGING!`,
+                options: [],
+                aliases: ['egg']
+            }
+        }),
+        fart: generateCommandString({
+            cmdName: 'fart',
+            cmdDescription: 'Gets a fart.',
+            cmdUsage: {
+                usage: `fart and you\'ll get a 💨\nCan you smell it?!\nAt least try to!`,
+                options: [],
+                aliases: ['fart']
+            }
+        })
     },
     Info: {
-        compile: `${b('Usage:')} ${prefix}compile [language] [code]\n${b('Available languages:')} c, cpp, c#, rill, erlang, elixir, haskell, d, java, rust, python, python2.7, ruby, scala, groovy, nodejs, nodejs14, coffeescript, spidermonkey, swift, perl, php, lua, sql, pascal, lisp, lazyk, vim, pypy, ocaml, go, bash, pony, crystal, nim, openssl, f#, r, typescript, julia`,
-        covid: `${b('Usage:')} ${prefix}covid (or ${prefix}covid [1-7] for number of days to get info about) to get back information about active cases, infected people today, etc...`,
-        wolfram: `${b('Usage:')} ${prefix}wolfram [question] and you'll receive an answer from Wolfram Alpha.\n${b('Options:')}\n• full answer: -f\n${b('Aliases:')}\n[wolframalpha, wolfram, wolf, wf]`,
-        urban: `${b('Usage:')} ${prefix}urban [term] and you'll receive the top definition for that term from Urban Dictionary.\n${b('Options:')}\n${m(`• Word of the day: [how many days ago? 0-9] -wotd\n• random: -r`)}\n${b('Aliases:')}\n[urban, ud]`,
-        translate: `${b('Usage:')} ${prefix}translate [text] and you'll receive the translation for the text from Google Translate.\n${b('Options:')}\n(defaults to english if no option used)\n${m(`• translate to: -l=[code] or -lang=[code]`)}\n${b('Language codes:')}\nAfrikaans = *af*, Albanian = *sq*, Amharic = *am*, Arabic = *ar*, Armenian = *hy*, Azerbaijani = *az*, Basque = *eu*, Belarusian = *be*, Bengali = *bn*, Bosnian = *bs*, Bulgarian = *bg*, Catalan = *ca*, Cebuano = *ceb*, Chinese (Simplified) = *zh-CN*, Chinese (Traditional) = *zh-TW*, Corsican = *co*, Croatian = *hr*, Czech = *cs*, Danish = *da*, Dutch = *nl*, English = *en*, Esperanto = *eo*, Estonian = *et*, Finnish = *fi*, French = *fr*, Frisian = *fy*, Galician = *gl*, Georgian = *ka*, German = *de*, Greek = *el*, Gujarati = *gu*, Haitian Creole = *ht*, Hausa = *ha*, Hawaiian = *haw*, Hebrew = *iw*, Hindi = *hi*, Hmong = *hmn*, Hungarian = *hu*, Icelandic = *is*, Igbo = *ig*, Indonesian = *id*, Irish = *ga*, Italian = *it*, Japanese = *ja*, Kannada = *kn*, Kazakh = *kk*, Khmer = *km*, Korean = *ko*, Kurdish = *ku*, Kyrgyz = *ky*, Lao = *lo*, Latvian = *lv*, Lithuanian = *lt*, Luxembourgish = *lb*, Macedonian = *mk*, Malagasy = *mg*, Malay = *ms*, Malayalam = *ml*, Maltese = *mt*, Maori = *mi*, Marathi = *mr*, Mongolian = *mn*, Myanmar (Burmese) = *my*, Nepali = *ne*, Norwegian = *no*, Nyanja (Chichewa) = *ny*, Pashto = *ps*, Persian = *fa*, Polish = *pl*, Portuguese (Portugal, Brazil) = *pt*, Punjabi = *pa*, Romanian = *ro*, Russian = *ru*, Samoan = *sm*, Scots Gaelic = *gd*, Serbian = *sr*, Sesotho = *st*, Shona = *sn*, Sindhi = *sd*, Sinhala (Sinhalese) = *si*, Slovak = *sk*, Slovenian = *sl*, Somali = *so*, Spanish = *es*, Sundanese = *su*, Swahili = *sw*, Swedish = *sv*, Tagalog (Filipino) = *tl*, Tajik = *tg*, Tamil = *ta*, Telugu = *te*, Thai = *th*, Turkish = *tr*, Turkmen = *tk*, Ukrainian = *uk*, Urdu = *ur*, Uzbek = *uz*, Vietnamese = *vi*, Welsh = *cy*, Xhosa = *xh*, Yiddish = *yi*, Yoruba = *yo*, Zulu = *zu*\n${b('Aliases:')}\n[translate, tran, tr]`,
-        recognizeMusic: `${b('Usage:')} reply with ${prefix}recognize to an audio message or a video.\n${b('Options:')}\n${m(`• All results: -f or -full`)}\n${b('Aliases:')}\n[recognize, rec, rm]`,
-        nikud: `${b('Usage:')} ${prefix}nikud [text] or reply with ${prefix}nikud to a chat message.\n${b('Aliases:')}\n[nikud, nik, נקד]`,
-        grammar: `${b('Usage:')} ${prefix}grammar [text] or reply with ${prefix}grammar to a chat message for grammar fixing.\n${b('Options:')}\n• language: -l=[code] or -lang=[code]\n\n${b('Language codes:')}\nFrench = *fra*, English = *eng*\n${b('Aliases:')}\n[grammar, gram]`,
-        tts: `${b('Usage:')} ${prefix}tts [text] or reply with ${prefix}tts to a chat message for text to speech.\n${b('Options:')}\n• language: -l=[code] or -lang=[code]\n\n${b('Language codes:')}\nArabic = *ara*, German = *ger*, Spanish = *spa*, French = *fra*, Hebrew = *heb*, Italian = *ita*, Japanese = *jpn*, Dutch = *dut*, Polish = *pol*, Portuguese = *por*, Romanian = *rum*, Russian = *rus*, Turkish = *tur*, Chinese = *chi*, English = *eng*\n${b('Aliases:')}\n[tts]`,
-        context: `${b('Usage:')} ${prefix}context [text] or reply with ${prefix}context to a chat message for translating with context.\n${b('Options:')}\n• from language: -fl=[code] or -froml=[code] or -fromlang=[code]\n• to language: -tl=[code] or -tol=[code] or -tolang=[code]\n\n${b('Language codes:')}\nArabic = *ara*, German = *ger*, Spanish = *spa*, French = *fra*, Hebrew = *heb*, Italian = *ita*, Japanese = *jpn*, Dutch = *dut*, Polish = *pol*, Portuguese = *por*, Romanian = *rum*, Russian = *rus*, Turkish = *tur*, Chinese = *chi*, English = *eng*\n${b('Aliases:')}\n[context, cont]`,
-        synonym: `${b('Usage:')} ${prefix}synonym [text] or reply with ${prefix}synonym to a chat message for getting synonyms and antonyms for the text given.\n${b('Options:')}\n• language: -l=[code] or -lang=[code]\n\n${b('Language codes:')}\nArabic = *ara*, German = *ger*, Spanish = *spa*, French = *fra*, Hebrew = *heb*, Italian = *ita*, Japanese = *jpn*, Dutch = *dut*, Polish = *pol*, Portuguese = *por*, Romanian = *rum*, Russian = *rus*, Turkish = *tur*, Chinese = *chi*, English = *eng*\n${b('Aliases:')}\n[synonym, syno]`,
-        conjugate: `${b('Usage:')} ${prefix}conjugate [text] or reply with ${prefix}conjugate to a chat message for getting information about the text's conjugation.\n${b('Options:')}\n• language: -l=[code] or -lang=[code]\n\n${b('Language codes:')}\nArabic = *ara*, German = *ger*, Spanish = *spa*, French = *fra*, Hebrew = *heb*, Italian = *ita*, Japanese = *jpn*, Dutch = *dut*, Polish = *pol*, Portuguese = *por*, Romanian = *rum*, Russian = *rus*, Turkish = *tur*, Chinese = *chi*, English = *eng*\n${b('Aliases:')}\n[conjugate, conj]`,
-        thisDoesntExist: `${b('Usage:')} ${prefix}thisdoesntexist [-flag] (where -flag is one of the flags below) or else a random one will be chosen.\n${b('Options:')}\n• -person\n• -cat\n• -horse\n• -rental\n• -waifu\n• -question\n• -chemical\n• -word\n• -city\n• -simpsons\n• -art\n• -video : *could take some time*\n• -ideas\n• -lyrics : \n\tTopic: type in chat or -t/topic=[topic]\n\tGenre: -g/genre=[genre]\n\tMood: -m/mood=[mood]\nGenres: [country, metal, rock, pop, rap, edm]\nMoods: [verysad, sad, neutral, happy, veryhappy]\n${b('Aliases:')}\n[thisdoesntexist, tde]`,
-        emojiGenerator: `${b('Usage:')} ${prefix}emojigenerator [number] (where number is an integer between 1-999)\n${b('Aliases:')}\n[emojigenerator, randemoji]`,
-        qr: `${b('Usage:')} ${prefix}qr [data] (where data is the content or content seperated with "|" if needed for some of the options below.)\n${b('Options:')}\nTypes: -type=[type]\nText (default): -type=text\nJust enter a text/website/etc.\n\nEmail: -type=email\n"email|subject|message body"\n\nPhone: -type=phone\nJust enter a phone number\n\nSMS: -type=sms\n"phone number|message"\n\nContact: -type=contact\n"first name|last name|work position|organization|Website|Email|Work phone|Home phone|Mobile phone|Fax work|Fax home|Street|City|State|Zipcode|Country"\n\nWiFi: -type=wifi\n"wifi name|WEP or WPA|Password"\n\nEvent: -type=event\n"Event title|Location|Start date|Start time|End date|End time"\n Date example: YYYY.MM.DD\nTime example: HH:MM\n\nCrypto: -type=crypto\n"Address|Amount"\nChoose the coin using -coin=[type] (where type is one of the following: [bitcoin, bitcoincash, ethereum, litecoin, dash])\n\nWhatsapp: -type=wa\n"Number|Message"\n\n${i(`Note that text can be empty between "|" that you don't want filled in above types.`)}\n\nFile: -file=[type]\nChoose one of the following: [png, svg, pdf, eps]\n\nSize: -size=[300-2000]\n\nMain body: -body=[type]\nChoose one of the following: [square, mosaic, dot, circle, circle-zebra, circle-zebra-vertical, circular, edge-cut, edge-cut-smooth, japnese, leaf, pointed, pointed-edge-cut, pointed-in, pointed-in-smooth,pointed-smooth, round,  rounded-in, rounded-in-smooth, rounded-pointed, star, diamond]\n\nEye: -eye=[0-16]\n\nEyeball: -eyeball=[0-19]\n\nBody Color: -bodycolor=[color in hex]\n\nBackground Color: -bgcolor=[color in hex]\n\nEye 1-3 Color: -eye[1-3]color=[color in hex] or all together -eyescolor=[color in hex]\n\nEyeball 1-3 Color: -eyeball[1-3]color=[color in hex] or all together -eyeballscolor=[color in hex]\n\nGradient: -gradientcolor1=[color in hex] -gradientcolor2=[color in hex]\n\nGradient type: -gradienttype=[linear, radial]\n\nGradient on eyes (default is false): -gradientoneyes=true ${b('Aliases:')}\n[qr]`,
-        carInfo: `${b('Usage:')} ${prefix}carinfo [number] (where number is the car's number of length between 7-8)\n${b('Aliases:')}\n[carinfo]`,
-        currency: `${b('Usage:')} ${prefix}currency [amount (default is 1)] -to=[id] -from=[id]\n${b('IDs:')}\n`,
-        imagine: `${b('Usage:')} ${prefix}imagine [text] (where text is the text you want to come to life.)\n\n${b('Options:')}\n• Enhance: (-enhance or -hd) Whether to enhance the image or not.\nDefault: false.\n\n• Model version: (-v=[1.5/2.1]) The model to be used. Default: 2.1\n\n• Quality: (-quality=[25-150]) Quality refers to the number of artistic steps taken while creating. The more steps, the higher the quality.\nDefault: 25.\n\n• Freedom: (-freedom=[0-30])(float) the level of freedom (or strictness) you allow when creating from your prompt. Higher values force to follow your prompt.\nDefault: 7.5.\n\n• Ratio: (-ratio=[1-5]) The aspect ratio of the image.\n 1: Cinema 16:9\n 2: Landscape 3:2\n 3: Square 1:1\n 4: Tablet 2:3\n 5: Phone 9:16.\nDefault: 3 (square).\n\n• Image: (-image and tag an image or -image and a link of an image) The image to start the creation from.\n\n• Strength: (-strength=[0-1]) The strength of the image. (To use with an image)\n\n• Negative Prompt: (-neg="prompt here") a description of what you do *not* want in the image - will stay away from concepts in the negative prompt.\n\n${b('Aliases:')}\n[imagine]`,
-        poll: `${b('Usage:')} ${prefix}poll [question, option1, options2, etc...]\n${b('Aliases:')}\n[poll]`,
+        compile: generateCommandString({
+            cmdName: 'compile',
+            cmdDescription: 'Compile and run code in many different languages.',
+            cmdUsage: {
+                usage: `compile [language] [code]`,
+                options: [
+                    {
+                        name: 'Available Languages',
+                        description: 'The available languages are: c, cpp, c#, rill, erlang, elixir, haskell, d, java, rust, python, python2.7, ruby, scala, groovy, nodejs, nodejs14, coffeescript, spidermonkey, swift, perl, php, lua, sql, pascal, lisp, lazyk, vim, pypy, ocaml, go, bash, pony, crystal, nim, openssl, f#, r, typescript, julia',
+                    }
+                ],
+                aliases: ['compile']
+            }
+        }),
+        covid: generateCommandString({
+            cmdName: 'covid',
+            cmdDescription: 'Gets information about the covid-19 virus.',
+            cmdUsage: {
+                usage: `covid (or covid [1-7] for number of days to get info about) to get back information about active cases, infected people today, etc...`,
+                options: [],
+                aliases: ['covid']
+            }
+        }),
+        wolfram: generateCommandString({
+            cmdName: 'wolfram',
+            cmdDescription: 'Gets an answer from Wolfram Alpha.',
+            cmdUsage: {
+                usage: `wolfram [question] and you'll receive an answer from Wolfram Alpha.`,
+                options: [
+                    {
+                        name: 'Full answer',
+                        description: 'Gets the full answer from Wolfram Alpha.',
+                        usage: '-f'
+                    }
+                ],
+                aliases: ['wolframalpha', 'wolfram', 'wolf', 'wf']
+            }
+        }),
+        urban: generateCommandString({
+            cmdName: 'urban',
+            cmdDescription: 'Gets the top definition for the term you specified from Urban Dictionary.',
+            cmdUsage: {
+                usage: 'urban [term] and you\'ll receive the top definition for that term from Urban Dictionary.',
+                options: [
+                    {
+                        name: 'Word of the day',
+                        description: 'Gets the word of the day from Urban Dictionary.',
+                        usage: '[how many days ago? 0-9] -wotd'
+                    },
+                    {
+                        name: 'Random',
+                        description: 'Gets a random word from Urban Dictionary.',
+                        usage: '-r'
+                    }
+                ],
+                aliases: ['urban', 'ud']
+            }
+        }),
+        translate: generateCommandString({
+            cmdName: 'translate',
+            cmdDescription: 'Translate text from one language to another.',
+            cmdUsage: {
+                usage: 'translate [text] and you\'ll receive the translation for the text from Google Translate.',
+                options: [
+                    {
+                        name: 'Translate to',
+                        description: 'Translate to a specific language.',
+                        usage: '-l=[code] or -lang=[code]',
+                        moreOptions: [
+                            {
+                                name: 'Language codes',
+                                description: 'Afrikaans = *af*, Albanian = *sq*, Amharic = *am*, Arabic = *ar*, Armenian = *hy*, Azerbaijani = *az*, Basque = *eu*, Belarusian = *be*, Bengali = *bn*, Bosnian = *bs*, Bulgarian = *bg*, Catalan = *ca*, Cebuano = *ceb*, Chinese (Simplified) = *zh-CN*, Chinese (Traditional) = *zh-TW*, Corsican = *co*, Croatian = *hr*, Czech = *cs*, Danish = *da*, Dutch = *nl*, English = *en*, Esperanto = *eo*, Estonian = *et*, Finnish = *fi*, French = *fr*, Frisian = *fy*, Galician = *gl*, Georgian = *ka*, German = *de*, Greek = *el*, Gujarati = *gu*, Haitian Creole = *ht*, Hausa = *ha*, Hawaiian = *haw*, Hebrew = *iw*, Hindi = *hi*, Hmong = *hmn*, Hungarian = *hu*, Icelandic = *is*, Igbo = *ig*, Indonesian = *id*, Irish = *ga*, Italian = *it*, Japanese = *ja*, Kannada = *kn*, Kazakh = *kk*, Khmer = *km*, Korean = *ko*, Kurdish = *ku*, Kyrgyz = *ky*, Lao = *lo*, Latvian = *lv*, Lithuanian = *lt*, Luxembourgish = *lb*, Macedonian = *mk*, Malagasy = *mg*, Malay = *ms*, Malayalam = *ml*, Maltese = *mt*, Maori = *mi*, Marathi = *mr*, Mongolian = *mn*, Myanmar (Burmese) = *my*, Nepali = *ne*, Norwegian = *no*, Nyanja (Chichewa) = *ny*, Pashto = *ps*, Persian = *fa*, Polish = *pl*, Portuguese (Portugal, Brazil) = *pt*, Punjabi = *pa*, Romanian = *ro*, Russian = *ru*, Samoan = *sm*, Scots Gaelic = *gd*, Serbian = *sr*, Sesotho = *st*, Shona = *sn*, Sindhi = *sd*, Sinhala (Sinhalese) = *si*, Slovak = *sk*, Slovenian = *sl*, Somali = *so*, Spanish = *es*, Sundanese = *su*, Swahili = *sw*, Swedish = *sv*, Tagalog (Filipino) = *tl*, Tajik = *tg*, Tamil = *ta*, Telugu = *te*, Thai = *th*, Turkish = *tr*, Ukrainian = *uk*, Urdu = *ur*, Uzbek = *uz*, Vietnamese = *vi*, Welsh = *cy*, Xhosa = *xh*, Yiddish = *yi*, Yoruba = *yo*, Zulu = *zu*',
+                            }
+                        ]
+                    }
+                ],
+                default: 'defaults to english if no option used',
+                aliases: ['translate', 'tran', 'tr']
+            }
+        }),
+        recognizeMusic: generateCommandString({
+            cmdName: 'recognizeMusic',
+            cmdDescription: 'Recognize a song from an audio message or a video.',
+            cmdUsage: {
+                usage: 'reply with the command to an audio message or a video.',
+                options: [
+                    {
+                        name: 'All results',
+                        description: 'Get all the results from the API.',
+                        usage: '-f or -full'
+                    }
+                ],
+                aliases: ['recognize', 'rec', 'rm']
+            }
+        }),
+        nikud: generateCommandString({
+            cmdName: 'nikud',
+            cmdDescription: 'Add nikud to a text.',
+            cmdUsage: {
+                usage: 'nikud [text] or reply with the command to a text message.',
+                options: [],
+                aliases: ['nikud', 'nik', 'נקד']
+            },
+        }),
+        grammar: generateCommandString({
+            cmdName: 'grammar',
+            cmdDescription: 'Fix grammar in a text.',
+            cmdUsage: {
+                usage: 'grammar [text] or reply with the command to a text message.',
+                options: [
+                    {
+                        name: 'language',
+                        description: 'The language of the text.',
+                        usage: '-l=[code] or -lang=[code]',
+                        moreOptions: [
+                            {
+                                name: 'Language codes',
+                                description: 'French = *fra*, English = *eng*'
+                            }
+                        ]
+                    }
+                ],
+                aliases: ['grammar', 'gram']
+            },
+        }),
+        tts: generateCommandString({
+            cmdName: 'tts',
+            cmdDescription: 'Text to speech.',
+            cmdUsage: {
+                usage: 'tts [text] or reply with the command to a text message.',
+                options: [
+                    {
+                        name: 'language',
+                        description: 'The language of the text.',
+                        usage: '-l=[code] or -lang=[code]',
+                        moreOptions: [
+                            {
+                                name: 'Language codes',
+                                description: 'Arabic = *ara*, German = *ger*, Spanish = *spa*, French = *fra*, Hebrew = *heb*, Italian = *ita*, Japanese = *jpn*, Dutch = *dut*, Polish = *pol*, Portuguese = *por*, Romanian = *rum*, Russian = *rus*, Turkish = *tur*, Chinese = *chi*, English = *eng*'
+                            }
+                        ]
+                    }
+                ],
+                aliases: ['tts']
+            },
+        }),
+        context: generateCommandString({
+            cmdName: 'context',
+            cmdDescription: 'Translate with context.',
+            cmdUsage: {
+                usage: 'context [text] or reply with the command to a text message.',
+                options: [
+                    {
+                        name: 'From language',
+                        description: 'The language of the text.',
+                        usage: '-fl=[code] or -froml=[code] or -fromlang=[code]',
+                    },
+                    {
+                        name: 'To language',
+                        description: 'The language to translate to.',
+                        usage: '-tl=[code] or -tol=[code] or -tolang=[code]',
+                        moreOptions: [
+                            {
+                                name: 'Language codes',
+                                description: 'Arabic = *ara*, German = *ger*, Spanish = *spa*, French = *fra*, Hebrew = *heb*, Italian = *ita*, Japanese = *jpn*, Dutch = *dut*, Polish = *pol*, Portuguese = *por*, Romanian = *rum*, Russian = *rus*, Turkish = *tur*, Chinese = *chi*, English = *eng*'
+                            }
+                        ]
+                    }
+                ],
+                aliases: ['context', 'cont']
+            },
+        }),
+        synonym: generateCommandString({
+            cmdName: 'synonym',
+            cmdDescription: 'Get synonyms and antonyms for a text.',
+            cmdUsage: {
+                usage: 'synonym [text] or reply with the command to a text message.',
+                options: [
+                    {
+                        name: 'Language',
+                        description: 'The language of the text.',
+                        usage: '-l=[code] or -lang=[code]',
+                        moreOptions: [
+                            {
+                                name: 'Language codes',
+                                description: 'Arabic = *ara*, German = *ger*, Spanish = *spa*, French = *fra*, Hebrew = *heb*, Italian = *ita*, Japanese = *jpn*, Dutch = *dut*, Polish = *pol*, Portuguese = *por*, Romanian = *rum*, Russian = *rus*, Turkish = *tur*, Chinese = *chi*, English = *eng*'
+                            }
+                        ]
+                    }
+                ],
+                aliases: ['synonym', 'syno']
+            },
+        }),
+        conjugate: generateCommandString({
+            cmdName: 'conjugate',
+            cmdDescription: 'Get conjugation information for a text.',
+            cmdUsage: {
+                usage: 'conjugate [text] or reply with the command to a text message.',
+                options: [
+                    {
+                        name: 'Language',
+                        description: 'The language of the text.',
+                        usage: '-l=[code] or -lang=[code]',
+                        moreOptions: [
+                            {
+                                name: 'Language codes',
+                                description: 'Arabic = *ara*, German = *ger*, Spanish = *spa*, French = *fra*, Hebrew = *heb*, Italian = *ita*, Japanese = *jpn*, Dutch = *dut*, Polish = *pol*, Portuguese = *por*, Romanian = *rum*, Russian = *rus*, Turkish = *tur*, Chinese = *chi*, English = *eng*'
+                            }
+                        ]
+                    }
+                ],
+                aliases: ['conjugate', 'conj']
+            },
+        }),
+        thisDoesntExist: generateCommandString({
+            cmdName: "thisdoesntexist",
+            cmdDescription: "Generate a thisdoesntexist type of item.",
+            cmdUsage: {
+                usage: "thisdoesntexist [-flag] (where -flag is one of the flags below) or else a random one will be chosen.",
+                options: [
+                    {
+                        name: "Flags",
+                        description: "",
+                        usage: "-flag=[flag]",
+                        default: "random",
+                        moreOptions: [
+                            {
+                                name: "Person",
+                                description: "Generate a person that doesn't exist.",
+                                usage: "-person"
+                            },
+                            {
+                                name: "Cat",
+                                description: "Generate a cat that doesn't exist.",
+                                usage: "-cat"
+                            },
+                            {
+                                name: "Horse",
+                                description: "Generate a horse that doesn't exist.",
+                                usage: "-horse"
+                            },
+                            {
+                                name: "Rental",
+                                description: "Generate a rental that doesn't exist.",
+                                usage: "-rental"
+                            },
+                            {
+                                name: "Waifu",
+                                description: "Generate a waifu that doesn't exist.",
+                                usage: "-waifu"
+                            },
+                            {
+                                name: "Question",
+                                description: "Generate a question that doesn't exist.",
+                                usage: "-question"
+                            },
+                            {
+                                name: "Chemical",
+                                description: "Generate a chemical that doesn't exist.",
+                                usage: "-chemical"
+                            },
+                            {
+                                name: "Word",
+                                description: "Generate a word that doesn't exist.",
+                                usage: "-word"
+                            },
+                            {
+                                name: "City",
+                                description: "Generate a city that doesn't exist.",
+                                usage: "-city"
+                            },
+                            {
+                                name: "Simpsons",
+                                description: "Generate a simpsons character that doesn't exist.",
+                                usage: "-simpsons"
+                            },
+                            {
+                                name: "Art",
+                                description: "Generate a piece of art that doesn't exist.",
+                                usage: "-art"
+                            },
+                            {
+                                name: "Video",
+                                description: "Generate a video that doesn't exist. (could take some time)",
+                                usage: "-video"
+                            },
+                            {
+                                name: "Ideas",
+                                description: "Generate an idea that doesn't exist.",
+                                usage: "-ideas"
+                            },
+                            {
+                                name: "Lyrics",
+                                description: "Generate lyrics that don't exist.",
+                                usage: "-lyrics",
+                                moreOptions: [
+                                    {
+                                        name: "Topic",
+                                        description: "The topic of the lyrics.",
+                                        usage: "-t/topic=[topic]"
+                                    },
+                                    {
+                                        name: "Genre",
+                                        description: "The genre of the lyrics. (country, metal, rock, pop, rap, edm)",
+                                        usage: "-g/genre=[genre]"
+
+                                    },
+                                    {
+                                        name: "Mood",
+                                        description: "The mood of the lyrics. (verysad, sad, neutral, happy, veryhappy)",
+                                        usage: "-m/mood=[mood]"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                aliases: ['thisdoesntexist', 'tde']
+            }
+        }),
+        emojiGenerator: generateCommandString({
+            cmdName: "emojigenerator",
+            cmdDescription: "Generate a random emoji.",
+            cmdUsage: {
+                usage: "emojigenerator [number] (where number is an integer between 1-999)",
+                options: [],
+                aliases: ["emojigenerator", "randemoji"]
+            },
+        }),
+        qr: generateCommandString({
+            cmdName: "qr",
+            cmdDescription: "Generate a QR code.",
+            cmdUsage: {
+                usage: "qr [data] (where data is the content or content seperated with \"|\" if needed for some of the options below.)",
+                options: [
+                    {
+                        name: "Types",
+                        description: "",
+                        usage: "-type=[type]",
+                        default: "text",
+                        moreOptions: [
+                            {
+                                name: "Text",
+                                description: "Create a qr code from text/website/etc.",
+                                usage: "-type=text and enter a text/website/etc.",
+                                default: "text"
+                            },
+                            {
+                                name: "Email",
+                                description: "Create a qr code for an email.",
+                                usage: "-type=email \"email|subject|message body\"",
+                                default: "email"
+                            },
+                            {
+                                name: "Phone",
+                                description: "Create a qr code for a phone number.",
+                                usage: "-type=phone and enter a phone number",
+                            },
+                            {
+                                name: "SMS",
+                                description: "Create a qr code for an SMS.",
+                                usage: "-type=sms \"phone number|message\"",
+                            },
+                            {
+                                name: "Contact",
+                                description: "Create a qr code for a contact.",
+                                usage: "-type=contact \"first name|last name|work position|organization|Website|Email|Work phone|Home phone|Mobile phone|Fax work|Fax home|Street|City|State|Zipcode|Country\"",
+                            },
+                            {
+                                name: "WiFi",
+                                description: "Create a qr code for a WiFi.",
+                                usage: "-type=wifi \"wifi name|WEP or WPA|Password\"",
+                            },
+                            {
+                                name: "Event",
+                                description: "Create a qr code for an event.",
+                                usage: "-type=event \"Event title|Location|Start date|Start time|End date|End time\"\n Date example: YYYY.MM.DD\nTime example: HH:MM",
+                            },
+                            {
+                                name: "Crypto",
+                                description: "Create a qr code for a crypto address.",
+                                usage: "-type=crypto \"Address|Amount\"\nChoose the coin using -coin=[type] (where type is one of the following: [bitcoin, bitcoincash, ethereum, litecoin, dash])",
+                            },
+                            {
+                                name: "WhatsApp",
+                                description: "Create a qr code for a WhatsApp message.",
+                                usage: "-type=wa \"phone number|message\"",
+                            },
+                            {
+                                name: "File",
+                                description: "Choose one of the following: [png, svg, pdf, eps]",
+                                usage: "-type=[type]",
+                            },
+                            {
+                                name: "Size",
+                                description: "Choose the size of the qr code image.",
+                                usage: "-size=[300-2000]",
+                            },
+                            {
+                                name: "Body",
+                                description: "Choose one of the following: [square, mosaic, dot, circle, circle-zebra, circle-zebra-vertical, circular, edge-cut, edge-cut-smooth, japnese, leaf, pointed, pointed-edge-cut, pointed-in, pointed-in-smooth,pointed-smooth, round,  rounded-in, rounded-in-smooth, rounded-pointed, star, diamond]",
+                                usage: "-body=[type]",
+                            },
+                            {
+                                name: "Eye",
+                                description: "Choose the eye type.",
+                                usage: "-eye=[0-16]",
+                            },
+                            {
+                                name: "Eyeball",
+                                description: "Choose the eyeball type.",
+                                usage: "-eyeball=[0-19]",
+                            },
+                            {
+                                name: "Body Color",
+                                description: "Choose the body color.",
+                                usage: "-bodycolor=[color in hex]",
+                            },
+                            {
+                                name: "Background Color",
+                                description: "Choose the background color.",
+                                usage: "-bgcolor=[color in hex]",
+                            },
+
+                            {
+                                name: "Eye 1-3 Color",
+                                description: "Choose the eye color.",
+                                usage: "-eye[1-3]color=[color in hex] or all together -eyescolor=[color in hex]",
+                            },
+                            {
+                                name: "Eyeball 1-3 Color",
+                                description: "Choose the eyeball color.",
+                                usage: "-eyeball[1-3]color=[color in hex] or all together -eyeballscolor=[color in hex]",
+                            },
+                            {
+                                name: "Gradient",
+                                description: "Choose the gradient color.",
+                                usage: "-gradientcolor1=[color in hex] -gradientcolor2=[color in hex]",
+                            },
+                            {
+                                name: "Gradient type",
+                                description: "Choose the gradient type.",
+                                usage: "-gradienttype=[linear, radial]",
+                            },
+                            {
+                                name: "Gradient on eyes",
+                                description: "Choose if the gradient is on the eyes.",
+                                usage: "-gradientoneyes=true",
+                            },
+                        ],
+                    },
+                ],
+                aliases: ["qr"],
+            }
+        }),
+        carInfo: generateCommandString({
+            cmdName: "carinfo",
+            cmdDescription: "Get information about a car or a motorbike.",
+            cmdUsage: {
+                usage: "carinfo [number] (where number is the car's number of length between 7-8)",
+                options: [],
+                aliases: ["carinfo"]
+            }
+        }),
+        currency: generateCommandString({
+            cmdName: "currency",
+            cmdDescription: "Convert currencies.",
+            cmdUsage: {
+                usage: "currency [amount (default is 1)] -to=[id] -from=[id]",
+                options: [{ name: "IDs", description: "", usage: "", default: "", moreOptions: [] }],
+                aliases: ["currency"]
+            }
+        }),
+        imagine: generateCommandString({
+            cmdName: "imagine",
+            cmdDescription: "Turn text into images.",
+            cmdUsage: {
+                usage: "imagine [text] (where text is the text you want to come to life.)",
+                options: [
+                    {
+                        name: "Enhance", description: "Whether to enhance the image or not.", usage: "-enhance or -hd", default: "False", moreOptions: []
+                    },
+                    {
+                        name: "Model Version", description: "The model to be used.", usage: "-v=[1.5/2.1]", default: "2.1", moreOptions: []
+                    },
+                    {
+                        name: "Quality", description: "Quality refers to the number of artistic steps taken while creating. The more steps, the higher the quality.", usage: "-quality=[25-150]", default: "25", moreOptions: []
+                    },
+                    {
+                        name: "Freedom",
+                        description: "The level of freedom (or strictness) you allow when creating from your prompt. Higher values force to follow your prompt.",
+                        default: "7.5",
+                        usage: "-freedom=[0-30](float)",
+                        moreOptions: []
+                    },
+                    {
+                        name: "Ratio",
+                        description: "The aspect ratio of the image.",
+                        default: "3 (square)",
+                        usage: "-ratio=[1-5]",
+                        moreOptions: [
+                            { name: "1", description: "Cinema 16:9" },
+                            { name: "2", description: "Landscape 3:2" },
+                            { name: "3", description: "Square 1:1" },
+                            { name: "4", description: "Tablet 2:3" },
+                            { name: "5", description: "Phone 9:16" }
+                        ]
+                    },
+                    {
+                        name: "Image",
+                        description: "The image to start the creation from.",
+                        default: "",
+                        usage: "-image and tag an image or -image and a link of an image",
+                        moreOptions: [
+                            {
+                                name: "Strength",
+                                description: "The strength of the image. (To use with an image)",
+                                default: "",
+                                usage: "-strength=[0-1]",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                    {
+                        name: "Negative Prompt",
+                        description: "A description of what you do *not* want in the image - will stay away from concepts in the negative prompt.",
+                        default: "",
+                        usage: "-neg='prompt here'",
+                        moreOptions: []
+                    }
+                ],
+                aliases: ["imagine"]
+            }
+        }),
+        enhanceImage: generateCommandString({
+            cmdName: "enhanceimage",
+            cmdDescription: "Enhance an image.",
+            cmdUsage: {
+                usage: "enhance with an image or reply to an image with the command.",
+                options: [],
+                aliases: ["enhance"]
+            }
+        }),
+        poll: generateCommandString({
+            cmdName: "poll",
+            cmdDescription: "Create a poll.",
+            cmdUsage: {
+                usage: "poll [question, option1, options2, etc...]",
+                options: [],
+                aliases: ["poll"]
+            }
+        }),
     },
     Sticker: {
-        sticker: `${b('Usage:')}\n${m(`reply with ${prefix}sticker or send the image/gif/video with caption ${prefix}sticker.`)}\n${b('OR')}\n ${m('Reply to a URL of an image/gif to create the sticker from that instead.')}\n${b('Options:')}\n${m(`• Cropping: -c\n\n• Remove background: -r\n• Background: -bg\n• Background from URL: -url=[image link]\n\n• Image stroke: -s\n• Image stroke size: -size=[1-10]\n• Image stroke alpha: -alpha=[0-255]\n• Image stroke color: -color[color name or #hex]\n\n• Text on sticker: -t [and type text you want, seperate text to top and bottom using "|" character]\n• Text fill color: -fcolor=[color name or #hex]\n• Text stroke color: -scolor=[color name or #hex]\n• Font size: -fsize=[number 1-1000]\n• Max text rows: -rows=[1-6]\n\n• As Whatsapp message: -m (for images)\n• As Whatsapp reply: -rep\n• Reply Phone number: -p=[name/phone)\n• Reply Name: -n=[name]\n• Replied Phone number: -rp=[name/phone)\n• Replied Name: -rn=[name]\n• Time on voice: -time=[HH:MM:SS]\n\n(for background: send an image (which you want it\'s background removed), then quote the image with the background picture you want)`)}\n${b('Aliases:')}\n${m('[sticker, s]')}`,
-        textSticker: `${b('Usage:')}\n${m(`reply with ${prefix}textsticker or ${prefix}textsticker [text].`)}\n${b('Options:')}\n${m(`• BG Color: -bgcolor: [color name or #hex]\n• Stroke: -s: true/false\n• Stroke Color: -scolor: [color name or #hex]\n• Stroke Size: -ssize: [1-100]\n• Fill Color: -fcolor: [color name or #hex]\n• Font Size: -fsize: [1-1000]\n• Max Rows: -rows: [1-15]`)}\n${b('Aliases:')}\n${m('[textsticker, ts]')}`,
+        sticker: generateCommandString({
+            cmdName: "sticker",
+            cmdDescription: "Create a sticker.",
+            cmdUsage: {
+                usage: "sticker [image/gif/video] (reply to an image/gif/video or send an image/gif/video with the command) or sticker [url] (reply to a url of an image/gif/video or send a url with the command)",
+                options: [
+                    {
+                        name: "Image Options",
+                        description: "",
+                        moreOptions: [
+                            {
+                                name: "Cropping",
+                                description: "Crop the image to a square.",
+                                usage: "-c",
+                                default: "False",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Remove Background",
+                                description: "Remove the background of the image.",
+                                usage: "-r",
+                                default: "False",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Background",
+                                description: "The background of the sticker. (send an image (which you want it\'s background removed), then quote the image with the background picture you want)",
+                                usage: "-bg",
+                                default: "none",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Background from URL",
+                                description: "The background of the sticker from a URL.",
+                                usage: "-url=[image link]",
+                                default: "none",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Image stroke",
+                                description: "Add a stroke to the image.",
+                                usage: "-s",
+                                default: "False",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Image stroke size",
+                                description: "The size of the stroke.",
+                                usage: "-size=[1-10]",
+                                default: "1",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Image stroke alpha",
+                                description: "The alpha of the stroke.",
+                                usage: "-alpha=[0-255]",
+                                default: "255",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Image stroke color",
+                                description: "The color of the stroke.",
+                                usage: "-color=[color name or #hex]",
+                                default: "white",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                    {
+                        name: "Text Options",
+                        description: "The text to add to the sticker.",
+                        usage: "-t [and type text you want, seperate text to top and bottom using \"|\" character]",
+                        moreOptions: [
+                            {
+                                name: "Text fill color",
+                                description: "The color of the text.",
+                                usage: "-fcolor=[color name or #hex]",
+                                default: "white",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Text stroke color",
+                                description: "The color of the stroke.",
+                                usage: "-scolor=[color name or #hex]",
+                                default: "black",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Text font size",
+                                description: "The size of the font.",
+                                usage: "-fsize=[1-1000]",
+                                default: "50",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Text stroke size",
+                                description: "The size of the stroke.",
+                                usage: "-ssize=[1-100]",
+                                default: "1",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Max text rows",
+                                description: "The max rows of text.",
+                                usage: "-rows=[1-6]",
+                                default: "2",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                    {
+                        name: "Whatsapp message",
+                        description: "Send the sticker as a Whatsapp message.",
+                        usage: "",
+                        default: "False",
+                        moreOptions: [
+                            {
+                                name: "Whatsapp message",
+                                description: "Send the sticker as a Whatsapp message.",
+                                usage: "-m",
+                                default: "False",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Reply",
+                                description: "Reply to a message.",
+                                usage: "-rep",
+                                default: "False",
+                                moreOptions: [
+                                    {
+                                        name: "Reply Phone number",
+                                        description: "The phone number of the person you want to reply to.",
+                                        usage: "-p=[name/phone]",
+                                        default: "Taken from the original message",
+                                        moreOptions: []
+                                    },
+                                    {
+                                        name: "Reply Name",
+                                        description: "The name of the person you want to reply to.",
+                                        usage: "-n=[name]",
+                                        default: "Taken from the original message",
+                                        moreOptions: []
+                                    },
+                                    {
+                                        name: "Replied Phone number",
+                                        description: "The phone number of the person that replied to you.",
+                                        usage: "-rp=[name/phone]",
+                                        default: "Taken from the original message",
+                                        moreOptions: []
+                                    },
+                                    {
+                                        name: "Replied Name",
+                                        description: "The name of the person that replied to you.",
+                                        usage: "-rn=[name]",
+                                        default: "Taken from the original message",
+                                        moreOptions: []
+                                    },
+                                ]
+                            },
+                            {
+                                name: "Time on voice message",
+                                description: "The time on the voice message.",
+                                usage: "-time=[HH:MM:SS]",
+                                default: "Current time",
+                                moreOptions: []
+                            }
+                        ]
+                    },
+                ],
+                aliases: ['sticker', 's']
+            }
+        }),
+        textSticker: generateCommandString({
+            cmdName: 'textSticker',
+            cmdDescription: 'Create a sticker from text.',
+            cmdUsage: {
+                usage: `textsticker [text] or reply with textsticker to a message.`,
+                options: [
+                    {
+                        name: "Background color",
+                        description: "The background color of the sticker.",
+                        usage: "-bgcolor=[color name or #hex]",
+                        default: "Transparent",
+                        moreOptions: []
+                    },
+                    {
+                        name: "Stroke",
+                        description: "Add a stroke to the image.",
+                        usage: "-s",
+                        default: "False",
+                        moreOptions: [
+                            {
+                                name: "Stroke color",
+                                description: "The color of the stroke.",
+                                usage: "-scolor=[color name or #hex]",
+                                default: "black",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Stroke size",
+                                description: "The size of the stroke.",
+                                usage: "-ssize=[1-100]",
+                                default: "1",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Fill color",
+                                description: "The color of the text.",
+                                usage: "-fcolor=[color name or #hex]",
+                                default: "white",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Font size",
+                                description: "The size of the font.",
+                                usage: "-fsize=[1-1000]",
+                                default: "50",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Max text rows",
+                                description: "The max rows of text.",
+                                usage: "-rows=[1-15]",
+                                default: "2",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                ],
+                aliases: ['textsticker', 'ts']
+            }
+        }),
     },
     Media: {
-        removebg: `${b('Usage:')}\n${m(`reply with ${prefix}removebg to an image/sticker or send the image with caption ${prefix}removebg to receive a file without the image background.`)}\n${b('Options:')}\n${m(`• remove background (only images): -r\n• background: -bg\n• background from url: -url=[image link]\n• Stroke:\n • size: -size=[1-10]\n • color: -color=[color name or #hex]\n • alpha: -alpha=[0-255]\n• Text:\n • stroke color: -scolor=[color name or #hex]\n • fill color: -fcolor=[color name or #hex]\n • size: -fsize=[number 1-1000]\n • rows: -rows=[1-6]\n(for background: send an image (which you want it\'s background removed), then quote the image with the background picture you want)`)}\n${b('Aliases:')}\n${m('[removebg, rmbg]')}`,
-        toimage: `${b('Usage:')}\n${m(`reply with ${prefix}toimage to an image/sticker or send the image with caption ${prefix}toimage to receive an image.`)}\n${b('Options:')}\n${m(`• remove background (only images): -r\n• background: -bg\n• background from url: -url=[image link]\n• Stroke:\n • size: -size=[1-10]\n • color: -color=[color name or #hex]\n • alpha: -alpha=[0-255]\n• Text:\n • stroke color: -scolor=[color name or #hex]\n • fill color: -fcolor=[color name or #hex]\n • size: -fsize=[number 1-1000]\n • rows: -rows=[1-6]\n• File:\n • get image/sticker as a file: -file or -f\n(for background: send an image (which you want it\'s background removed), then quote the image with the background picture you want)`)}\n${b('Aliases:')}\n${m('[toimage, image, img]')}`,
-        videotomp3: `${b('Usage:')}\n${m(`reply with ${prefix}videotomp3 to a video or send the video with caption ${prefix}videotomp3 to receive the audio of the video file.`)}\n${b('Aliases:')}\n${m('[videotomp3, v2mp3, v2m]')}`,
-        addBackground: `${b('Usage:')}\n${m(`reply with ${prefix}addBackground to an image/sticker or send the image with caption ${prefix}addBackground to receive a file with the background added.`)}\n${b('Options:')}\n${m(`• Background from url: -url=[image link]\n• To Sticker: -s/-sticker\n\n(Quoted image is the image and background is the message you're sending)`)}\n${b('Aliases:')}\n${m('[addBackground, bg]')}`,
+        removebg: generateCommandString({
+            cmdName: 'removebg',
+            cmdDescription: 'Remove the background of an image.',
+            cmdUsage: {
+                usage: `removebg or reply with removebg to an image/sticker or send the image with caption removebg to receive a file without the image background.`,
+                options: [
+                    {
+                        name: "Background",
+                        description: "The background of the image. (send an image (which you want it\'s background removed), then quote the image with the background picture you want)",
+                        usage: "-bg",
+                        default: "False",
+                        moreOptions: [
+                            {
+                                name: "Background from url",
+                                description: "The background of the image from a url.",
+                                usage: "-url=[image link]",
+                                default: "False",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                    {
+                        name: "Stroke",
+                        description: "Add a stroke to the image.",
+                        usage: "-s",
+                        default: "False",
+                        moreOptions: [
+                            {
+                                name: "Stroke size",
+                                description: "The size of the stroke.",
+                                usage: "-size=[1-10]",
+                                default: "1",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Stroke color",
+                                description: "The color of the stroke.",
+                                usage: "-color=[color name or #hex]",
+                                default: "black",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Stroke alpha",
+                                description: "The alpha of the stroke.",
+                                usage: "-alpha=[0-255]",
+                                default: "255",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                    {
+                        name: "Text",
+                        description: "Add text to the image.",
+                        usage: "-t",
+                        default: "False",
+                        moreOptions: [
+                            {
+                                name: "Stroke color",
+                                description: "The color of the stroke.",
+                                usage: "-scolor=[color name or #hex]",
+                                default: "white",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Fill color",
+                                description: "The color of the text.",
+                                usage: "-fcolor=[color name or #hex]",
+                                default: "black",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Font size",
+                                description: "The size of the font.",
+                                usage: "-fsize=[1-1000]",
+                                default: "50",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Max text rows",
+                                description: "The max rows of text.",
+                                usage: "-rows=[1-6]",
+                                default: "2",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                    {
+                        name: "File",
+                        description: "Get the image/sticker as a file.",
+                        usage: "-file or -f",
+                        default: "False",
+                        moreOptions: []
+                    },
+                ],
+                aliases: ['removebg', 'rmbg']
+            },
+        }),
+        toimage: generateCommandString({
+            cmdName: 'toimage',
+            cmdDescription: 'Convert a sticker to an image.',
+            cmdUsage: {
+                usage: `toimage or reply with the command to an image/sticker or send the image with caption toimage to receive an image.`,
+                options: [
+                    {
+                        name: "Remove background",
+                        description: "Remove the background of the image.",
+                        usage: "-r",
+                        default: "False",
+                        moreOptions: []
+                    },
+                    {
+                        name: "Background",
+                        description: "The background of the image. (send an image (which you want it\'s background removed), then quote the image with the background picture you want)",
+                        usage: "-bg",
+                        default: "False",
+                        moreOptions: [
+                            {
+                                name: "Background from url",
+                                description: "The background of the image from a url.",
+                                usage: "-url=[image link]",
+                                default: "False",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                    {
+                        name: "Stroke",
+                        description: "Add a stroke to the image.",
+                        usage: "-s",
+                        default: "False",
+                        moreOptions: [
+                            {
+                                name: "Stroke size",
+                                description: "The size of the stroke.",
+                                usage: "-size=[1-10]",
+                                default: "1",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Stroke color",
+                                description: "The color of the stroke.",
+                                usage: "-color=[color name or #hex]",
+                                default: "white",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Stroke alpha",
+                                description: "The alpha of the stroke.",
+                                usage: "-alpha=[0-255]",
+                                default: "255",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                    {
+                        name: "Text",
+                        description: "Add text to the image.",
+                        usage: "-t",
+                        default: "False",
+                        moreOptions: [
+                            {
+                                name: "Stroke color",
+                                description: "The color of the stroke.",
+                                usage: "-scolor=[color name or #hex]",
+                                default: "white",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Fill color",
+                                description: "The color of the text.",
+                                usage: "-fcolor=[color name or #hex]",
+                                default: "black",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Font size",
+                                description: "The size of the font.",
+                                usage: "-fsize=[1-1000]",
+                                default: "50",
+                                moreOptions: []
+                            },
+                            {
+                                name: "Max text rows",
+                                description: "The max rows of text.",
+                                usage: "-rows=[1-6]",
+                                default: "2",
+                                moreOptions: []
+                            },
+                        ]
+                    },
+                    {
+                        name: "File",
+                        description: "Get the image/sticker as a file.",
+                        usage: "-file or -f",
+                        default: "False",
+                        moreOptions: []
+                    },
+                ],
+                aliases: ['toimage', 'image', 'img']
+            },
+        }),
+        videotomp3: generateCommandString({
+            cmdName: 'videotomp3',
+            cmdDescription: 'Convert a video to audio.',
+            cmdUsage: {
+                usage: `videotomp3 or reply with videotomp3 to a video.`,
+                options: [],
+                aliases: ['videotomp3', 'v2mp3', 'v2m']
+            },
+        }),
+        addBackground: generateCommandString({
+            cmdName: 'addbackground',
+            cmdDescription: `Add a background to an image. (Quoted image is the image and background is the message you're sending)`,
+            cmdUsage: {
+                usage: `addbackground or reply with addbackground to an image/sticker or send the image with caption addbackground to receive a file with the background added.`,
+                options: [
+                    {
+                        name: "Background from url",
+                        description: "Adds a background from a url.",
+                        usage: "-url=[image link]",
+                        default: "None",
+                        moreOptions: []
+                    },
+                    {
+                        name: "To Sticker",
+                        description: "Converts the image to a sticker.",
+                        usage: "-s/-sticker",
+                        default: "False",
+                        moreOptions: []
+                    },
+
+                ],
+                aliases: ['addbackground', 'bg']
+            }
+        }),
     },
     Help: {
         help: `Oh, I see you've found the 🐰 🥚\n${b('What did you expect to find here...? ')}\n\nWell if you're already here, I have a cool story for you which starts like this...\n\n`
@@ -196,4 +1575,28 @@ module.exports = {
     help,
     returnType,
     prefix
+}
+
+
+function generateCommandString(json) {
+    let commandString = `${b('Command Name:')} ${json.cmdName}\n\n`;
+    commandString += `${b('Description:')} ${json.cmdDescription}\n\n`;
+    commandString += `${b('Usage:')} ${prefix}${json.cmdUsage.usage}\n\n`;
+    if (json.cmdUsage.options.length) commandString += `${b('Options:')}\n`;
+
+    function recursivelyPrintOptions(options, level) {
+        options.forEach((option) => {
+            commandString += `${'  '.repeat(level)}• ${option.name}: ${option.description}\n`;
+            if (option.usage) commandString += `${'  '.repeat(level)}Usage: (${option.usage})\n`;
+            if (option.moreOptions) recursivelyPrintOptions(option.moreOptions, level + 1);
+            if (option.default) commandString += `${'  '.repeat(level)}Default: ${option.default}\n`;
+            if (level === 0) commandString += '---------------------';
+            if (option.moreOptions || option.default || option.usage) commandString += '\n';
+        });
+    }
+
+    recursivelyPrintOptions(json.cmdUsage.options, 0);
+
+    commandString += `\n${b('Aliases:')} ${json.cmdUsage.aliases.join(', ')}`;
+    return commandString;
 }
