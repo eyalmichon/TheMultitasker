@@ -179,9 +179,9 @@ class Admin {
         func: async (message, client) => {
             let msg = message.quotedMsg || message;
             console.log(`Getting profile pic of ${msg.sender.pushname}`)
-            let base64 = await client.downloadProfilePicFromMessage(msg).catch(err => { return { err: err } });
-            if (base64.err) return returnType.reply(`⛔ Error, ${msg.sender.pushname} is private or doesn't have a profile pic.`)
-            return returnType.sendFile(`data:image/jpeg;base64, ${base64}`, 'profile.jpg', `Here's the profile pic of ${msg.sender.pushname}`, false);
+            let link = await client.getProfilePicFromServer(msg.sender.id).catch(err => { return { err: err } });
+            if (link.err) return returnType.reply(`⛔ Error, ${msg.sender.pushname} is private or doesn't have a profile pic.`)
+            return returnType.fileFromURL(link, 'profile.jpg', `Here's the profile pic of ${msg.sender.pushname}`);
         },
         help: () => help.Admin.getProfilePic,
         timer: () => this.defaultTimer
