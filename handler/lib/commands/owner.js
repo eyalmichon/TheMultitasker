@@ -478,12 +478,14 @@ class Owner {
             const options = parser.parse(message.args);
             let n = options.n || 1;
             let text = options.joinedText;
-            if (text)
+            let to = options.to;
+            console.log(`Spamming ${n} messages to ${to ? to : message.from}`)
+            if (message.quotedMsg)
                 for (let i = 0; i < n; i++)
-                    client.sendText(message.from, text);
-            else if (message.quotedMsg)
+                    client.forwardMessages(to ? to : message.from, message.quotedMsg.id);
+            else if (text)
                 for (let i = 0; i < n; i++)
-                    client.forwardMessages(message.from, message.quotedMsg.id);
+                    client.sendText(to ? to : message.from, text);
             return { info: true };
         },
         help: () => help.Owner.spamMessage,
@@ -509,12 +511,10 @@ class Owner {
                     console.log(res)
                     return returnType.reply(res);
                 })
-
         },
         help: () => '',
         timer: () => this.defaultTimer
     }
-
 }
 
 module.exports = { Owner }
