@@ -156,7 +156,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
                 .then(res => res.json())
                 .then(json => {
                     if (options.enhance) {
-                        return fetch(`${imagineSecrets.apiUrl}/enhance`, {
+                        return fetch(`${imagineSecrets.enhanceUrl}`, {
                             "headers": {
                                 "accept": "application/json",
                                 "accept-language": "en-US,en;q=0.9,he;q=0.8",
@@ -208,6 +208,18 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
 
 })
 
+const enhanceImage = (base64) => new Promise(async (resolve, reject) => {
+    return textToImage('a', { init_image: base64, prompt_strength: "0", version: "1.5", enhance: true })
+        .then(res => {
+            resolve(res)
+        })
+        .catch(err => {
+            reject(err)
+        })
+})
+
+
 module.exports = {
-    textToImage
+    textToImage,
+    enhanceImage
 }
