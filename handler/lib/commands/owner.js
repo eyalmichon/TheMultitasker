@@ -475,7 +475,7 @@ class Owner {
 
     spamMessage = {
         func: (message, client) => {
-            const options = parser.parse(message.args);
+            const options = parser.parse(message.args, false);
             let n = options.n || 1;
             let text = options.joinedText;
             let to = options.to;
