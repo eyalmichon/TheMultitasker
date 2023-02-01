@@ -1,6 +1,6 @@
-const { b, m, i, help, returnType } = require("./helper");
+const { b, m, i, help, returnType, prefix } = require("./helper");
 const { errors } = require('./errors');
-const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras, qrcode, carInfo, currency, imagine, fetcher } = require("..");
+const { compile, covid, wolfram, parser, urban, translate, recognize, nikud, reverso, doesntExist, downloader, extras, qrcode, carInfo, currency, imagine, fetcher, ai } = require("..");
 const { decryptMedia } = require("@open-wa/wa-automate");
 
 class Info {
@@ -70,12 +70,29 @@ class Info {
         commands.enhance = this.addInfo(this.enhanceImage)
 
         commands.poll = this.addInfo(this.poll)
+
+        commands.summarize = this.addInfo(this.summarize)
+        commands.sum = this.alias(this.summarize)
+
+        commands.topics = this.addInfo(this.topics)
+
+        commands.splitbysentence = this.addInfo(this.splitBySentence)
+        commands.sbs = this.alias(this.splitBySentence)
+
+        commands.anonymize = this.addInfo(this.anonymize)
+        commands.anon = this.alias(this.anonymize)
+
+        commands.htmlcontent = this.addInfo(this.htmlContent)
+        commands.html = this.alias(this.htmlContent)
+
+        commands.transcribe = this.addInfo(this.transcribe)
+        commands.tb = this.alias(this.transcribe)
     }
 
     compile = {
         func: (message) => {
             let compiler = message.args.shift();
-            let code = message.args.join(' ');
+            let code = message.body.replace(`${prefix}compile ${compiler}`, '').trim();
             return compile.compile(compiler, code)
                 .then(result => returnType.reply(result))
         },
@@ -507,6 +524,137 @@ class Info {
         help: () => help.Info.poll,
         timer: () => this.defaultTimer
     }
+
+    summarize = {
+        func: (message) => {
+            const options = parser.parse(message.args);
+            const text = options.joinedText;
+            if (!text) return errors.EMPTY_TEXT;
+            const long = !!options.long;
+            if (!long && text.length > 10000) return errors.CONTENT_TOO_LARGE;
+            const maxLength = Math.abs(parseInt(options.max)) || 100;
+            const minLength = Math.abs(parseInt(options.min)) || 5;
+
+            return ai.summarize(text, { maxLength, minLength })
+                .then(result => returnType.reply(result))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN();
+                }
+                )
+        },
+        help: () => help.Info.summarize,
+        timer: () => 60
+    }
+
+    topics = {
+        func: (message) => {
+            const options = parser.parse(message.args);
+            const text = options.joinedText;
+            if (!text) return errors.EMPTY_TEXT;
+            const long = !!options.long;
+            if (!long && text.length > 10000) return errors.CONTENT_TOO_LARGE;
+            const hash = !!options.hash;
+
+            return ai.topics(text)
+                .then(result => returnType.reply(hash ? result.map(topic => `#${topic}`).join(' ') : result.join(', ')))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN();
+                }
+                )
+        },
+        help: () => help.Info.topics,
+        timer: () => 60
+    }
+
+    splitBySentence = {
+        func: (message) => {
+            const options = parser.parse(message.args);
+            const text = options.joinedText;
+            if (!text) return errors.EMPTY_TEXT;
+            const long = !!options.long;
+            if (!long && text.length > 10000) return errors.CONTENT_TOO_LARGE;
+
+            return ai.splitBySentence(text)
+                .then(result => returnType.reply(result.join('\n\n')))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN();
+                }
+                )
+        },
+        help: () => help.Info.splitBySentence,
+        timer: () => 60
+    }
+
+    anonymize = {
+        func: (message) => {
+            const options = parser.parse(message.args);
+            const text = options.joinedText;
+            if (!text) return errors.EMPTY_TEXT;
+            const long = !!options.long;
+            if (!long && text.length > 10000) return errors.CONTENT_TOO_LARGE;
+
+            return ai.anonymize(text)
+                .then(result => returnType.reply(result))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN();
+                }
+                )
+        },
+        help: () => help.Info.anonymize,
+        timer: () => 60
+    }
+    htmlContent = {
+        func: (message) => {
+            const options = parser.parse(message.args);
+            const url = options.url;
+            if (!url) return errors.EMPTY_TEXT;
+            const long = !!options.long;
+            if (!long && url.length > 10000) return errors.CONTENT_TOO_LARGE;
+
+            return ai.htmlContent(url)
+                .then(result => returnType.reply(result))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN();
+                }
+                )
+        },
+        help: () => help.Info.htmlContent,
+        timer: () => 60
+    }
+
+    transcribe = {
+        func: async (message) => {
+            const options = parser.parse(message.args);
+            if (!message.quotedMsg) return errors.NO_QUOTED_MESSAGE;
+
+            if (!['ptt', 'audio'].includes(message.quotedMsg.type)) return errors.WRONG_TYPE_RECO;
+
+            const long = !!options.long;
+            if (!long && message.duration > 60) return errors.CONTENT_TOO_LARGE;
+
+            const data = await decryptMedia(message.quotedMsg);
+            if (!data) return errors.UNKNOWN();
+
+            const speakerDetection = options.speaker ? true : false;
+            const timestampPerLabel = options.ts ? true : false;
+
+            return ai.transcribe(data, { speakerDetection, timestampPerLabel })
+                .then(result => returnType.reply(result.join('\n\n')))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN();
+                })
+        },
+        help: () => help.Info.transcribe,
+        timer: () => 60
+    }
+
+
 }
 
 module.exports = { Info }
