@@ -70,6 +70,12 @@ Command pattern used for easy management of adding more commands.
   - Get info on cars 🚗 and motorcycles 🏍 in Israel.
   - Currency checking. 💱💵
   - Imagine, text to image generation. 🖼
+  - Summarize text. 📝
+  - Get topics of text. 📌
+  - Split text by sentences. 📃
+  - Anonymize text. 🕵️‍♂️
+  - Get contents of a website. 🌐
+  - Transcribe audio. 🎙 
 
 - ### Forwarder Commands ⏩:
   - Forward messages randomly from a chosen group. (group IDs need to be set manually)
