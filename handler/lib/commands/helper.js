@@ -1,6 +1,36 @@
 const { b, m, i } = require('../../util/style');
 
 /**
+ * Generates a string representation of the command and its options and usage.
+ *
+ * @param {object} json - The JSON object containing information about the command.
+ * @returns {string} A string representation of the command and its options and usage.
+ */
+function generateCommandString(json) {
+    let commandString = `${b('Command Name:')} ${json.cmdName}\n\n`;
+    commandString += `${b('Description:')} ${json.cmdDescription}\n\n`;
+    commandString += `${b('Usage:')} ${prefix}${json.cmdUsage.usage}\n\n`;
+    if (json.cmdUsage.options.length) commandString += `${b('Options:')}\n`;
+
+
+    function recursivelyPrintOptions(options, level) {
+        options.forEach((option) => {
+            commandString += `${'  '.repeat(level)}• ${option.name}: ${option.description}\n`;
+            if (option.usage) commandString += `${'  '.repeat(level)}Usage: (${option.usage})\n`;
+            if (option.moreOptions) recursivelyPrintOptions(option.moreOptions, level + 1);
+            if (option.default) commandString += `${'  '.repeat(level)}Default: ${option.default}\n`;
+            if (level === 0) commandString += '---------------------';
+            if (option.moreOptions || option.default || option.usage) commandString += '\n';
+        });
+    }
+
+    recursivelyPrintOptions(json.cmdUsage.options, 0);
+
+    commandString += `\n${b('Aliases:')} ${json.cmdUsage.aliases.join(', ')}`;
+    return commandString;
+}
+
+/**
  * The bot's global prefix.
  */
 const prefix = '!';
@@ -1093,6 +1123,93 @@ const help = {
                 aliases: ["poll"]
             }
         }),
+        summarize: generateCommandString({
+            cmdName: "summarize",
+            cmdDescription: "Summarize a text.",
+            cmdUsage: {
+                usage: "summarize [text]",
+                options: [
+                    {
+                        name: "Min Length",
+                        description: "The minimum length of the summary.",
+                        usage: "-min=[number]",
+                        default: "5",
+                    },
+                    {
+                        name: "Max Length",
+                        description: "The maximum length of the summary.",
+                        usage: "-max=[number]",
+                        default: "100",
+                    }
+                ],
+                aliases: ["summarize", "sum"]
+            }
+        }),
+        topics: generateCommandString({
+            cmdName: "topics",
+            cmdDescription: "Get a list of topics from the given text.",
+            cmdUsage: {
+                usage: "topics [text]",
+                options: [
+                    {
+                        name: "hashtags",
+                        description: "Whether to include hashtags or not.",
+                        usage: "-hash",
+                        default: "False"
+                    }
+                ],
+                aliases: ["topics"]
+            }
+        }),
+        splitBySentence: generateCommandString({
+            cmdName: "splitbysentence",
+            cmdDescription: "Split a text by sentences.",
+            cmdUsage: {
+                usage: "splitbysentence [text]",
+                options: [],
+                aliases: ["splitbysentence", "sbs"]
+            }
+        }),
+        anonymize: generateCommandString({
+            cmdName: "anonymize",
+            cmdDescription: "Anonymize a text.",
+            cmdUsage: {
+                usage: "anonymize [text]",
+                options: [],
+                aliases: ["anonymize", "anon"]
+            }
+        }),
+        htmlContent: generateCommandString({
+            cmdName: "htmlcontent",
+            cmdDescription: "Get the HTML contents of a website.",
+            cmdUsage: {
+                usage: "htmlcontent [url]",
+                options: [],
+                aliases: ["htmlcontent", "html"]
+            }
+        }),
+        transcribe: generateCommandString({
+            cmdName: "transcribe",
+            cmdDescription: "Transcribe an audio file.",
+            cmdUsage: {
+                usage: "transcribe with a reply to an audio file.",
+                options: [
+                    {
+                        name: "Speaker Detection",
+                        description: "Whether to detect speakers or not.",
+                        usage: "-speaker=true/false",
+                        default: "false"
+                    },
+                    {
+                        name: "Timestamps Per Label",
+                        description: "Should timestamps be included for each speaker label.",
+                        usage: "-ts=true/false",
+                        default: "false"
+                    }
+                ],
+                aliases: ['transcribe', 'tb']
+            }
+        }),
     },
     Sticker: {
         sticker: generateCommandString({
@@ -1570,33 +1687,85 @@ const help = {
     }
 }
 
+
+function getRandomWaitMsg() {
+    const waitMsgs = [
+        `🧙‍♂️ Hang tight! I'm working on it 💪`,
+        `🧙‍♂️ One moment please... 🕰️`,
+        `🧙‍♂️ Sorry for the wait, I've got this under control 🛠️`,
+        `🧙‍♂️ Just a sec, almost there! 🏃‍♂️`,
+        `🧙‍♂️ Taking care of it now! 🔨`,
+        `🧙‍♂️ Almost done, thank you for your patience 💆‍♀️`,
+        `🧙‍♂️ Bear with me, this won't take long! 🐻`,
+        `🧙‍♂️ Just a bit longer, I promise! 🤞`,
+        `🧙‍♂️ Working on it as fast as I can! 💨`,
+        `🧙‍♂️ I know it's taking a while, but I'm almost done! 🏁`,
+        `🧙‍♂️ Almost finished! Hang in there 💪`,
+        `🧙‍♂️ Just a few more moments, I promise! 💁‍♀️`,
+        `🧙‍♂️ It's taking a bit longer than expected, sorry 🙇‍♂️`,
+        `🧙‍♂️ Almost there! Just a little bit more time 🕰️`,
+        `🧙‍♂️ I'm making progress, thank you for your patience 🙏`,
+        `🧙‍♂️ Sorry for the wait, I've got this under control 🚧`,
+        `🧙‍♂️ Hang on just a bit longer, I'm almost done 🛠️`,
+        `🧙‍♂️ I know it's taking a while, but I'm working as fast as I can 💨`,
+        `🧙‍♂️ Sorry for the delay, I'll have it ready soon! 🕰️`,
+        `🧙‍♂️ Just chillin' like a villain, almost done 🦹‍♂️`,
+        `🧙‍♂️ Time flies when you're solving problems 🕰️⏰`,
+        `🧙‍♂️ Taking a break from saving the world, be right back 🦸‍♀️`,
+        `🧙‍♂️ This is taking longer than a Kardashian marriage, sorry! 💔`,
+        `🧙‍♂️ Just gotta tie up a few loose ends, hold on tight! 💪`,
+        `🧙‍♂️ Almost done, making sure everything is perfect like Beyoncé 💁‍♀️`,
+        `🧙‍♂️ Taking my time like a snail with a slow Internet connection 🐌`,
+        `🧙‍♂️ Just warming up my superpowers, be right back! 🔥`,
+        `🧙‍♂️ Sorry for the wait, I'm just a one-man-show! 🎭`,
+        `🧙‍♂️ I'm working on it, just like a hamster in a wheel 🐹`,
+        `🧙‍♂️ Just giving my brain a workout, be right back 🧠`,
+        `🧙‍♂️ Taking a sip of coffee and getting right back to it ☕`,
+        `🧙‍♂️ Almost done, just need to find my superhero cape 🦸‍♂️`,
+        `🧙‍♂️ This is taking longer than a Disney movie, sorry! 🎥`,
+        `🧙‍♂️ Time to put my detective skills to work, one moment please 🕵️‍♂️`,
+        `🧙‍♂️ Just putting the finishing touches, like a master chef 🍳`,
+        `🧙‍♂️ Sorry for the wait, I'm just a one-man-band 🎸`,
+        `🧙‍♂️ Almost done, just need to brush up on my magic tricks 🎩`,
+        `🧙‍♂️ I know it's taking a while, but I'm working like a busy bee 🐝`,
+        `🧙‍♂️ Sorry for the delay, I'm just building suspense like a movie trailer 🎥`,
+        `🧙‍♂️ Just fine-tuning the details, almost there 🔍`,
+        `🧙‍♂️ Analyzing the situation, be back in a jiffy 💻`,
+        `🧙‍♂️ Sorry for the wait, I'm working on a solution 💡`,
+        `🧙‍♂️ Almost done, just need to find the missing piece 🔍`,
+        `🧙‍♂️ Taking a moment to think, I'll be right back 🤔`,
+        `🧙‍♂️ Almost there, just tying up some loose ends 🔜`,
+        `🧙‍♂️ Taking a moment to regroup, I'll be back soon 💪`,
+        `🧙‍♂️ Sorry for the wait, I'm working on a breakthrough 💥`,
+        `🧙‍♂️ Almost done, just need to finish the final stretch 🏁`,
+        `🧙‍♂️ Taking a moment to strategize, I'll be back soon 🧙‍♂️`,
+        `🧙‍♂️ Sorry for the delay, I'm working on a game plan 📈`,
+        `🧙‍♂️ Almost there, just need to put the puzzle together 🧩`,
+        `🧙‍♂️ Taking a moment to recalculate, I'll be back soon 📊`,
+        `🧙‍♂️ Sorry for the wait, I'm working on an optimization 💡`,
+        `🧙‍♂️ Almost done, just need to run a final check 🔍`,
+        `🧙‍♂️ Taking a moment to review, I'll be back soon 💻`,
+        `🧙‍♂️ Almost there, just need to complete the final touch 🎨`,
+        `🧙‍♂️ Just taking a quick nap, almost done 💤`,
+        `🧙‍♂️ Sorry for the wait, I'm on a wild goose chase 🦢`,
+        `🧙‍♂️ Almost there, just need to untangle the spaghetti 🍝`,
+        `🧙‍♂️ Taking a break to play a quick game of rock-paper-scissors 🤞`,
+        `🧙‍♂️ Sorry for the delay, I'm solving a Rubik's Cube 🧩`,
+        `🧙‍♂️ Almost done, just need to catch a falling star 🌟`,
+        `🧙‍♂️ Taking a moment to brush up on my yo-yo skills 🪀`,
+        `🧙‍♂️ Sorry for the inconvenience, I'm learning to ride a unicycle 🪁`,
+        `🧙‍♂️ Almost there, just need to finish a round of mini-golf 🏌️‍♂️`,
+        `🧙‍♂️ Taking a break to play a quick game of duck-duck-goose 🦆`,
+
+    ]
+    return waitMsgs[Math.floor(Math.random() * waitMsgs.length)]
+}
+
+
 module.exports = {
     b, m, i,
     help,
     returnType,
-    prefix
-}
-
-
-function generateCommandString(json) {
-    let commandString = `${b('Command Name:')} ${json.cmdName}\n\n`;
-    commandString += `${b('Description:')} ${json.cmdDescription}\n\n`;
-    commandString += `${b('Usage:')} ${prefix}${json.cmdUsage.usage}\n\n`;
-    if (json.cmdUsage.options.length) commandString += `${b('Options:')}\n`;
-
-    function recursivelyPrintOptions(options, level) {
-        options.forEach((option) => {
-            commandString += `${'  '.repeat(level)}• ${option.name}: ${option.description}\n`;
-            if (option.usage) commandString += `${'  '.repeat(level)}Usage: (${option.usage})\n`;
-            if (option.moreOptions) recursivelyPrintOptions(option.moreOptions, level + 1);
-            if (option.default) commandString += `${'  '.repeat(level)}Default: ${option.default}\n`;
-            if (level === 0) commandString += '---------------------';
-            if (option.moreOptions || option.default || option.usage) commandString += '\n';
-        });
-    }
-
-    recursivelyPrintOptions(json.cmdUsage.options, 0);
-
-    commandString += `\n${b('Aliases:')} ${json.cmdUsage.aliases.join(', ')}`;
-    return commandString;
+    prefix,
+    getRandomWaitMsg
 }

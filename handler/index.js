@@ -1,4 +1,4 @@
-const { Commands, prefix, errors } = require('./lib/commands');
+const { Commands, prefix, errors, getRandomWaitMsg } = require('./lib/commands');
 const { BlackList } = require('./util/blacklist');
 const { MuteList } = require('./util/mutelist');
 const { b, m, i } = require('./util/style');
@@ -312,7 +312,7 @@ const msgHandler = async (client, message) => {
             break;
         // Social Commands.
         case 'Social':
-            waitMsg = client.reply(from, i('I\'m on it! 🔨'), id);
+            waitMsg = client.reply(from, i(getRandomWaitMsg()), id);
             result = await commands.execute(command, message.args);
             break;
         // Social Commands.
@@ -322,9 +322,8 @@ const msgHandler = async (client, message) => {
             break;
         // Info Commands.
         case 'Info':
-            waitMsg = client.reply(from, i('🧙‍♂️ This may take some time...'), id);
+            waitMsg = client.reply(from, i(getRandomWaitMsg()), id);
             result = await commands.execute(command, message);
-
             break;
         // Sticker Commands.
         case 'Sticker':
@@ -339,12 +338,12 @@ const msgHandler = async (client, message) => {
                     }
                 }
             }
-            waitMsg = client.reply(from, i('🧙‍♂️ Please wait a moment while I do some magic...'), id);
+            waitMsg = client.reply(from, i(getRandomWaitMsg()), id);
             result = await commands.execute(command, message);
             break;
         // Media Commands.
         case 'Media':
-            waitMsg = client.reply(from, i('🧙‍♂️ Just sit back, enjoy the view, and i\'ll be right back...'), id);
+            waitMsg = client.reply(from, i(getRandomWaitMsg()), id);
             result = await commands.execute(command, message);
             break;
         default:

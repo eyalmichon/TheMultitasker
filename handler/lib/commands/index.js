@@ -1,5 +1,5 @@
 const { errors } = require('./errors')
-const { prefix } = require('./helper')
+const { prefix, getRandomWaitMsg } = require('./helper')
 const { Admin } = require("./admin");
 const { Forwarder } = require("./forwarder");
 const { Info } = require("./info");
@@ -62,5 +62,6 @@ class Commands {
 module.exports = {
     Commands,
     prefix,
-    errors
+    errors,
+    getRandomWaitMsg
 }
