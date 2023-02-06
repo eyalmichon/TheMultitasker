@@ -1054,7 +1054,41 @@ const help = {
                         name: "Enhance", description: "Whether to enhance the image or not.", usage: "-enhance or -hd", default: "False", moreOptions: []
                     },
                     {
-                        name: "Model Version", description: "The model to be used.", usage: "-v=[1.5/2.1]", default: "2.1", moreOptions: []
+                        name: "Model", description: "The model to be used.", usage: "-v=[model]", default: "2.1", moreOptions: [
+                            // ['1.5', '2.1', '2.1-vangogh', '2.1-picasso', '2.1-alicezhang', 'openjourney', 'analog', 'duchaiten', 'deliberate', 'dreamshaper',
+                            // 'double-exposure', 'redshift', 'nitro', 'arcane', 'archer', 'disney', 'synthwave', 'vector-art', 'pixel', 'pixel-scenery', 
+                            // 'pixel-character', 'anything', 'eimis', 'waifu', 'grapefruit', 'pfg', 'realistic-vision', 'f222', 'ppp', 'hassan']
+                            { name: "1.5", description: "The original 1.5 model." },
+                            { name: "2.1", description: "The original 2.1 model." },
+                            { name: "2.1-vangogh", description: "The 2.1 model with a Vangogh style." },
+                            { name: "2.1-picasso", description: "The 2.1 model with a Picasso style." },
+                            { name: "2.1-alicezhang", description: "The 2.1 model with an Alice Zhang style." },
+                            { name: "openjourney", description: "The Open Journey model, trained on high-quality Midjourney fantasy artworks." },
+                            { name: "analog", description: "The Analog model, using Dreambooth trained on a diverse set of analog photographs." },
+                            { name: "duchaiten", description: "The Duchaiten model, great for Anime, 3D Art, and NSFW." },
+                            { name: "deliberate", description: "The Deliberate model, It is a difficult model to master, but it is known for its versatility. Use very detailed prompts and negative prompts for the best results. Higher steps may be required to avoid artifacts." },
+                            { name: "dreamshaper", description: "The Dreamshaper model, especially good for paintings and portraits." },
+                            { name: "double-exposure", description: "The Double Exposure model, great for capturing the double exposure effect." },
+                            { name: "redshift", description: "The Redshift model, great for high resolution 3D artworks." },
+                            { name: "nitro", description: "The Nitro model, great for three art styles (Archer, Arcane, and Modern Disney) - simultaneously while keeping each style separate from the others." },
+                            { name: "arcane", description: "The Arcane model, great for unique art style from the TV Show Arcane." },
+                            { name: "archer", description: "The Archer model, great for unique art style from the TV Show Archer." },
+                            { name: "disney", description: "The Disney model, great for images from Disney Pixar and 3D artworks." },
+                            { name: "synthwave", description: "The Synthwave model, combines both synthwave and inkpunk styles." },
+                            { name: "vector-art", description: "The Vector Art model, great for vector art." },
+                            { name: "pixel", description: "The Pixel model, great for pixel art." },
+                            { name: "pixel-scenery", description: "The Pixel Scenery model, great for pixel art scenery." },
+                            { name: "pixel-character", description: "The Pixel Character model, great for pixel art characters." },
+                            { name: "anything", description: "The Anything model, intended to produce high-quality, highly detailed anime style with just a few prompts." },
+                            { name: "eimis", description: "The Eimis model, works well on anime and landscape generations." },
+                            { name: "waifu", description: "The Waifu model, great for anime style." },
+                            { name: "grapefruit", description: "The Grapefruit model, great for Hentai." },
+                            { name: "pfg", description: "The PFG model, works well on Anime NSFW." },
+                            { name: "realistic-vision", description: "The Realistic Vision model, photorealism model focused on lighting, anatomy, and NSFW." },
+                            { name: "f222", description: "The F222 model, focused on anatomy and NSFW." },
+                            { name: "ppp", description: "The PPP model, realistic model merge, tested and tweaked for human females. It is mostly based on NSFW models. Key models used: F222, BerryMix, HassanBlend1.4, and many more, including Dreambooth for specific sex pose training." },
+                            { name: "hassan", description: "The Hassan model, great for photorealism and NSFW." }
+                        ]
                     },
                     {
                         name: "Quality", description: "Quality refers to the number of artistic steps taken while creating. The more steps, the higher the quality.", usage: "-quality=[25-150]", default: "25", moreOptions: []

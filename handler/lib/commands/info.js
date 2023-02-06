@@ -445,7 +445,7 @@ class Info {
                 delete options.ratio;
             }
             if (!!options.v) {
-                options.version = options.v;
+                options.model = options.v;
                 delete options.v;
             }
             if (message.type === 'image' || (message.quotedMsg && message.quotedMsg.type === 'image'))
