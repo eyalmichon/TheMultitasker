@@ -1,64 +1,132 @@
-const { fetchJson } = require('../util/fetcher');
+const { fetchText } = require('../util/fetcher');
 const { Covid } = require('../util/config.json');
-const { isInt } = require('../util/utilities');
+const { randomUserAgent } = require('../util/utilities');
+const cheerio = require('cheerio');
+
+const BASE_URL = Covid.url;
+const options = { "User-Agent": randomUserAgent() };
+const countries = [
+    "afghanistan", "albania", "algeria", "andorra", "angola", "anguilla", "antigua-and-barbuda",
+    "argentina", "armenia", "aruba", "australia", "austria", "azerbaijan", "bahamas", "bahrain",
+    "bangladesh", "barbados", "belarus", "belgium", "belize", "benin", "bermuda", "bhutan", "bolivia",
+    "bosnia-and-herzegovina", "botswana", "brazil", "british-virgin-islands", "brunei-darussalam", "bulgaria",
+    "burkina-faso", "burundi", "cabo-verde", "cambodia", "cameroon", "canada", "caribbean-netherlands",
+    "cayman-islands", "central-african-republic", "chad", "channel-islands", "chile", "china", "china-hong-kong-sar",
+    "china-macao-sar", "colombia", "congo", "costa-rica", "cote-d-ivoire", "croatia", "cuba", "curacao", "cyprus",
+    "czech-republic", "democratic-republic-of-the-congo", "denmark", "djibouti", "dominica", "dominican-republic",
+    "ecuador", "egypt", "el-salvador", "equatorial-guinea", "eritrea", "estonia", "ethiopia", "faeroe-islands",
+    "falkland-islands-malvinas", "fiji", "finland", "france", "french-guiana", "french-polynesia", "gabon",
+    "gambia", "georgia", "germany", "ghana", "gibraltar", "greece", "greenland", "grenada", "guadeloupe",
+    "guatemala", "guinea", "guinea-bissau", "guyana", "haiti", "holy-see", "honduras", "hungary", "iceland",
+    "india", "indonesia", "iran", "iraq", "ireland", "isle-of-man", "israel", "italy", "jamaica", "japan",
+    "jordan", "kazakhstan", "kenya", "kuwait", "kyrgyzstan", "laos", "latvia", "lebanon", "liberia",
+    "libya", "liechtenstein", "lithuania", "luxembourg", "macedonia", "madagascar", "malawi", "malaysia",
+    "maldives", "mali", "malta", "martinique", "mauritania", "mauritius", "mayotte", "mexico", "moldova",
+    "monaco", "mongolia", "montenegro", "montserrat", "morocco", "mozambique", "myanmar", "namibia", "nepal",
+    "netherlands", "new-caledonia", "new-zealand", "nicaragua", "niger", "nigeria", "norway", "oman", "pakistan",
+    "panama", "papua-new-guinea", "paraguay", "peru", "philippines", "poland", "portugal", "qatar", "reunion",
+    "romania", "russia", "rwanda", "saint-barthelemy", "saint-kitts-and-nevis", "saint-lucia", "saint-martin",
+    "saint-vincent-and-the-grenadines", "san-marino", "saudi-arabia", "senegal", "serbia", "seychelles",
+    "sierra-leone", "singapore", "sint-maarten", "slovakia", "slovenia", "somalia", "south-africa",
+    "south-korea", "spain", "sri-lanka", "state-of-palestine", "sudan", "suriname", "swaziland",
+    "sweden", "switzerland", "syria", "taiwan", "tanzania", "thailand", "timor-leste", "togo",
+    "trinidad-and-tobago", "tunisia", "turkey", "turks-and-caicos-islands", "uganda", "uk", "ukraine",
+    "united-arab-emirates", "uruguay", "us", "uzbekistan", "venezuela", "viet-nam", "zambia", "zimbabwe"
+]
 
 /**
-* more options from the API:
-* "body": "{\"requests\":[{\"id\":\"0\",\"queryName\":\"externalLinks\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"1\",\"queryName\":\"infectedPerDate\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"2\",\"queryName\":\"updatedPatientsOverallStatus\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"3\",\"queryName\":\"sickPerDateTwoDays\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"4\",\"queryName\":\"sickPatientPerLocation\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"5\",\"queryName\":\"patientsStatus\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"7\",\"queryName\":\"vaccinated\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"8\",\"queryName\":\"deadPatientsPerDate\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"9\",\"queryName\":\"testResultsPerDate\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"12\",\"queryName\":\"vaccinationsPerAge\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"14\",\"queryName\":\"infectionFactor\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"16\",\"queryName\":\"testsPerDate\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"19\",\"queryName\":\"patientsPerDate\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"23\",\"queryName\":\"averageInfectedPerWeek\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"24\",\"queryName\":\"researchGraph\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"25\",\"queryName\":\"infectedByPeriodAndAgeAndGender\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"26\",\"queryName\":\"HospitalBedStatusSegmentation\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"27\",\"queryName\":\"isolatedVerifiedDoctorsAndNurses\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"28\",\"queryName\":\"hospitalStatus\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"30\",\"queryName\":\"spotlightLastupdate\",\"single\":false,\"parameters\":{}},
-* {\"id\":\"31\",\"queryName\":\"spotlightAggregatedPublic\",\"single\":true,\"parameters\":{}},
-* {\"id\":\"34\",\"queryName\":\"spotlightPublic\",\"single\":false,\"parameters\":{}}]}",
-*/
-const endpoint = Covid.url;
-const options = Covid.requestOptions;
+     * get information from the official API.
+     * @param {*} days number of days to get, 1-7
+     * @param {*} country country to get data from.
+     * @returns information about infected people on these days.
+     */
+const infected = (days = '1', country = 'israel') => new Promise((resolve, reject) => {
+    console.log(`looking for last ${days} days of Covid data in ${country}...`);
 
-/**
- * get information from the official API.
- * @param {*} days number of days to get, 1-7
- * @returns information about infected people on these days.
- */
-const infected = (days = '1') => new Promise((resolve, reject) => {
-
-    console.log(`looking for last ${days} days of Covid data...`);
-
-    if (!isInt(days) || 0 >= days || days > 7)
+    if (!parseInt(days) || 0 >= days || days > 7)
         days = 1;
-    fetchJson(endpoint, options).then(body => {
 
-        let info = body[0].data;
-        let activePatients = body[1].data;
-        let text = `🟢 Active Cases: ${activePatients[0].amount + activePatients[1].amount}\n`;
-        let finalText = [];
-        for (let i = 0; i < days; i++) {
-            let day = info.pop();
-            text += (`🗓️ Date: ${day['date'].replace(/\T.*$/g, '')}\n🤒 Infected: ${day.amount}\n🦸‍♂️ Recovered: ${day.recovered}\n😷 Total Cases: ${day.sum}`);
-            if (day.coronaEvents) text += (`\n✨ Event: ${day.coronaEvents}`);
-            finalText.push(text);
-            text = '';
-        }
-        resolve(finalText.join('\n\n'));
-    }).catch(err => {
-        console.error(err);
-        reject(err);
-    });
+    if (!countries.includes(country))
+        country = 'israel'
+
+    return fetchText(`${BASE_URL}/coronavirus/country/${country}/`, options)
+        .then(body => {
+            const $ = cheerio.load(body);
+
+            const img = `${BASE_URL}` + $('h1 div img').attr('src');
+            const tempCases = $('div#maincounter-wrap').eq(0).text().split(':')[1].trim();
+            const cases = parseInt(tempCases.replace(/,/g, ''), 10);
+            const tempDeaths = $('div#maincounter-wrap').eq(1).text().split(':')[1].trim();
+            const deaths = parseInt(tempDeaths.replace(/,/g, ''), 10);
+            const tempRecovered = $('div#maincounter-wrap').eq(2).text().split(':')[1].trim();
+            const recovered = parseInt(tempRecovered.replace(/,/g, ''), 10);
+            const activeCases = [];
+            const closedCases = [];
+
+            $('div .col-md-6').eq(0).each((i, el) => {
+                const $element = $(el);
+                const tempInfected = $element.find('div.number-table-main').text();
+                const infected = parseInt(tempInfected.replace(/,/g, ''), 10);
+                const tempInMidCondition = $element.find('span.number-table').eq(0).text();
+                const inMidCondition = parseInt(tempInMidCondition.replace(/,/g, ''), 10);
+                const tempCritical = $element.find('span.number-table').eq(1).text();
+                const criticalStates = parseInt(tempCritical.replace(/,/g, ''), 10);
+
+                activeCases.push({
+                    infected,
+                    inMidCondition,
+                    criticalStates
+                });
+            });
+
+            $('div .col-md-6').eq(1).each((i, el) => {
+                const $element = $(el);
+                const infected = $element.find('div.number-table-main').text();
+                const casesWhichHadAnOutcome = parseInt(infected.replace(/,/g, ''), 10);
+                const tempRecovered = $element.find('span.number-table').eq(0).text();
+                const recovered = parseInt(tempRecovered.replace(/,/g, ''), 10);
+                const tempDeaths = $element.find('span.number-table').eq(1).text();
+                const deaths = parseInt(tempDeaths.replace(/,/g, ''), 10);
+
+                closedCases.push({
+                    casesWhichHadAnOutcome,
+                    recovered,
+                    deaths
+                });
+            });
+
+            const last7Days = { dates: [], text: [] }
+
+            const $last7Days = $('div .col-md-12').end()
+
+
+            last7Days.dates.push($last7Days.find('.news_date').text().split(' ').slice(0, 2).join(' '))
+
+            $last7Days.find('.news_li').each((i, el) => {
+                last7Days.text.push($(el).text().replace(/in.*/, '').trim())
+            })
+
+
+            $last7Days.find('.btn.btn-light.date-btn').each((i, el) => {
+                last7Days.dates.push($(el).text().trim())
+            })
+
+            const finalText = [];
+            let byDays = [];
+            for (let i = 0; i < days && i < last7Days.dates.length; i++)
+                byDays.push(`📅 ${last7Days.dates[i]}: ${last7Days.text[i]}`)
+
+            finalText.push(byDays.join('\n'))
+            finalText.push(`🩺 Active Cases: ${cases - deaths - recovered}\n💀 Deaths: ${deaths}\n💪 Recovered: ${recovered}\n📈 Total Cases: ${cases}`)
+            if (activeCases.length) finalText.push(`****** 🟢 Active Cases 🟢 ******\n🦠 Infected: ${activeCases[0].infected}\n🤕 In Mid Condition: ${activeCases[0].inMidCondition}\n🆘 Critical States: ${activeCases[0].criticalStates}`)
+            if (closedCases.length) finalText.push(`****** 🔴 Closed Cases 🔴 ******\n🦸‍♂️ Recovered: ${closedCases[0].recovered}\n💀 Deaths: ${closedCases[0].deaths}\n📊 Cases Which Had An Outcome: ${closedCases[0].casesWhichHadAnOutcome}`)
+
+            resolve({ text: finalText.join('\n\n'), img })
+        })
+        .catch(err => {
+            console.error(err);
+            reject(err);
+        });
 });
 
 module.exports = {

@@ -8,15 +8,7 @@
         "Activated": false
     },
     "Covid": {
-        "url": "https://datadashboardapi.health.gov.il/api/queries/_batch",
-        "requestOptions": {
-            "method": "POST",
-            "headers": {
-                "content-type": "application/json"
-            },
-            "referrer": "https://datadashboard.health.gov.il/",
-            "body": "{\"requests\":[{\"id\":\"1\",\"queryName\":\"infectedPerDate\",\"single\":false,\"parameters\":{}},{\"id\":\"3\",\"queryName\":\"sickPerDateTwoDays\",\"single\":false,\"parameters\":{}}]}"
-        }
+        "url": "https://www.worldometers.info"
     },
     "Nikud": {
         "url": "https://nakdan-3-0a.loadbalancer.dicta.org.il/api",

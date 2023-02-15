@@ -102,8 +102,15 @@ class Info {
 
     covid = {
         func: (message) => {
-            return covid.infected(message.args[0])
-                .then(infectedInfo => returnType.reply(infectedInfo))
+            const options = parser.parse(message.args, false);
+            let country = options.c || 'israel';
+
+            return covid.infected(message.args[0], country)
+                .then(infectedInfo => returnType.fileFromURL(infectedInfo.img, 'the_multitasker.gif', infectedInfo.text))
+                .catch(err => {
+                    console.error(err)
+                    return errors.UNKNOWN();
+                })
         },
         help: () => help.Info.covid,
         timer: () => this.defaultTimer
