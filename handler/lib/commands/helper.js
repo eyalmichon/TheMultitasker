@@ -358,7 +358,7 @@ const help = {
                         usage: '-to=groupID'
                     }
                 ],
-                aliases: ['spammsg']
+                aliases: ['spammsg', 'spam']
             }
         }),
     },
