@@ -66,6 +66,7 @@ class Owner {
         commands.countmsgs = this.addInfo(this.countMessagesByText)
 
         commands.spammsg = this.addInfo(this.spamMessage)
+        commands.spam = this.alias(this.spamMessage)
 
         // commands.m = this.addInfo(this.m);
 
@@ -474,21 +475,63 @@ class Owner {
     }
 
     spamMessage = {
-        func: (message, client) => {
+        func: async (message, client) => {
             const options = parser.parse(message.args, false);
             let n = options.n || 1;
             let text = options.joinedText;
             let to = options.to;
+            let join = options.join;
+            let tagall = options.tag;
+
+            if (join)
+                to = await client.joinGroupViaLink(join);
+
+            // wait for 500ms before sending the messages.
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+
+
             console.log(`Spamming ${n} messages to ${to ? to : message.from}`)
             if (message.quotedMsg)
-                for (let i = 0; i < n; i++)
-                    client.forwardMessages(to ? to : message.from, message.quotedMsg.id);
+                for (let i = 0; i < n; i++) {
+                    console.log(`Forwarding message ${i + 1} of ${n}`)
+                    await client.forwardMessages(to ? to : message.from, message.quotedMsg.id);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
             else if (text)
-                for (let i = 0; i < n; i++)
-                    client.sendText(to ? to : message.from, text);
+                for (let i = 0; i < n; i++) {
+                    console.log(`Sending message ${i + 1} of ${n}`)
+                }
+
+            if (tagall) {
+                let groupMembers = await client.getGroupMembersId(to)
+                console.log(`Tagging ${groupMembers.length} members`)
+                await client.sendTextWithMentions(to ? to : message.from, groupMembers.map(member => `@${member.replace('@c.us', '')}`).join(' '))
+                if (groupMembers.length > 100)
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            // wait 1 second before leaving the group.
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (join)
+                await client.leaveGroup(to);
+
             return { info: true };
         },
         help: () => help.Owner.spamMessage,
+        timer: () => this.defaultTimer
+    }
+
+    joinGroup = {
+        func: (message, client) => {
+            const options = parser.parse(message.args);
+            let link = options.url
+            if (!link)
+                return errors.NO_LINK;
+            client.joinGroupViaLink(link);
+            return { info: true };
+        },
+        help: () => help.Owner.joinGroup,
         timer: () => this.defaultTimer
     }
 
