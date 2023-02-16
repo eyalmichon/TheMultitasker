@@ -19,7 +19,7 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@iamtraction/google-translate": "^1.1.2",
-    "@open-wa/wa-automate": "^4.54.6",
+    "@open-wa/wa-automate": "^4.57.0",
     "abort-controller": "^3.0.0",
     "changelog-parser": "^2.8.1",
     "cheerio": "^1.0.0-rc.11",
