@@ -68,6 +68,8 @@ class Owner {
         commands.spammsg = this.addInfo(this.spamMessage)
         commands.spam = this.alias(this.spamMessage)
 
+        commands.joingroup = this.addInfo(this.joinGroup)
+
         // commands.m = this.addInfo(this.m);
 
         commands.up = this.addInfo(this.uploadImg)
@@ -432,8 +434,36 @@ class Owner {
     }
 
     removeMsg = {
-        func: (message, client) => {
-            client.deleteMessage(message.from, message.quotedMsg.id, false);
+        func: async (message, client) => {
+            const options = parser.parse(message.args);
+            let all = options.a
+
+            if (!message.quotedMsg)
+                return errors.NO_QUOTED_MESSAGE;
+
+            if (all) {
+
+                // ************* until this function is fixed... *************
+                // const messages = await client.loadEarlierMessagesTillDate(message.from, timestamp);
+
+                // this is a workaround for the above function.
+                message.quotedMsg = await client.getMessageById(message.quotedMsg.id);
+                if (!message.quotedMsg)
+                    while (!message.quotedMsg) {
+                        await client.loadEarlierMessages(message.from);
+                        message.quotedMsg = await client.getMessageById(message.quotedMsg.id);
+                    }
+                const timestamp = message.quotedMsg.timestamp;
+
+                const messages = await client.loadAndGetAllMessagesInChat(message.from, true, true)
+                    .then(messages => messages.filter(msg => msg.timestamp >= timestamp && msg.sender.id === message.quotedMsg.sender.id).map(msg => msg.id))
+
+                console.log(`Deleting ${messages.length} messages...`);
+                client.deleteMessage(message.from, messages, false);
+            }
+            else
+                client.deleteMessage(message.from, message.quotedMsg.id, false);
+
             client.deleteMessage(message.from, message.id, false);
             return { info: true };
         },
@@ -483,13 +513,11 @@ class Owner {
             let join = options.join;
             let tagall = options.tag;
 
-            if (join)
+            if (join) {
                 to = await client.joinGroupViaLink(join);
-
-            // wait for 500ms before sending the messages.
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-
+                // wait for 2 seconds before sending the messages.
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
 
             console.log(`Spamming ${n} messages to ${to ? to : message.from}`)
             if (message.quotedMsg)
@@ -501,6 +529,7 @@ class Owner {
             else if (text)
                 for (let i = 0; i < n; i++) {
                     console.log(`Sending message ${i + 1} of ${n}`)
+                    await client.sendText(to ? to : message.from, text);
                 }
 
             if (tagall) {
@@ -511,10 +540,11 @@ class Owner {
                     await new Promise(resolve => setTimeout(resolve, 1000));
             }
 
-            // wait 1 second before leaving the group.
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            if (join)
+            if (join) {
+                // wait 1 second before leaving the group.
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 await client.leaveGroup(to);
+            }
 
             return { info: true };
         },

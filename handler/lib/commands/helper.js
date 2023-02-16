@@ -322,7 +322,11 @@ const help = {
             cmdDescription: 'Remove a message sent by the bot or anyone if the bot has admin.',
             cmdUsage: {
                 usage: `remove`,
-                options: [],
+                options: [{
+                    name: 'All',
+                    description: 'Remove all messages sent by a person up to the replied message.',
+                    usage: '-a'
+                }],
                 aliases: ['remove', 'rmv']
             }
         }),
