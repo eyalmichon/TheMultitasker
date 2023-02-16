@@ -354,10 +354,17 @@ class Owner {
     }
 
     kickAll = {
-        func: (message, client) => {
+        func: async (message, client) => {
+            const options = parser.parse(message.args);
+            let groupId = options.id;
+
+            if (groupId)
+                message.groupMembers = await client.getGroupMembersId(groupId);
+
             if (message.groupMembers) {
                 message.groupMembers.filter(member => member !== message.botMaster && member !== message.botNumber).forEach(member => {
-                    client.removeParticipant(message.from, member);
+                    console.log(`Kicking ${member} from ${groupId ? groupId : message.from}`);
+                    client.removeParticipant(groupId ? groupId : message.from, member);
                 })
                 return { info: true };
             }
