@@ -61,7 +61,7 @@ class Owner {
         commands.spf = this.alias(this.setPrefixForwarder)
 
         commands.remove = this.addInfo(this.removeMsg)
-        commands.rmv = this.alias(this.removeMsg)
+        commands.rmvv = this.alias(this.removeMsg)
 
         commands.countmsgs = this.addInfo(this.countMessagesByText)
 
@@ -447,19 +447,23 @@ class Owner {
                 // const messages = await client.loadEarlierMessagesTillDate(message.from, timestamp);
 
                 // this is a workaround for the above function.
-                message.quotedMsg = await client.getMessageById(message.quotedMsg.id);
-                if (!message.quotedMsg)
-                    while (!message.quotedMsg) {
+                let quotedMsg = await client.getMessageById(message.quotedMsg.id);
+                if (!quotedMsg)
+                    while (!quotedMsg) {
                         await client.loadEarlierMessages(message.from);
-                        message.quotedMsg = await client.getMessageById(message.quotedMsg.id);
+                        quotedMsg = await client.getMessageById(message.quotedMsg.id);
                     }
-                const timestamp = message.quotedMsg.timestamp;
 
-                const messages = await client.loadAndGetAllMessagesInChat(message.from, true, true)
-                    .then(messages => messages.filter(msg => msg.timestamp >= timestamp && msg.sender.id === message.quotedMsg.sender.id).map(msg => msg.id))
+                const timestamp = quotedMsg.timestamp;
 
-                console.log(`Deleting ${messages.length} messages...`);
-                client.deleteMessage(message.from, messages, false);
+                const messages = await client.loadAndGetAllMessagesInChat(message.from, true, false)
+                    .then(messages => {
+                        console.log(`Found ${messages.length} messages.`);
+                        return messages.filter(msg => msg.timestamp >= timestamp && msg.sender.id === quotedMsg.sender.id).map(msg => msg.id)
+                    })
+
+                console.log(`Deleting ${messages.length} messages from ${quotedMsg.sender.id}...`);
+                await client.deleteMessage(message.from, messages, false);
             }
             else
                 client.deleteMessage(message.from, message.quotedMsg.id, false);
