@@ -487,6 +487,9 @@ class Info {
                 .then(result => returnType.fileFromURL(result.image_url, 'the_multitasker.png', options.joinedText))
                 .catch(err => {
                     console.error(err);
+                    if (err === 'Insufficient permissions')
+                        return errors.INSUFFICIENT_PERMISSIONS_IMAGINE;
+
                     return errors.UNKNOWN();
                 })
         },

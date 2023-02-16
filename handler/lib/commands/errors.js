@@ -54,6 +54,7 @@ const errors = {
     NO_QUOTED_MESSAGE: addType(`📛 Error, no quoted message found.`),
     POLL_ERROR_TOO_LESS: addType(`📛 Error, you need to enter at least 2 options.`),
     POLL_ERROR_TOO_MANY: addType(`📛 Error, you can only enter up to 12 options.`),
+    INSUFFICIENT_PERMISSIONS_IMAGINE: addType(`📛 Error, you don't have the required permissions to use other models.`),
 }
 
 
