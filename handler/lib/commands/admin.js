@@ -67,9 +67,8 @@ class Admin {
 
     promote = {
         func: (message, client) => {
-            // *bot master is immune to promote command*
             // Promote the quoted person 
-            if (!!message.quotedMsg && message.quotedMsg.sender.id !== message.botMaster)
+            if (!!message.quotedMsg)
                 client.promoteParticipant(message.from, message.quotedMsg.sender.id);
             // Go over the mentioned members and promote them all.
             message.mentionedJidList.forEach(member => {
