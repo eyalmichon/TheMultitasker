@@ -61,7 +61,7 @@ class Owner {
         commands.spf = this.alias(this.setPrefixForwarder)
 
         commands.remove = this.addInfo(this.removeMsg)
-        commands.rmvv = this.alias(this.removeMsg)
+        commands.rmv = this.alias(this.removeMsg)
 
         commands.countmsgs = this.addInfo(this.countMessagesByText)
 
@@ -448,26 +448,38 @@ class Owner {
             if (!message.quotedMsg)
                 return errors.NO_QUOTED_MESSAGE;
 
+            client.deleteMessage(message.from, message.id, false);
+
             if (all) {
 
                 // ************* until this function is fixed... *************
                 // const messages = await client.loadEarlierMessagesTillDate(message.from, timestamp);
 
                 // this is a workaround for the above function.
-                let quotedMsg = await client.getMessageById(message.quotedMsg.id);
+                let messages = await client.loadAndGetAllMessagesInChat(message.from, true)
+                let fetchArr = [];
+
+                let quotedMsg = messages.find(msg => msg.id === message.quotedMsg.id);
+
                 if (!quotedMsg)
-                    while (!quotedMsg) {
-                        await client.loadEarlierMessages(message.from);
-                        quotedMsg = await client.getMessageById(message.quotedMsg.id);
+                    while (true) {
+                        fetchArr = await client.loadEarlierMessages(message.from);
+                        console.log(`Fetched ${fetchArr.length} messages.`)
+                        // if not array or empty array, break.
+                        if (!Array.isArray(fetchArr) || !fetchArr.length) break;
+                        messages.push(...fetchArr);
+                        // check if the quoted message is in the array, if it is we are done.
+                        if (quotedMsg = fetchArr.find(msg => msg.id === message.quotedMsg.id)) {
+                            console.log('Quoted message found in array, breaking.')
+                            break;
+                        }
                     }
 
+                if (!quotedMsg) return
                 const timestamp = quotedMsg.timestamp;
 
-                const messages = await client.loadAndGetAllMessagesInChat(message.from, true, false)
-                    .then(messages => {
-                        console.log(`Found ${messages.length} messages.`);
-                        return messages.filter(msg => msg.timestamp >= timestamp && msg.sender.id === quotedMsg.sender.id).map(msg => msg.id)
-                    })
+                messages = messages.filter(msg => msg.timestamp >= timestamp && msg.sender.id === quotedMsg.sender.id).map(msg => msg.id)
+
 
                 console.log(`Deleting ${messages.length} messages from ${quotedMsg.sender.id}...`);
                 await client.deleteMessage(message.from, messages, false);
@@ -475,7 +487,6 @@ class Owner {
             else
                 client.deleteMessage(message.from, message.quotedMsg.id, false);
 
-            client.deleteMessage(message.from, message.id, false);
             return { info: true };
         },
         help: () => help.Owner.removeMsg,
