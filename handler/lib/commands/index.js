@@ -8,6 +8,7 @@ const { Social } = require("./social");
 const { Sticker } = require('./sticker');
 const { Media } = require('./media');
 const { Help } = require('./help');
+const { AI } = require('./ai');
 
 class Commands {
     // Initialize all commands to the commands object.
@@ -20,6 +21,7 @@ class Commands {
         new Info(this.commands, 10);
         new Sticker(this.commands, 5);
         new Media(this.commands, 5);
+        new AI(this.commands, 60)
         // Keep last.
         new Help(this.commands, 0);
     }

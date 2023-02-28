@@ -346,6 +346,11 @@ const msgHandler = async (client, message) => {
             waitMsg = client.reply(from, i(getRandomWaitMsg()), id);
             result = await commands.execute(command, message);
             break;
+        // AI Commands.
+        case 'AI':
+            waitMsg = client.reply(from, i(getRandomWaitMsg()), id);
+            result = await commands.execute(command, message);
+            break;
         default:
             result = errors.WRONG_CMD
             break;
