@@ -661,21 +661,6 @@ const help = {
                 aliases: ['translate', 'tran', 'tr']
             }
         }),
-        recognizeMusic: generateCommandString({
-            cmdName: 'recognizeMusic',
-            cmdDescription: 'Recognize a song from an audio message or a video.',
-            cmdUsage: {
-                usage: 'reply with the command to an audio message or a video.',
-                options: [
-                    {
-                        name: 'All results',
-                        description: 'Get all the results from the API.',
-                        usage: '-f or -full'
-                    }
-                ],
-                aliases: ['recognize', 'rec', 'rm']
-            }
-        }),
         nikud: generateCommandString({
             cmdName: 'nikud',
             cmdDescription: 'Add nikud to a text.',
@@ -794,112 +779,6 @@ const help = {
                 ],
                 aliases: ['conjugate', 'conj']
             },
-        }),
-        thisDoesntExist: generateCommandString({
-            cmdName: "thisdoesntexist",
-            cmdDescription: "Generate a thisdoesntexist type of item.",
-            cmdUsage: {
-                usage: "thisdoesntexist [-flag] (where -flag is one of the flags below) or else a random one will be chosen.",
-                options: [
-                    {
-                        name: "Flags",
-                        description: "",
-                        usage: "-flag=[flag]",
-                        default: "random",
-                        moreOptions: [
-                            {
-                                name: "Person",
-                                description: "Generate a person that doesn't exist.",
-                                usage: "-person"
-                            },
-                            {
-                                name: "Cat",
-                                description: "Generate a cat that doesn't exist.",
-                                usage: "-cat"
-                            },
-                            {
-                                name: "Horse",
-                                description: "Generate a horse that doesn't exist.",
-                                usage: "-horse"
-                            },
-                            {
-                                name: "Rental",
-                                description: "Generate a rental that doesn't exist.",
-                                usage: "-rental"
-                            },
-                            {
-                                name: "Waifu",
-                                description: "Generate a waifu that doesn't exist.",
-                                usage: "-waifu"
-                            },
-                            {
-                                name: "Question",
-                                description: "Generate a question that doesn't exist.",
-                                usage: "-question"
-                            },
-                            {
-                                name: "Chemical",
-                                description: "Generate a chemical that doesn't exist.",
-                                usage: "-chemical"
-                            },
-                            {
-                                name: "Word",
-                                description: "Generate a word that doesn't exist.",
-                                usage: "-word"
-                            },
-                            {
-                                name: "City",
-                                description: "Generate a city that doesn't exist.",
-                                usage: "-city"
-                            },
-                            {
-                                name: "Simpsons",
-                                description: "Generate a simpsons character that doesn't exist.",
-                                usage: "-simpsons"
-                            },
-                            {
-                                name: "Art",
-                                description: "Generate a piece of art that doesn't exist.",
-                                usage: "-art"
-                            },
-                            {
-                                name: "Video",
-                                description: "Generate a video that doesn't exist. (could take some time)",
-                                usage: "-video"
-                            },
-                            {
-                                name: "Ideas",
-                                description: "Generate an idea that doesn't exist.",
-                                usage: "-ideas"
-                            },
-                            {
-                                name: "Lyrics",
-                                description: "Generate lyrics that don't exist.",
-                                usage: "-lyrics",
-                                moreOptions: [
-                                    {
-                                        name: "Topic",
-                                        description: "The topic of the lyrics.",
-                                        usage: "-t/topic=[topic]"
-                                    },
-                                    {
-                                        name: "Genre",
-                                        description: "The genre of the lyrics. (country, metal, rock, pop, rap, edm)",
-                                        usage: "-g/genre=[genre]"
-
-                                    },
-                                    {
-                                        name: "Mood",
-                                        description: "The mood of the lyrics. (verysad, sad, neutral, happy, veryhappy)",
-                                        usage: "-m/mood=[mood]"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                aliases: ['thisdoesntexist', 'tde']
-            }
         }),
         emojiGenerator: generateCommandString({
             cmdName: "emojigenerator",
@@ -1054,6 +933,125 @@ const help = {
                 aliases: ["currency"]
             }
         }),
+        poll: generateCommandString({
+            cmdName: "poll",
+            cmdDescription: "Create a poll.",
+            cmdUsage: {
+                usage: "poll [question, option1, options2, etc...]",
+                options: [],
+                aliases: ["poll"]
+            }
+        }),
+    },
+    AI: {
+        recognizeMusic: generateCommandString({
+            cmdName: 'recognizeMusic',
+            cmdDescription: 'Recognize a song from an audio message or a video.',
+            cmdUsage: {
+                usage: 'reply with the command to an audio message or a video.',
+                options: [
+                    {
+                        name: 'All results',
+                        description: 'Get all the results from the API.',
+                        usage: '-f or -full'
+                    }
+                ],
+                aliases: ['recognize', 'rec', 'rm']
+            }
+        }),
+        thisDoesntExist: generateCommandString({
+            cmdName: "thisdoesntexist",
+            cmdDescription: "Generate a thisdoesntexist type of item.",
+            cmdUsage: {
+                usage: "thisdoesntexist [-flag] (where -flag is one of the flags below) or else a random one will be chosen.",
+                options: [
+                    {
+                        name: "Flags",
+                        description: "",
+                        usage: "-flag=[flag]",
+                        default: "random",
+                        moreOptions: [
+                            {
+                                name: "Person",
+                                description: "Generate a person that doesn't exist.",
+                            },
+                            {
+                                name: "Cat",
+                                description: "Generate a cat that doesn't exist.",
+                            },
+                            {
+                                name: "Horse",
+                                description: "Generate a horse that doesn't exist.",
+                            },
+                            {
+                                name: "Rental",
+                                description: "Generate a rental that doesn't exist.",
+                            },
+                            {
+                                name: "Waifu",
+                                description: "Generate a waifu that doesn't exist.",
+                            },
+                            {
+                                name: "Question",
+                                description: "Generate a question that doesn't exist.",
+                            },
+                            {
+                                name: "Chemical",
+                                description: "Generate a chemical that doesn't exist.",
+                            },
+                            {
+                                name: "Word",
+                                description: "Generate a word that doesn't exist.",
+                            },
+                            {
+                                name: "City",
+                                description: "Generate a city that doesn't exist.",
+                            },
+                            {
+                                name: "Simpsons",
+                                description: "Generate a simpsons character that doesn't exist.",
+                            },
+                            {
+                                name: "Art",
+                                description: "Generate a piece of art that doesn't exist.",
+                            },
+                            {
+                                name: "Video",
+                                description: "Generate a video that doesn't exist. (could take some time)",
+                            },
+                            {
+                                name: "Ideas",
+                                description: "Generate an idea that doesn't exist.",
+                            },
+                            {
+                                name: "Lyrics",
+                                description: "Generate lyrics that don't exist.",
+                                usage: "-flag=lyrics -t/topic=[topic] -g/genre=[genre] -m/mood=[mood]",
+                                moreOptions: [
+                                    {
+                                        name: "Topic",
+                                        description: "The topic of the lyrics.",
+                                        usage: "-t/topic=[topic]"
+                                    },
+                                    {
+                                        name: "Genre",
+                                        description: "The genre of the lyrics. (country, metal, rock, pop, rap, edm)",
+                                        usage: "-g/genre=[genre]"
+
+                                    },
+                                    {
+                                        name: "Mood",
+                                        description: "The mood of the lyrics. (verysad, sad, neutral, happy, veryhappy)",
+                                        usage: "-m/mood=[mood]"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                aliases: ['thisdoesntexist', 'tde']
+            }
+        }),
         imagine: generateCommandString({
             cmdName: "imagine",
             cmdDescription: "Turn text into images.",
@@ -1158,15 +1156,6 @@ const help = {
                 aliases: ["enhance"]
             }
         }),
-        poll: generateCommandString({
-            cmdName: "poll",
-            cmdDescription: "Create a poll.",
-            cmdUsage: {
-                usage: "poll [question, option1, options2, etc...]",
-                options: [],
-                aliases: ["poll"]
-            }
-        }),
         summarize: generateCommandString({
             cmdName: "summarize",
             cmdDescription: "Summarize a text.",
@@ -1252,6 +1241,73 @@ const help = {
                     }
                 ],
                 aliases: ['transcribe', 'tb']
+            }
+        }),
+        aiContentDetection: generateCommandString({
+            cmdName: "aicontentdetection",
+            cmdDescription: "Detect if the text content was written by a human or an AI.",
+            cmdUsage: {
+                usage: "aicontentdetection [text]",
+                options: [],
+                aliases: ["aicontentdetection", "acd"]
+            }
+        }),
+        excuseGenerator: generateCommandString({
+            cmdName: "excusegenerator",
+            cmdDescription: "Generate an excuse for a certain target (e.g. boss, teacher, etc.).",
+            cmdUsage: {
+                usage: "excusegenerator [messup]",
+                options: [
+                    {
+                        name: "Target",
+                        description: "The target of the excuse.",
+                        usage: "-target=[boss, teacher, etc.]",
+                        default: "Boss"
+                    },
+                    {
+                        name: "Proffesionalism",
+                        description: "The proffesionalism of the excuse.",
+                        usage: "-pro=[0-100]",
+                        default: "50"
+                    }
+                ],
+                aliases: ["excusegenerator", "excuse"]
+            }
+        }),
+        randomIdea: generateCommandString({
+            cmdName: "randomidea",
+            cmdDescription: "Generate a random idea.",
+            cmdUsage: {
+                usage: "randomidea",
+                options: [],
+                aliases: ["randomidea"]
+            }
+        }),
+        dreamInterpretation: generateCommandString({
+            cmdName: "dreaminterpretation",
+            cmdDescription: "Interpret a dream.",
+            cmdUsage: {
+                usage: "dreaminterpretation [dream]",
+                options: [],
+                aliases: ["dreaminterpretation", "dreaminterpret", "di"]
+            }
+        }),
+        sqlFixer: generateCommandString({
+            cmdName: "sqlfixer",
+            cmdDescription: "Fix a SQL query.",
+            cmdUsage: {
+                usage: "sqlfixer [query]",
+                options: [],
+                aliases: ["sqlfixer", "sqlf"]
+            }
+        }),
+        sqlExplainer: generateCommandString({
+            cmdName: "sqlexplainer",
+            cmdDescription: "Explain a SQL query.",
+            cmdUsage: {
+                usage: "sqlexplainer [query]",
+                options: [],
+                aliases: ["sqlexplainer", "sqle"]
             }
         }),
     },

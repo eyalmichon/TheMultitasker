@@ -56,11 +56,10 @@ Command pattern used for easy management of adding more commands.
 
 - ### Info Commands ℹ:
   - Compile 👨‍💻 and get output from many languages like Python 🐍, C, Java, etc....
-  - Get COVID-19 🦠 updates for Israel.
+  - Get COVID-19 🦠 updates for many countries.
   - Get answers to questions ❓ from WolframAlpha.
   - Get definition of words / Word of the day / random word from Urban Dictionary.
   - Translate sentences using Google Translate.
-  - Recognize music 👂🎶.
   - Fix grammar.
   - Text to speech.
   - Translate with context.
@@ -69,13 +68,24 @@ Command pattern used for easy management of adding more commands.
   - get this doesn't exist content from [this](https://thisxdoesnotexist.com/) collection
   - Get info on cars 🚗 and motorcycles 🏍 in Israel.
   - Currency checking. 💱💵
+
+- ### AI Commands 🤖:
+  - Recognize music 👂🎶.
   - Imagine, text to image generation. 🖼
+  - Enhance image quality. 🖼
   - Summarize text. 📝
   - Get topics of text. 📌
   - Split text by sentences. 📃
   - Anonymize text. 🕵️‍♂️
   - Get contents of a website. 🌐
   - Transcribe audio. 🎙 
+  - AI detector for text. 🕵️‍♂️
+  - Excuse generator. 🤷‍♂️
+  - Random Idea generator. 💡
+  - Dream Interpretation. 🌙
+  - SQL Fixer. 🐛
+  - SQL Explainer. 📖
+
 
 - ### Forwarder Commands ⏩:
   - Forward messages randomly from a chosen group. (group IDs need to be set manually)
@@ -128,7 +138,7 @@ Now you'll need to create a senders file in json format at `./handler/util` whic
 
 The group info needed here is the JID of the group. (which looks like this "\*\*\*\*-\*\*\*\*@g.us")
 Same thing for regular users (which is the phone number with @c.us appended)
-```json
+```js
 {
   "Me": "****@c.us",
   "Allowed": [
@@ -138,13 +148,14 @@ Same thing for regular users (which is the phone number with @c.us appended)
   "WelcomeMsg": ["****-****@g.us"],
   "RedAlerts-MessageOnly": [""],
   "RedAlerts": [""],
-  ...
+  "ProjectEgg": "****-****@g.us",
+  "Fartictionary": "****-****@g.us"
 }
 ```
 Now if you want to use any api that is using image uploading / music recognition / better background removal you'll need to create an account on [imgur](https://imgur.com) and get a client ID and secret and place them in a new secrets.json file located at `./handler/util` folder .
 
 #### Example secrets.json:
-```json
+```js
 {
     "Imgur": {
         "ID": "*********",
@@ -159,7 +170,55 @@ Now if you want to use any api that is using image uploading / music recognition
             "access_key": "******",
             "access_secret": "******"
         }],
-    "removebg":["******"]
+    "removebg":["******"],
+    // you'll need to get this yourself from mage dot space
+    "imagineSecrets": {
+        "apiUrl": "",
+        "enhanceUrl": "",
+        "refferer": "",
+        "googleApi": "",
+        "x-client-data": "",
+        "x-client-version": "",
+        "x-firebase-gmpid": ""
+    },
+    "AISecrets": {
+      // you'll need to get this yourself from one ai dot come
+        "oneai": {
+            "keys": [
+            ],
+            "apiEndpoint": "",
+            "AISignInAPI": ""
+        },
+        "contentDetector": {
+          // you'll need to get this yourself from writer dot com
+            "short": {
+                "apiEndpoint": ""
+            },
+            // you'll need to get this yourself from copy leaks dot com
+            "long": {
+                "apiEndpoint": "",
+                "referrer": ""
+            }
+        },
+        // you'll need to get this yourself from excuses dot ai
+        "excuseGenerator": {
+            "apiEndpoint": "",
+            "referrer": ""
+        },
+        // you'll need to get this yourself from ideas ai dot com
+        "randomIdea": {
+            "apiEndpoint": ""
+        },
+        // you'll need to get this yourself from dream interpreter dot ai
+        "dreamInterpretation": {
+            "apiEndpoint": "",
+            "referrer": ""
+        },
+        // you'll need to get this yourself from air ops dot com
+        "sql": {
+            "apiEndpoint": ""
+        }
+    }
 }
 ```
 

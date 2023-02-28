@@ -1,15 +1,28 @@
 const { fetchJson } = require('../util/fetcher');
 const { AISecrets } = require('../util/secrets.json');
+const { randomUserAgent } = require('../util/utilities');
 
-const API_KEYS = AISecrets.keys;
 
 /**
  * Returns a randomly selected key from the API_KEYS array.
  *
- * @returns {string} A randomly selected key from the API_KEYS array.
+ * @returns {string} A randomly selected key from an array of keys.
  */
-function getRandomKey() {
-    return API_KEYS[Math.floor(Math.random() * API_KEYS.length)]
+function getRandomKey(keys) {
+    return keys[Math.floor(Math.random() * keys.length)]
+}
+/**
+ * Generates a random UUID
+ * @returns {string} A random UUID
+ */
+function generateUID() {
+    var d = new Date().getTime();
+    var uid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    return uid;
 }
 
 /**
@@ -22,10 +35,10 @@ function getRandomKey() {
  * @returns {Promise} A Promise that resolves with the API response or rejects with an error
  */
 const baseAPICall = (text, options) => new Promise((resolve, reject) => {
-    return fetchJson(AISecrets.AIAPI, {
+    return fetchJson(AISecrets.oneai.apiEndpoint, {
         "headers": {
             "accept": "application/json, text/plain, */*",
-            "api-key": getRandomKey(),
+            "api-key": getRandomKey(AISecrets.oneai.keys),
             "content-type": "application/json",
         },
         "body": JSON.stringify({
@@ -57,7 +70,7 @@ const baseAPICall = (text, options) => new Promise((resolve, reject) => {
  */
 const summarize = (text, options = {}) => new Promise((resolve, reject) => {
 
-    console.log(`Summarizing text: ${text.substr(0, 100)}...`)
+    console.log(`Summarizing text: ${text.substring(0, 100)}...`)
 
     const autoLength = (options.maxLength || options.minLength) ? false : true;
     const maxLength = options.maxLength || 100;
@@ -81,7 +94,7 @@ const summarize = (text, options = {}) => new Promise((resolve, reject) => {
  */
 const topics = (text) => new Promise((resolve, reject) => {
 
-    console.log(`Extracting topics from text: ${text.substr(0, 100)}...`)
+    console.log(`Extracting topics from text: ${text.substring(0, 100)}...`)
 
     return baseAPICall(text, { type: 'article-topics' })
         .then((res) => {
@@ -102,7 +115,7 @@ const topics = (text) => new Promise((resolve, reject) => {
  */
 const splitBySentence = (text) => new Promise((resolve, reject) => {
 
-    console.log(`Splitting text into sentences: ${text.substr(0, 100)}...`)
+    console.log(`Splitting text into sentences: ${text.substring(0, 100)}...`)
 
     return baseAPICall(text, { type: 'sentences' })
         .then((res) => {
@@ -123,7 +136,7 @@ const splitBySentence = (text) => new Promise((resolve, reject) => {
  */
 const anonymize = (text) => new Promise((resolve, reject) => {
 
-    console.log(`Anonymizing text: ${text.substr(0, 100)}...`)
+    console.log(`Anonymizing text: ${text.substring(0, 100)}...`)
 
     return baseAPICall(text, { type: 'anonymize' })
         .then((res) => {
@@ -171,11 +184,11 @@ const transcribe = (file, options = {}) => new Promise((resolve, reject) => {
     const speakerDetection = options.speakerDetection || false;
     const timestampPerLabel = options.timestampPerLabel || false;
     const timestampPerWord = options.timestampPerWord || false;
-    const _API_KEY = getRandomKey();
-    return fetchJson(`${AISecrets.AIAPI}/async/file?pipeline=%7B%22input_type%22%3A%22conversation%22%2C%22steps%22%3A%5B%7B%22skill%22%3A%22transcribe%22%2C%22params%22%3A%7B%22speaker_detection%22%3A${speakerDetection}%2C%22timestamp_per_word%22%3A${timestampPerWord}%2C%22timestamp_per_label%22%3A${timestampPerLabel}%2C%22engine%22%3A%22whisper%22%7D%7D%5D%2C%22output_type%22%3A%22json%22%2C%22multilingual%22%3A%7B%22enabled%22%3Atrue%7D%2C%22content_type%22%3A%22audio%2Fmp3%22%7D`,
+    const API_KEY = getRandomKey(AISecrets.oneai.keys);
+    return fetchJson(`${AISecrets.oneai.apiEndpoint}/async/file?pipeline=%7B%22input_type%22%3A%22conversation%22%2C%22steps%22%3A%5B%7B%22skill%22%3A%22transcribe%22%2C%22params%22%3A%7B%22speaker_detection%22%3A${speakerDetection}%2C%22timestamp_per_word%22%3A${timestampPerWord}%2C%22timestamp_per_label%22%3A${timestampPerLabel}%2C%22engine%22%3A%22whisper%22%7D%7D%5D%2C%22output_type%22%3A%22json%22%2C%22multilingual%22%3A%7B%22enabled%22%3Atrue%7D%2C%22content_type%22%3A%22audio%2Fmp3%22%7D`,
         {
             headers: {
-                "api-key": _API_KEY,
+                "api-key": API_KEY,
                 "Content-Type": "application/json",
             },
             body: file,
@@ -185,10 +198,10 @@ const transcribe = (file, options = {}) => new Promise((resolve, reject) => {
             const taskId = res.task_id;
             const checkStatus = new Promise((resolve, reject) => {
                 const interval = setInterval(async () => {
-                    const taskStatus = await fetchJson(`${AISecrets.AIAPI}/async/tasks/${taskId}`,
+                    const taskStatus = await fetchJson(`${AISecrets.oneai.apiEndpoint}/async/tasks/${taskId}`,
                         {
                             headers: {
-                                "api-key": _API_KEY,
+                                "api-key": API_KEY,
                                 "Content-Type": "application/json",
                             }
                         });
@@ -210,6 +223,214 @@ const transcribe = (file, options = {}) => new Promise((resolve, reject) => {
         );
 });
 
+/**
+ * Detect AI content.
+ * @param {string} text - Text to check
+ * @returns {Promise} - The score of the AI content
+ * @example
+ * aiContentDetector('My name is John Doe. I live in New York City.')
+ * // => score: 0.000051
+ */
+const aiContentDetector = (text) => new Promise((resolve, reject) => {
+
+    console.log(`Checking for AI content for the following text: ${text.substring(0, 100)}...`)
+
+    if (!text) return reject({ message: 'Text is empty', code: 0 });
+    if (text.length > 25000) return reject({ message: 'Text is too long', code: 1 });
+
+    const result = text.length < 1500 ?
+        fetchJson(AISecrets.contentDetector.short.apiEndpoint, {
+            "headers": {
+                "accept": "text/plain, */*; q=0.01",
+                "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            },
+            "body": `action=ai_content_detector_recaptcha&inputs=${text.split(' ').join('+')}&token=`,
+            "method": "POST",
+            "user-agent": randomUserAgent()
+        })
+            .then(data => {
+                console.log(data);
+                return data.find(item => item.label === 'LABEL_1').score
+            })
+        :
+        fetchJson(AISecrets.contentDetector.long.apiEndpoint, {
+            "headers": {
+                "accept": "application/json, text/plain, */*",
+                "content-type": "application/json",
+            },
+            "referrer": AISecrets.contentDetector.long.referrer,
+            "body": `{\"text\":\"${text}\"}`,
+            "method": "POST",
+            "user-agent": randomUserAgent()
+        })
+            .then(data => {
+                console.log(data);
+                return data.summary.human ? data.results[0].probability : 1 - data.results[0].probability
+            })
+    return result.then(data => {
+        resolve(data);
+    })
+        .catch(err => {
+            console.error(err);
+            return reject({ message: 'Unknown error, check logs', code: '2' });
+        })
+
+});
+
+/**
+ * Generate an excuse.
+ * @param {string} target - Target persona to generate excuse for.
+ * @param {string} messup - Messup to generate excuse for.
+ * @param {number} professionalism - Professionalism of the excuse.
+ * @returns {Promise} - The generated excuse.
+ */
+const excuseGenerator = (target, messup, professionalism) => new Promise((resolve, reject) => {
+    console.log(`Generating excuse for ${target} with messup of ${messup.length > 200 ? messup.substring(0, 200) + '...' : messup} and professionalism of ${professionalism}...`)
+
+    // check that professionalism is between 0-100
+    professionalism = professionalism > 100 ? 100 : professionalism < 0 ? 0 : professionalism;
+    // slice target to 50 chars
+    target = target.substring(0, 50);
+
+    return fetchJson(AISecrets.excuseGenerator.apiEndpoint, {
+        "headers": {
+            "accept": "*/*",
+            "accept-language": "en-US,en;q=0.9,he;q=0.8",
+            "content-type": "application/json",
+        },
+        "referrer": AISecrets.excuseGenerator.referrer,
+        "body": `{"0":{"json":{"messup":"${messup}","request":"","professionalism":${professionalism},"target":"${target}"}}}`,
+        "method": "POST",
+        "user-agent": randomUserAgent()
+    })
+        .then(data => {
+            const res = {
+                excuse: data[0].result.data.json.generation,
+                targetResponse: data[0].result.data.json.targetsGeneration,
+            }
+            resolve(res);
+        })
+        .catch(err => {
+            console.error(err);
+            reject(err);
+        })
+});
+
+/**
+ * Generate a random idea.
+ * @returns {Promise} - The generated idea.
+ * @example
+ * randomIdea()
+ * // => "A new way to make money"
+ */
+const randomIdea = () => new Promise(async (resolve, reject) => {
+    console.log(`Generating random idea...`)
+
+    fetchJson(AISecrets.randomIdea.apiEndpoint, {
+        "headers": {
+            "accept": "application/json, text/javascript, */*; q=0.01",
+            "accept-language": "en-US,en;q=0.9,he;q=0.8",
+            "x-requested-with": "XMLHttpRequest"
+        },
+        "body": null,
+        "method": "GET",
+        "user-agent": randomUserAgent()
+    })
+        .then(data => resolve(data.new_idea.idea))
+        .catch(err => {
+            console.error(err)
+            reject(err)
+        })
+})
+
+/**
+ * Interpret a dream.
+ * @param {string} dream - Dream to interpret.
+ * @returns {Promise} - The interpretation of the dream.
+ */
+const dreamInterpretation = (dream) => new Promise(async (resolve, reject) => {
+    console.log(`Interpreting dream: ${dream.substring(0, 100)}...`)
+
+    if (dream.split(' ').length < 5)
+        reject({ message: "Dream must be at least 5 words", code: 0 })
+
+    fetchJson(AISecrets.dreamInterpretation.apiEndpoint, {
+        "headers": {
+            "accept": "*/* ",
+            "accept-language": "en-US,en;q=0.9,he;q=0.8",
+            "content-type": "application/json",
+            "uid": generateUID(),
+        },
+        "referrer": AISecrets.dreamInterpretation.referrer,
+        "body": `{\"dream\":\"${dream}\",\"lat\":null,\"long\":null}`,
+        "method": "POST",
+        "user-agent": randomUserAgent()
+    })
+        .then(data => {
+            if (!data.success)
+                reject({ message: data, code: 1 })
+            resolve({
+                dream: data.dream.dream,
+                interpretation: data.dream.interpretation
+            })
+        })
+        .catch(err => {
+            console.error(err)
+            reject(err)
+        })
+
+})
+
+/**
+ * Fix SQL code.
+ * @param {string} sqlCode - SQL code to fix.
+ * @returns {Promise} - The fixed SQL code.
+ */
+const sqlFixer = (sqlCode) => new Promise(async (resolve, reject) => {
+    console.log(`Trying to fix the following SQL code: ${sqlCode}`)
+
+    // reaplce all newlines with \\n with regex
+    sqlCode = sqlCode.replace(/(\r\n|\n|\r)/gm, '\\n')
+    return fetchJson(`${AISecrets.sql.apiEndpoint}/7/execute`, {
+        "headers": {
+            "accept": "application/json",
+            "accept-language": "en-US,en;q=0.9,he;q=0.8",
+            "content-type": "application/json",
+        },
+        "body": `{\"variables\":{\"sql_query\":\"${sqlCode}\"},\"anonymous_id\":\"${generateUID()}\"}`,
+        "method": "POST",
+    })
+        .then(data => resolve(data.result))
+        .catch(err => {
+            console.error(err)
+            reject(err)
+        })
+})
+
+/**
+ * Explain SQL code.
+ * @param {string} sqlCode - SQL code to explain.
+ * @returns {Promise} - The explanation of the SQL code.
+ */
+const sqlExplainer = (sqlCode) => new Promise(async (resolve, reject) => {
+    console.log(`Trying to explain the following SQL code: ${sqlCode}`)
+    // reaplce all newlines with \\n with regex
+    sqlCode = sqlCode.replace(/(\r\n|\n|\r)/gm, '\\n')
+    return fetchJson(`${AISecrets.sql.apiEndpoint}/4/execute`, {
+        "headers": {
+            "accept": "application/json",
+            "content-type": "application/json",
+        },
+        "body": `{\"variables\":{\"query\":\"${sqlCode}\"},\"anonymous_id\":\"${generateUID()}\"}`,
+        "method": "POST",
+    })
+        .then(data => resolve(data.result))
+        .catch(err => {
+            console.error(err)
+            reject(err)
+        })
+})
+
 module.exports = {
     summarize,
     topics,
@@ -217,4 +438,10 @@ module.exports = {
     anonymize,
     htmlContent,
     transcribe,
+    aiContentDetector,
+    excuseGenerator,
+    randomIdea,
+    dreamInterpretation,
+    sqlFixer,
+    sqlExplainer
 };
