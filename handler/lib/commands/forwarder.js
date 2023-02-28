@@ -19,8 +19,20 @@ class Forwarder {
                 var release = await this.lock()
 
                 if (!this.groupsDB[name]) {
-
                     let messagesArr = await client.loadAndGetAllMessagesInChat(fromID, false);
+                    let fetchArr = []
+
+                    while (true) {
+                        console.log(`Getting more messages from ${name} group.`)
+                        fetchArr = await client.loadEarlierMessages(fromID);
+                        // if not array or empty array, break.
+                        if (!Array.isArray(fetchArr) || !fetchArr.length) break;
+                        console.log(`Loaded ${fetchArr.length} more messages from ${name} group.`)
+                        messagesArr.push(...fetchArr)
+
+                    };
+                    console.log(`Loaded ${messagesArr.length} messages from ${name} group.`)
+                    // console.log(`These are the messages: ${messagesArr.map(m => m.id)}`)
                     this.groupsDB[name] = [];
                     messagesArr.forEach(message => {
                         this.groupsDB[name].push(message.id);
