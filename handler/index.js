@@ -400,10 +400,11 @@ const msgHandler = async (client, message) => {
                 .catch(err => { client.reply(from, errors.UNKNOWN(), id); console.error(err) });
             break;
         case 'filesFromURL':
-            result.info
-                .forEach(link =>
-                    client.sendFileFromUrl(from, link, '', '', id, null)
-                        .catch(err => { client.reply(from, errors.UNKNOWN(), id); console.error(err) }));
+            for (let i = 0; i < result.info.length; i++) {
+                let link = result.info[i];
+                await client.sendFileFromUrl(from, link, 'themultitasker.png', '', id)
+                    .catch(err => { client.reply(from, errors.UNKNOWN(), id); console.error(err) });
+            }
             break;
         case 'sendFile':
             await client.sendFile(from, result.info.path, result.info.fileName, result.info.title, id)
