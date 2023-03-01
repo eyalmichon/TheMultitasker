@@ -1,4 +1,4 @@
-const { fetchJson } = require('../util/fetcher');
+const { fetchJson, fetchText } = require('../util/fetcher');
 const { AISecrets } = require('../util/secrets.json');
 const { randomUserAgent } = require('../util/utilities');
 
@@ -431,6 +431,144 @@ const sqlExplainer = (sqlCode) => new Promise(async (resolve, reject) => {
         })
 })
 
+/**
+ * Base function for the wonderful.
+ * @param {*} options includes body
+ */
+const wonderfulBase = (options) => new Promise((resolve, reject) => {
+
+    return fetchJson(AISecrets.wonderful.apiEndpoint, {
+        "headers": {
+            "accept": "*/*",
+            "accept-language": "en-US,en;q=0.9,he;q=0.8",
+            "content-type": "application/json",
+        },
+        "body": options.body,
+        "method": "POST",
+        "user-agent": randomUserAgent()
+    })
+        .then(async res => {
+            let status = res.status
+            let id = res.id
+            let result
+            // set status to failed after 30 seconds
+            let timer = setTimeout(() => {
+                status = 'timeout'
+            }, 30000)
+            while (status !== 'succeeded' && status !== 'timeout') {
+                await fetchJson(`${AISecrets.wonderful.apiEndpoint}/${id}`, {
+                    "headers": {
+                        "accept": "*/*",
+                        "accept-language": "en-US,en;q=0.9,he;q=0.8",
+                    },
+                    "body": null,
+                    "method": "GET",
+                    "user-agent": randomUserAgent()
+                })
+                    .then(res => {
+                        status = res.status
+                        result = res.output
+                    })
+                await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+            clearTimeout(timer)
+
+            if (status === 'succeeded')
+                resolve(result)
+
+            else
+                reject({ message: result, code: status })
+        })
+})
+/**
+ * Colorize an image.
+ * @param {Buffer} buffer - Image to colorize.
+ * @param {Object} options - Options for the colorization.
+ * @param {string} options.url - URL to colorize.
+ * @returns {Promise} - The colorized image.
+ */
+const colorizeImage = (buffer, options) => new Promise((resolve, reject) => {
+    console.log(`Colorizing image...`)
+
+    let link = options?.url || buffer
+    let _options = {
+        body: JSON.stringify(
+            {
+                "version": "9451bfbf652b21a9bccc741e5c7046540faa5586cfa3aa45abc7dbb46151a4f7",
+                "input": {
+                    "image": link,
+                    "mode": "Real Gray Colorization",
+                    "classes": "88"
+                }
+            })
+    }
+    return wonderfulBase(_options)
+        .then(res => resolve(res.map(link => link.image)))
+        .catch(err => {
+            console.error(err);
+            reject(err);
+        });
+})
+
+/**
+ * Upscale an image.
+ * @param {Buffer} buffer - Image to upscale.
+ * @param {Object} options - Options for the upscaling.
+ * @param {string} options.url - URL to upscale.
+ * @returns {Promise} - The upscaled image.
+ */
+const upscaleImage = (buffer, options) => new Promise((resolve, reject) => {
+    console.log(`Upscaling image...`)
+    let link = options?.url || buffer
+    let _options = {
+        body: JSON.stringify(
+            {
+                "version": "9283608cc6b7be6b65a8e44983db012355fde4132009bf99d976b2f0896856a3",
+                "input": {
+                    "img": link,
+                    "version": "v1.4",
+                    "scale": 2
+                }
+            })
+    }
+    return wonderfulBase(_options)
+        .then(res => resolve(res))
+        .catch(err => {
+            console.error(err);
+            reject(err);
+        });
+})
+
+/**
+ * Generate a prayer.
+ * @param {string} text - Text to generate a prayer for.
+ * @param {string} type - Type of prayer to generate. Can be 'bible' or 'quran'.
+ * @returns {Promise} - The generated prayer.
+ */
+const prayerGPT = (text, type) => new Promise((resolve, reject) => {
+    console.log(`Generating prayer for ${text.length > 100 ? text.substring(0, 100) + '...' : text}`)
+
+    if (!['bible', 'quran'].includes(type))
+        return reject({ message: 'Invalid type', code: 0 })
+
+    return fetchText(AISecrets.prayer.apiEndpoint, {
+        "headers": {
+            "accept": "text/plain, */*; q=0.01",
+            "accept-language": "en-US,en;q=0.9,he;q=0.8",
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "x-requested-with": "XMLHttpRequest"
+        },
+        "body": `input=${text}&book=${type}`,
+        "method": "POST",
+        "user-agent": randomUserAgent()
+    })
+        .then(res => resolve(res.substring(res.indexOf('<hr />') + 6, res.length - 6).replace(/<br \/>/g, '\n')))
+        .catch(err => {
+            console.error(err);
+            reject({ message: err, code: 1 });
+        });
+})
+
 module.exports = {
     summarize,
     topics,
@@ -443,5 +581,8 @@ module.exports = {
     randomIdea,
     dreamInterpretation,
     sqlFixer,
-    sqlExplainer
+    sqlExplainer,
+    colorizeImage,
+    upscaleImage,
+    prayerGPT
 };

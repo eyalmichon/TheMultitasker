@@ -1310,6 +1310,54 @@ const help = {
                 aliases: ["sqlexplainer", "sqle"]
             }
         }),
+        colorizeImage: generateCommandString({
+            cmdName: "colorizeimage",
+            cmdDescription: "Colorize an image.",
+            cmdUsage: {
+                usage: "colorizeimage with an image or reply to an image with the command.",
+                options: [
+                    {
+                        name: "Link",
+                        description: "The link to the image.",
+                        usage: "Just send the commands with the link.",
+                        default: "None"
+                    }
+                ],
+                aliases: ["colorizeimage", "colorize"]
+            }
+        }),
+        upscaleImage: generateCommandString({
+            cmdName: "upscaleimage",
+            cmdDescription: "Upscale an image.",
+            cmdUsage: {
+                usage: "upscaleimage with an image or reply to an image with the command.",
+                options: [
+                    {
+                        name: "Link",
+                        description: "The link to the image.",
+                        usage: "Just send the commands with the link.",
+                        default: "None"
+                    }
+                ],
+                aliases: ["upscaleimage", "upscale"]
+            }
+        }),
+        prayer: generateCommandString({
+            cmdName: "prayer",
+            cmdDescription: "Get a prayer for a certain topic.",
+            cmdUsage: {
+                usage: "prayer [text to generate a prayer for]",
+                options: [
+                    {
+                        name: "Prayer Type",
+                        description: "The type of prayer.",
+                        usage: "-type=[bible, quran]",
+                        default: "bible"
+                    }
+                ],
+                aliases: ["prayer"]
+            }
+        }),
     },
     Sticker: {
         sticker: generateCommandString({

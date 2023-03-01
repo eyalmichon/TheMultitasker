@@ -2,6 +2,7 @@ const { b, m, i, help, returnType, prefix } = require("./helper");
 const { errors } = require('./errors');
 const { decryptMedia } = require("@open-wa/wa-automate");
 const { recognize, doesntExist, downloader, fetcher, parser, imagine, ai } = require("..");
+const { uploadImage } = require("../../util/fetcher");
 
 class AI {
 
@@ -59,6 +60,14 @@ class AI {
 
         commands.sqlexplainer = this.addInfo(this.sqlExplainer)
         commands.sqle = this.alias(this.sqlExplainer)
+
+        commands.colorizeimage = this.addInfo(this.colorizeImage)
+        commands.colorize = this.alias(this.colorizeImage)
+
+        commands.upscaleimage = this.addInfo(this.upscaleImage)
+        commands.upscale = this.alias(this.upscaleImage)
+
+        commands.prayer = this.addInfo(this.prayer)
     }
 
     recognizeMusic = {
@@ -450,6 +459,75 @@ class AI {
         help: () => help.AI.sqlExplainer,
         timer: () => this.defaultTimer
     }
+
+    colorizeImage = {
+        func: async (message) => {
+            const options = parser.parse(message.args);
+
+            if (message.type !== 'image' && (message.quotedMsg && message.quotedMsg.type !== 'image') && !options.url) return errors.BAD_CMD;
+
+            const link = options.url || await decryptMedia(message.quotedMsg || message).then(buffer => uploadImage(buffer)).catch(err => {
+                console.error(err);
+                return errors.UNKNOWN();
+            });
+
+            if (!link) return errors.UNKNOWN();
+
+            return ai.colorizeImage(link)
+                .then(result => returnType.filesFromURL(result))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN();
+                })
+        },
+        help: () => help.AI.colorizeImage,
+        timer: () => this.defaultTimer
+    }
+
+    upscaleImage = {
+        func: async (message) => {
+            const options = parser.parse(message.args);
+
+            if (message.type !== 'image' && (message.quotedMsg && message.quotedMsg.type !== 'image') && !options.url) return errors.BAD_CMD;
+
+            const link = options.url || await decryptMedia(message.quotedMsg || message).then(buffer => uploadImage(buffer)).catch(err => {
+                console.error(err);
+                return errors.UNKNOWN();
+            });
+
+
+            if (!link) return errors.UNKNOWN();
+
+            return ai.upscaleImage(link)
+                .then(result => returnType.fileFromURL(result, 'upscaled.jpg', 'Upscaled image'))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN();
+                })
+        },
+        help: () => help.AI.upscaleImage,
+        timer: () => this.defaultTimer
+    }
+
+    prayer = {
+        func: (message) => {
+            const options = parser.parse(message.args);
+            const type = options.type || 'bible';
+            const text = options.joinedText;
+            if (!text) return errors.EMPTY_TEXT;
+
+            return ai.prayerGPT(text, type)
+                .then(result => returnType.reply(result))
+                .catch(err => {
+                    console.error(err);
+                    return errors.UNKNOWN();
+                })
+        },
+        help: () => help.AI.prayer,
+        timer: () => this.defaultTimer
+    }
+
+
 
 }
 

@@ -85,6 +85,9 @@ Command pattern used for easy management of adding more commands.
   - Dream Interpretation. 🌙
   - SQL Fixer. 🐛
   - SQL Explainer. 📖
+  - Colorize image. 🎨
+  - Upscale image. 🖼
+  - Generate prayers. 🙏
 
 
 - ### Forwarder Commands ⏩:
