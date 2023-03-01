@@ -62,6 +62,31 @@ const isFloat = string => [...string].every(c => '0123456789.'.includes(c)) && (
  */
 const isBetween = (value, min, max) => min <= value && value <= max;
 
+/**
+ * Function for checking the magic number of a file.
+ * more info: https://en.wikipedia.org/wiki/List_of_file_signatures
+ * @param {Buffer} buffer The buffer of the file.
+ * @returns the file type.
+ */
+const getFileTypeFromBuffer = (buffer) => {
+    const types = {
+        'ffd8': 'jpg',
+        '8950': 'png',
+        'fffb': 'mp3',
+        '4949': 'tiff',
+        '424d': 'bmp',
+        '4749': 'gif',
+        '2550': 'pdf',
+        '504b': 'zip',
+        '5261': 'rar',
+        '1f8b': 'gz',
+        '4d5a': 'exe',
+
+    }
+    const hex = buffer.toString('hex', 0, 2)
+    return types[hex]
+}
+
 const base64Logo = `iVBORw0KGgoAAAANSUhEUgAAAh8AAAM3CAYAAACd1TI+AAAACXBIWXMAAAsSAAALEgHS3X78AAAgAElEQVR4nO3dP28bx7rH8eVB
 etu3YmednBdgBSe9FTAE2EW3SForTVJGqZyGiAw2cXWUMmkit3ERuSNAE5H6BJFewHGkjtW19Qp4Mcqzzpg7u9w/s7vz5/sBhJxD
 2Za4XO7++MwzM4P1ep0AgKtG48nexq+2I18mu0mS3DU8XtWVfJlkvrdczM8Mfw5ADsIHgM6MxhM9OOihQv/fKkDc8fxVOdf+90WS
@@ -349,5 +374,6 @@ module.exports = {
     isBetween,
     randomUserAgent,
     getTime,
+    getFileTypeFromBuffer,
     base64Logo
 }

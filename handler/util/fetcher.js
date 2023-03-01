@@ -1,9 +1,9 @@
 const fetch = require('node-fetch');
 const fs = require('fs');
 const FormData = require('form-data');
-const fileType = require('file-type');
 const AbortController = require('abort-controller');
 const secrets = require('../util/secrets.json');
+const { getFileTypeFromBuffer } = require('./utilities');
 
 // 500 MB
 const MAX_SIZE_ALLOWED = 524288000;
@@ -159,7 +159,7 @@ const fetchToFile = (url, extension, options = {}) => new Promise((resolve, reje
  * @param {Buffer} buffer Image Buffer
  */
 const uploadImage = (buffer) => new Promise((resolve, reject) => {
-    const { ext } = fileType(buffer)
+    ext = getFileTypeFromBuffer(buffer)
     if (![`jpeg`, `jpg`, `png`].includes(ext)) throw 'UNSUPPORTED_FILETYPE';
 
     let form = new FormData();
@@ -189,7 +189,7 @@ const uploadImage = (buffer) => new Promise((resolve, reject) => {
  * @returns uploaded file's link.
  */
 const uploadFile = (buffer) => new Promise((resolve, reject) => {
-    const { ext } = fileType(buffer)
+    const { ext } = getFileTypeFromBuffer(buffer)
     fetch(`http://transfer.sh/${getRandomFileName()}.${ext}`, {
         method: "put",
         body: buffer
@@ -203,7 +203,7 @@ const uploadFile = (buffer) => new Promise((resolve, reject) => {
 })
 
 const fetchFileType = (buffer) => {
-    try { return fileType(buffer).ext }
+    try { return getFileTypeFromBuffer(buffer) }
     catch { return null }
 }
 
