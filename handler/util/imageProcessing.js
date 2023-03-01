@@ -4,8 +4,8 @@ const FormData = require('form-data');
 const sharp = require('sharp');
 const { createCanvas, loadImage, registerFont } = require('canvas')
 const Color = require('color');
-const { removebg } = require('./secrets.json');
-const { isInt, isBetween } = require('./utilities');
+const { removeBackground } = require('./secrets.json');
+const { isInt, isBetween, randomUserAgent } = require('./utilities');
 registerFont('./handler/util/fonts/SecularOne-Regular.ttf', { family: 'Secular' })
 // FOR DEBUGGING
 // registerFont('./fonts/SecularOne-Regular.ttf', { family: 'Secular' })
@@ -196,8 +196,8 @@ const removeBG = (buffer, options = {}) => new Promise((resolve, reject) => {
     form.append('image_file', buffer)
     form.append('size', 'auto')
 
-    let i = Math.floor(Math.random() * removebg.length)
-    let randomKey = removebg[i]
+    let i = Math.floor(Math.random() * removeBackground.removebg.length)
+    let randomKey = removeBackground.removebg[i]
     console.log(`Using key number ${i} in from the array.`)
 
     fetcher.fetchJson('https://api.remove.bg/v1.0/removebg', {
@@ -215,8 +215,19 @@ const removeBG = (buffer, options = {}) => new Promise((resolve, reject) => {
             console.error(err);
             console.log('Trying another API...');
             fetcher.uploadImage(buffer)
-                .then(imgLink => fetcher.fetchBase64('https://bg.experte.de/?url=' + imgLink))
-                .then(base64 => resolve(new Buffer.from(base64, 'base64')))
+                .then(imgLink => fetcher.fetchText(removeBackground.rembg.apiEndpoint, {
+                    "headers": {
+                        "accept": "*/*",
+                        "accept-language": "en-US,en;q=0.9,he;q=0.8",
+                        "content-type": "application/json",
+                    },
+                    "body": `{\"imageUrl\":\"${imgLink}\"}`,
+                    "method": "POST",
+                    "user-agent": randomUserAgent()
+                }))
+                .then(res => res.substring(1, res.length - 1))
+                .then(res => fetcher.fetchBuffer(res))
+                .then(buffer => resolve(buffer))
                 .catch(err => {
                     console.error(err);
                     reject(err);
