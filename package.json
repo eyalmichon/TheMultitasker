@@ -34,7 +34,7 @@
     "sharp": "^0.30.7",
     "tiktok-scraper": "^1.4.36",
     "user-agents": "^1.0.1051",
-    "youtube-dl-exec": "^2.1.11",
+    "youtube-dl-exec": "^2.3.1",
     "ytdl-core": "^4.11.2"
   }
 }
