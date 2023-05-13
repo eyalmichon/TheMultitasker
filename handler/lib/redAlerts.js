@@ -1,4 +1,4 @@
-const { fetchWithTimeout } = require('../util/fetcher')
+const { fetch } = require('../util/fetcher')
 const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
