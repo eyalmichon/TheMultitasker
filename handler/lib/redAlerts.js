@@ -97,7 +97,7 @@ const alerts = async (client, getGroup) => {
 
     let requestOptions = {
         method: 'GET',
-        headers: config.RedAlerts.requestOptions
+        headers: config.RedAlerts.requestOptions.headers
     };
 
 
