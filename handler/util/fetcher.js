@@ -227,6 +227,7 @@ const fetchImageBuffer = (url) => new Promise(async (resolve, reject) => {
 
 
 module.exports = {
+    fetch,
     fetchJson,
     fetchText,
     fetchBase64,
