@@ -31,15 +31,21 @@ converter.cleanTmp();
 
 // Set the host number globally.
 async function setupBot(client) {
+    console.log('Setting up bot...')
+    console.log('Getting host number...')
     hostNumber = await client.getHostNumber() + '@c.us';
 
     // get all groups where bot is admin.
+    console.log('Getting all groups bot is part of...')
     const groups = await client.getAllGroups()
+    console.log('Getting all groups id\'s...')
     const groupIDs = groups.map(group => group.groupMetadata.id)
     const botAdminListPromises = []
+    console.log('Getting all groups admin list...')
     groupIDs.forEach(groupID => botAdminListPromises.push(client.getGroupAdmins(groupID).then(admins => admins.includes(hostNumber) ? groupID : false)))
     botAdminList = await Promise.all(botAdminListPromises)
     botAdminList = botAdminList.filter(id => id !== false)
+    console.log('Done setting up bot.')
 }
 
 /**
@@ -92,7 +98,7 @@ const restartHandler = async (client, cmds) => {
         switch (cmd) {
             case 'redalerts':
                 if (redAlerts.getState())
-                    commands.execute(cmd, { args: ['on'], getGroup: getGroup }, client)
+                    commands.execute(cmd, { args: ['on'], getGroup }, client)
                 break;
             default:
                 break;

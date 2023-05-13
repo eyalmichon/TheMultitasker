@@ -6,7 +6,7 @@ const config = require('../util/config.json');
 const json = require('../util/redAlerts/cities.json');
 
 var map = fs.readFileSync(path.join(__dirname, '../util/redAlerts/map.html'), 'utf8');
-var isActivated = config.RedAlerts.Activated;
+var isActivated = false
 
 /**
  * Change the isActivated state from true to false or the other way around.
@@ -44,7 +44,7 @@ function findCities(cities) {
         // get city data from json file.
         cityData = json[city];
         // if the city's zone isn't in the dictionary
-        if (!info[cityData.zone])
+        if (!cityData || !cityData.zone || !info[cityData.zone])
             // add an empty array with the zone as a key.
             info[cityData.zone] = [];
         // add the city name into the array of the zone's key
@@ -106,11 +106,9 @@ const alerts = async (client, getGroup) => {
             // fetch the json file from the official servers.
             let response = await fetch(redAlertsURL, requestOptions);
             let text = await response.text()
-            if (text.length <= 3) {
-                sleep(1500);
-            }
-            else {
-                let data = JSON.parse(text);
+            if (text.length > 3) {
+                // get rid of the first letter
+                let data = JSON.parse(text.substring(1, text.length));
                 if (prevID != data.id && data != prevJson) {
                     prevID = data.id;
                     prevJson = data;
@@ -126,8 +124,8 @@ const alerts = async (client, getGroup) => {
                         else
                             alert += "*• " + area + ":* " + city.join(', ') + " (" + firstCity.countdown + " שניות)\n\n";
                     }
-                    // console.log(prevID, data.title, cities);
-                    alert += "```בוט שומר החומות```";
+                    console.log(prevID, data.title, cities);
+                    alert += "```🧙‍♂️ The Multitasker 🚀```";
 
                     // send to groups only alert without image.
                     getGroup('RedAlerts-MessageOnly').forEach(groupM => {
@@ -135,30 +133,33 @@ const alerts = async (client, getGroup) => {
                     })
 
                     // only send an image if there is more than one city.
-                    if (data.data.length > 1) {
-                        puppeteer.launch().then(async browser => {
-                            const page = await browser.newPage();
-                            page.setViewport({ width: 500, height: 500 });
-                            let mapCpy = map.replace('LONG_LAT_AREA', getLongLat(data.data));
-                            // set contents of the page.
-                            await page.setContent(mapCpy);
-                            // save image in base64.
-                            var base64 = await page.screenshot({ encoding: "base64" });
-                            // send to all group memebers.
-                            getGroup('RedAlerts').forEach(async groupM => {
-                                console.log('sending alert with image to: ' + groupM);
-                                await client.sendImage(groupM, `data:image/png;base64,${base64}`, '', alert);
-                            });
-                            await browser.close();
-                        });
-                    }
-                    else {
-                        getGroup('RedAlerts').forEach(groupM => {
-                            client.sendText(groupM, alert);
-                        });
-                    }
+                    // if (data.data.length > 1) {
+                    //     puppeteer.launch().then(async browser => {
+                    //         const page = await browser.newPage();
+                    //         page.setViewport({ width: 500, height: 500 });
+                    //         let mapCpy = map.replace('LONG_LAT_AREA', getLongLat(data.data));
+                    //         // set contents of the page.
+                    //         await page.setContent(mapCpy);
+                    //         // save image in base64.
+                    //         var base64 = await page.screenshot({ encoding: "base64" });
+                    //         // send to all group memebers.
+                    //         getGroup('RedAlerts').forEach(async groupM => {
+                    //             console.log('sending alert with image to: ' + groupM);
+                    //             await client.sendFile(groupM, `data:image/png;base64,${base64}`, 'the_multitasker.png', alert);
+                    //         });
+                    //         await browser.close();
+                    //     });
+                    // }
+                    // else {
+                    getGroup('RedAlerts').forEach(groupM => {
+                        client.sendText(groupM, alert);
+                    });
+                    // }
                 }
             }
+            else
+                console.log('no alerts');
+
 
         } catch (error) {
             console.log('Fetch timed out!\nError was: ' + error);
