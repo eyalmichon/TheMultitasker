@@ -304,7 +304,7 @@ const textToImage = (text, options = {}) => new Promise(async (resolve, reject) 
     puppeteer.launch({ headless: true }).then(async browser => {
         const page = await browser.newPage();
         await page.setUserAgent(imagineSecrets.userAgent);
-        await page.goto('https://google.com/');
+        await page.goto(imagineSecrets.base);
 
         const result = await page.evaluate(async (bearerToken, text, options, imagineSecrets) => {
             return fetch(`${imagineSecrets.apiUrl}/generate`, {
