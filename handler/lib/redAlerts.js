@@ -111,7 +111,7 @@ const alerts = async (client, getGroup) => {
             }
             else {
                 let data = await response.json();
-                if (prevID != data.id && prevJson != prevJson) {
+                if (prevID != data.id && data != prevJson) {
                     prevID = data.id;
                     prevJson = data;
                     let cities = findCities(data.data);
@@ -146,6 +146,7 @@ const alerts = async (client, getGroup) => {
                             var base64 = await page.screenshot({ encoding: "base64" });
                             // send to all group memebers.
                             getGroup('RedAlerts').forEach(async groupM => {
+                                console.log('sending alert with image to: ' + groupM);
                                 await client.sendImage(groupM, `data:image/png;base64,${base64}`, '', alert);
                             });
                             await browser.close();
