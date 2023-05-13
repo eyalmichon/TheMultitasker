@@ -97,7 +97,7 @@ const restartHandler = async (client, cmds) => {
     cmds.forEach(cmd => {
         switch (cmd) {
             case 'redalerts':
-                if (redAlerts.getState())
+                if (redAlerts.getStateBeforeRestart())
                     commands.execute(cmd, { args: ['on'], getGroup }, client)
                 break;
             default:

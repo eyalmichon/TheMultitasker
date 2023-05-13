@@ -22,6 +22,13 @@ const changeState = (bool) => {
  */
 const getState = () => { return isActivated; }
 
+/**
+ * Get the state of the red alerts before restart
+ * @returns the state of the red alerts before restart
+ */
+const getStateBeforeRestart = () => { return config.RedAlerts.Activated; }
+
+
 // get an array of longitude and latitude of the given cities from the json file.
 function getLongLat(cities) {
     longLatArr = [];
@@ -173,5 +180,6 @@ const alerts = async (client, getGroup) => {
 module.exports = {
     alerts,
     changeState,
-    getState
+    getState,
+    getStateBeforeRestart
 }
