@@ -110,7 +110,7 @@ const alerts = async (client, getGroup) => {
                 sleep(1500);
             }
             else {
-                let data = await response.json();
+                let data = JSON.parse(text);
                 if (prevID != data.id && data != prevJson) {
                     prevID = data.id;
                     prevJson = data;
