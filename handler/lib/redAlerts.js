@@ -107,7 +107,7 @@ const alerts = async (client, getGroup) => {
         headers: config.RedAlerts.requestOptions.headers
     };
 
-
+    let noAlertsCount = 60;
     while (isActivated) {
         try {
             // fetch the json file from the official servers.
@@ -164,8 +164,13 @@ const alerts = async (client, getGroup) => {
                     // }
                 }
             }
-            else
-                console.log('no alerts');
+            else {
+                noAlertsCount++;
+                if (noAlertsCount == 60) {
+                    console.log('Red Alerts - no alerts for the last minute');
+                    noAlertsCount = 0;
+                }
+            }
 
 
         } catch (error) {
