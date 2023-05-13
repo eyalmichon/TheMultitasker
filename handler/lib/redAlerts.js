@@ -107,7 +107,7 @@ const alerts = async (client, getGroup) => {
         headers: config.RedAlerts.requestOptions.headers
     };
 
-    let noAlertsCount = 60;
+    let noAlertsCount = 0;
     while (isActivated) {
         try {
             // fetch the json file from the official servers.
