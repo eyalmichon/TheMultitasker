@@ -104,9 +104,12 @@ const alerts = async (client, getGroup) => {
     while (isActivated) {
         try {
             // fetch the json file from the official servers.
-            let response = await fetchWithTimeout(redAlertsURL, requestOptions, 4000);
-            let length = await response.headers.get('content-length');
-            if (length > 0) {
+            let response = await fetch(redAlertsURL, requestOptions);
+            let text = await response.text()
+            if (text.length <= 3) {
+                sleep(1500);
+            }
+            else {
                 let data = await response.json();
                 if (prevID != data.id && prevJson != prevJson) {
                     prevID = data.id;

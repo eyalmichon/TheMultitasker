@@ -2,8 +2,26 @@
     "RedAlerts": {
         "url": "https://www.oref.org.il/WarningMessages/alert/alerts.json",
         "requestOptions": {
-            "X-Requested-With": "XMLHttpRequest",
-            "Referer": "https://www.oref.org.il/"
+            "headers": {
+                "accept": "* /*",
+                "accept-encoding": "gzip, deflate, br",
+                "accept-language": "en-US,en;q=0.9,he;q=0.8",
+                "cache-control": "no-cache",
+                "connection": "keep-alive",
+                "content-type": "application/json;charset=utf-8",
+                "cookie": "ASP.NET_SessionId=4ynohigdk4a2chdbyjl5xat1; pakarGeoLocation=unknown; Lastalerts=; TS013a1194=010f83961dd96505c2c99ba22dd81ba159c9fa92c7e4255ead7280546f06039e3022edbffe65561518d61351e1b8b53fe244bc7d3eb5631d004d7d3557f8a9a2df1abd156a; zdSessionId_98861531=e7a7f9f0-1650-4180-9bb6-04adcc49f2ed",
+                "host": "www.oref.org.il",
+                "pragma": "no-cache",
+                "referer": "https://www.oref.org.il/12481-he/Pakar.aspx",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+                "x-requested-with": "XMLHttpRequest",
+                "sec-ch-ua": "\"Google Chrome\";v=\"113\", \"Chromium\";v=\"113\", \"Not-A.Brand\";v=\"24\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "Windows"
+            }
         },
         "Activated": false
     },
