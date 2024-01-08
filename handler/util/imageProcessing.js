@@ -1,8 +1,8 @@
 const { fetcher } = require('../lib/index');
 const FormData = require('form-data');
-// must be before canvas.
-const sharp = require('sharp');
+// must be before sharp.
 const { createCanvas, loadImage, registerFont } = require('canvas')
+const sharp = require('sharp');
 const Color = require('color');
 const { removeBackground } = require('./secrets.json');
 const { isInt, isBetween, randomUserAgent } = require('./utilities');
