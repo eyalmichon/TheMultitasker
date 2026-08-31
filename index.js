@@ -32,10 +32,10 @@ const start = async (client = new Client()) => {
     // Mutex lock for handleUnread.
     const lock = mutexify()
 
-    // refresh the client every 2 hours.
+    // refresh the client every 2 hours (7200000 ms).
     setInterval(() => {
         client.kill();
-    }, 3600000 * 2)
+    }, 7200000)
 
     // Set the host number globally.
     await setupBot(client);
