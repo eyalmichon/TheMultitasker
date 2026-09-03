@@ -17,6 +17,14 @@
    <img src="./release.png"/>
    </div>
 
+## Entry Point
+
+`index.js` is the process entry point (`main` in `package.json`). On startup it creates a `wa-automate` `Client`, then calls `start(client)`, which:
+
+- Sets up the bot via `setupBot`, restarts background commands (e.g. `redalerts`) that were active before a restart, and processes any unread messages on connect.
+- Registers `onMessage`/`onAnyMessage` listeners that dispatch to the command handlers in `handler/` (`msgHandler`, `forwardHandler`, `autoRemoveHandler`, `welcomeMsgHandler`).
+- Recycles the WhatsApp client every 2 hours via `setInterval`, and force-refocuses on `CONFLICT`/`DISCONNECTED` state changes to keep the session alive.
+
 ## Features
 
 Command pattern used for easy management of adding more commands.
