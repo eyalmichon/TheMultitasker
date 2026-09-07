@@ -32,7 +32,7 @@ const start = async (client = new Client()) => {
     // Mutex lock for handleUnread.
     const lock = mutexify()
 
-    // refresh the client every 2 hours.
+    // Refresh the client every 2 hours to avoid long-lived session drift/memory buildup.
     setInterval(() => {
         client.kill();
     }, 3600000 * 2)
